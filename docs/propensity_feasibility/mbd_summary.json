@@ -1,0 +1,123 @@
+{
+  "scope": "all Parquet footers; full detail event_time columns where footer bounds absent; all target and client_split rows",
+  "tables": {
+    "client_split": {
+      "files": 1000,
+      "rows": 100224,
+      "bytes": 7473868
+    },
+    "targets": {
+      "files": 435,
+      "rows": 1202688,
+      "bytes": 11530776
+    },
+    "detail/trx": {
+      "files": 400,
+      "rows": 38764930,
+      "bytes": 677286570,
+      "min_time": "2020-12-31 21:00:02.169545",
+      "max_time": "2022-12-31 20:59:58.460193",
+      "null_event_times": 0,
+      "scanned_time_column_files": 400
+    },
+    "detail/geo": {
+      "files": 460,
+      "rows": 66295724,
+      "bytes": 832478943,
+      "min_time": "2021-12-11 19:27:07.507106",
+      "max_time": "2022-12-31 20:59:58.725788",
+      "null_event_times": 0,
+      "scanned_time_column_files": 460
+    },
+    "detail/dialog": {
+      "files": 415,
+      "rows": 217205,
+      "bytes": 673942830,
+      "min_time": "2021-02-10 09:36:07.022271",
+      "max_time": "2022-12-31 20:25:11.730797",
+      "null_event_times": 0,
+      "scanned_time_column_files": 415
+    },
+    "ptls/trx": {
+      "files": 335,
+      "rows": 98721,
+      "bytes": 466967933
+    },
+    "ptls/geo": {
+      "files": 365,
+      "rows": 72573,
+      "bytes": 543224055
+    },
+    "ptls/dialog": {
+      "files": 410,
+      "rows": 46320,
+      "bytes": 672572671
+    }
+  },
+  "target_rows": 1202688,
+  "target_users": 100224,
+  "split_users": 100224,
+  "split_rows": 100224,
+  "target_users_missing_split": 0,
+  "split_users_without_targets": 0,
+  "duplicate_client_month_rows": 0,
+  "conflicting_split_clients": 0,
+  "target_split_fold_mismatch_rows": 0,
+  "target_null_cells": {
+    "client_id": 0,
+    "mon": 0,
+    "target_1": 0,
+    "target_2": 0,
+    "target_3": 0,
+    "target_4": 0,
+    "trans_count": 0,
+    "diff_trans_date": 120786,
+    "fold": 0
+  },
+  "months": [
+    "2022-02-28",
+    "2022-03-31",
+    "2022-04-30",
+    "2022-05-31",
+    "2022-06-30",
+    "2022-07-31",
+    "2022-08-31",
+    "2022-09-30",
+    "2022-10-31",
+    "2022-11-30",
+    "2022-12-31",
+    "2023-01-31"
+  ],
+  "labels": {
+    "target_1": {
+      "counts": {
+        "0": 1197326,
+        "1": 5362
+      },
+      "positive_rate": 0.004458346636866752
+    },
+    "target_2": {
+      "counts": {
+        "0": 1202111,
+        "1": 577
+      },
+      "positive_rate": 0.00047975867390378883
+    },
+    "target_3": {
+      "counts": {
+        "0": 1198158,
+        "1": 4530
+      },
+      "positive_rate": 0.0037665628991060025
+    },
+    "target_4": {
+      "counts": {
+        "0": 1199628,
+        "1": 3060
+      },
+      "positive_rate": 0.0025443007662835247
+    }
+  },
+  "limitation": "Event contents, event duplicates, per-user history and detail/ptls equivalence are not fully audited.",
+  "elapsed_seconds": 33.76070523262024
+}

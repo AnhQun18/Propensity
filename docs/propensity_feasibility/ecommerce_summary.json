@@ -1,0 +1,49 @@
+{
+  "scope": "all rows, four selected columns, both local CSV files",
+  "files": {
+    "2019-Nov.csv": {
+      "rows": 67501979,
+      "bytes": 9006762395
+    },
+    "2019-Oct.csv": {
+      "rows": 42448764,
+      "bytes": 5668612855
+    }
+  },
+  "rows": 109950743,
+  "users": 5316649,
+  "users_with_purchase": 697470,
+  "event_counts": {
+    "view": 104335509,
+    "cart": 3955446,
+    "purchase": 1659788
+  },
+  "min_time_utc": "2019-10-01 00:00:00 UTC",
+  "max_time_utc": "2019-11-30 23:59:59 UTC",
+  "distinct_calendar_days": 61,
+  "null_counts_selected_columns": {
+    "event_time": 0,
+    "event_type": 0,
+    "user_id": 0,
+    "category_code": 35413780
+  },
+  "missing_category_code_rows": 35413780,
+  "window": {
+    "history_start_utc": "2019-11-03 00:00:00 UTC",
+    "cutoff_utc": "2019-11-24 00:00:00 UTC",
+    "label_end_exclusive_utc": "2019-12-01 00:00:00 UTC",
+    "history_days": 21,
+    "label_days": 7,
+    "eligible_users": 3012913,
+    "positive_purchase_users": 71587,
+    "positive_purchase_rate": 0.02376006210600837,
+    "future_active_users_in_cohort": 712448
+  },
+  "limitations": [
+    "Purchase event is not verified net revenue or a unique order.",
+    "No full-row deduplication, session or product audit.",
+    "Users without a future purchase log receive label 0; observability is not guaranteed.",
+    "One feasibility window, not a trained-model evaluation."
+  ],
+  "elapsed_seconds": 159.66798877716064
+}
