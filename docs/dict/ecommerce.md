@@ -1,5 +1,5 @@
 # eCommerce — từ điển dữ liệu và bài toán dự đoán
-
+https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store
 ## 1. Tổng quan
 
 **Bài toán.** Dự đoán xác suất một người dùng thực hiện ít nhất một hành vi
