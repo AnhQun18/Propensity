@@ -1,4 +1,5 @@
 # MBD-mini — từ điển dữ liệu và bài toán dự đoán
+https://huggingface.co/datasets/ai-lab/MBD-mini
 
 ## 1. Tổng quan
 
