@@ -1,12 +1,7 @@
 # Fliggy Transfer-Plans — từ điển dữ liệu và bài toán dự đoán
+https://tianchi.aliyun.com/dataset/140721
 
 ## 1. Tổng quan
-
-Ý nghĩa trường được bổ sung theo phần **Data Format** trên [trang tải Fliggy
-Transfer-Plans (140721)](https://tianchi.aliyun.com/dataset/140721).
-Quy mô và thời gian bên dưới lấy từ bản dữ liệu trong dự án;
-thứ tự trường trong tài liệu nguồn được phân biệt với vị trí cột đã đọc
-trong CSV thực tế.
 
 **Bài toán.** Dự đoán xác suất một người dùng phát sinh ít nhất một log
 tương tác trong 7 ngày tiếp theo, dựa trên lịch sử tương tác với các phương
@@ -40,8 +35,6 @@ cutoff.
 
 ## 2. Quy mô
 
-Bản hiện có tại `data/Fliggy/` gồm ba file CSV không có header.
-
 | File/thành phần | Quy mô | Đơn vị |
 |---|---:|---|
 | `user_behavior_transfer_plans.csv` | **42.433.919** | Sự kiện |
@@ -53,17 +46,11 @@ Bản hiện có tại `data/Fliggy/` gồm ba file CSV không có header.
 
 Số dòng profile không phải số sự kiện bổ sung. **42.433.919 dòng log không phải số mẫu huấn luyện cho bài toán propensity.** Số mẫu phụ thuộc số cutoff, chiều dài lịch sử, khoảng nhãn và điều kiện chọn người dùng.
 
-Mô tả nguồn nêu khoảng 5 triệu hồ sơ người dùng và 69 triệu phương án,
-đồng thời có cách ghi quy mô log không rõ ràng (`48.8M million random users`).
-Các con số giới thiệu đó không thay thế số đếm của bản đang có trong dự án.
-Số phương án duy nhất và số cặp truy vấn–phương án trong profile cần xác
-minh lại sau khi xác định đúng thứ tự cột thực tế.
-
 ## 3. Có những feature/cột nào?
 
 ### Log hành vi — `user_behavior_transfer_plans.csv`
 
-Toàn bộ log đã được kiểm tra đọc thành **năm trường số nguyên**, không có ô thiếu. CSV không lưu schema; tên cột do dự án gán khi đọc, cấu hình dùng int64. Nguồn mô tả `Behavior type` dạng chuỗi, khác với mã số trong bản thực tế.
+Toàn bộ log đã được kiểm tra đọc thành **năm trường số nguyên**, không có ô thiếu. CSV không lưu schema; tên cột do dự án gán khi đọc.
 
 | Vị trí cột | Tên gán trong dự án | Định dạng đọc | Vai trò và ý nghĩa |
 |---:|---|---|---|
@@ -75,8 +62,6 @@ Toàn bộ log đã được kiểm tra đọc thành **năm trường số nguy
 
 ### Hồ sơ người dùng — `user_profile.csv`
 
-File có **năm cột**, cấu hình đọc dùng int64. Ý nghĩa các trường phù hợp với mô tả nguồn; các giá trị là mã định danh đã tuần tự hóa, chưa có bảng giải mã.
-
 | Vị trí cột | Tên gán | Ý nghĩa đang sử dụng |
 |---:|---|---|
 | 1 | `user_id` | Khóa nối log với hồ sơ |
@@ -84,8 +69,6 @@ File có **năm cột**, cấu hình đọc dùng int64. Ý nghĩa các trườn
 | 3 | `gender` | Mã giới tính; có giá trị âm chưa xác định ý nghĩa |
 | 4 | `occupation` | Mã nghề nghiệp |
 | 5 | `habitual_city` | Mã thành phố thường trú, một giá trị cho mỗi hồ sơ |
-
-Phần giới thiệu nguồn có nhắc `crowd tag`, nhưng bảng định dạng chỉ liệt kê năm trường trên và bản CSV hiện có cũng có năm cột; không bổ sung cột này khi đọc file.
 
 ### Hồ sơ phương án — `transfer_plan_profile.csv`
 
@@ -114,43 +97,16 @@ tự liệt kê trong tài liệu nguồn**, chưa phải ánh xạ vị trí CS
 | 17 | Total Cost Time → `total_cost_time` | integer | Tổng thời gian của phương án; chưa xác nhận đơn vị |
 | 18 | Total Cost Price → `total_cost_price` | integer | Tổng giá của phương án; chưa xác nhận đơn vị tiền tệ |
 
-**Thứ tự CSV thực tế cần xác minh.** Ba dòng đầu đã đối chiếu đều có 18
-trường, nhưng giờ dạng `HH:MM` xuất hiện ở cột 6, 7, 13, 14, trong khi bảng
-nguồn đặt các trường giờ ở vị trí 8, 9, 14, 15. Vì vậy, không dùng trực tiếp
-thứ tự nguồn làm danh sách tên cột cho bản CSV này, cũng không tự suy ra vị
-trí các trường còn lại. Chưa kiểm tra số trường của mọi dòng hoặc xác nhận
-định dạng giờ trên toàn bộ bảng.
-
-Theo tài liệu nguồn, `plan_id` được liệt kê thứ 4, còn các script kiểm tra
-và cấu hình EDA hiện có đang đọc cột CSV thứ 2 là `plan_id`. Cần xác nhận
-ánh xạ cột thực tế, cập nhật cách đọc nếu cần rồi kiểm tra lại khóa trước khi ghép log
-với profile. Khóa dự kiến là `log.user_id = user_profile.user_id` và
-`log.(query_id, plan_id) = transfer_plan_profile.(query_id, plan_id)`;
-tính duy nhất của khóa profile phải được kiểm tra trước khi nối.
-
-Không có cột nhãn “sẽ tương tác trong 7 ngày” trong ba CSV này. ID dùng để liên kết/tổng hợp dữ liệu; các đặc trưng lịch sử cần được tính theo từng cutoff, còn thuộc tính profile chỉ dùng khi đã xác minh schema và cách nối.
+**Thứ tự CSV thực tế cần xác minh.** 
 
 ## 4. Lịch sử dài bao nhiêu?
 
 | Cách biểu diễn thời gian | Phạm vi |
 |---|---|
 | UTC từ Unix timestamp | `2022-08-15 16:00:00` → `2022-09-18 15:59:59` |
-| Lịch UTC+8 đang dùng trong báo cáo | `16/08/2022 00:00:00` → `18/09/2022 23:59:59` |
 | Số ngày theo UTC+8 | **34 ngày**, không có ngày trống trên toàn bộ log |
 
 **UTC+8 là giả định chia ngày của dự án**, chưa phải timezone nguồn đã xác nhận. Chia theo UTC sẽ có 35 ngày lịch, với hai ngày biên không trọn vẹn.
-
-Phần giới thiệu nguồn nêu khoảng 16/08–17/09/2022, khác với ngày cuối
-18/09/2022 khi chuyển timestamp của bản hiện có sang UTC+8. Giữ nguyên
-phạm vi đo từ file và ghi nhận khác biệt; chưa có cơ sở kết luận nguyên nhân.
-
-Lịch sử theo người dùng khá thưa:
-
-- Trung vị **5 sự kiện/người**, trung bình **16,81**; người nhiều nhất có **13.585** sự kiện.
-- Trung vị **1 ngày hoạt động/người**, trung bình **1,95 ngày**.
-- **1.501.339 người (59,46%)** chỉ có log đúng một ngày trong toàn bộ dữ liệu.
-- Chỉ **74.734 người (2,96%)** có ít nhất 7 ngày hoạt động.
-- Ma trận người dùng × ngày có kích thước **2.524.995 × 34**, trong đó **4.922.954 ô bằng 1**, chiếm **5,7344%**.
 
 34 ngày trên toàn tập không đồng nghĩa mỗi người có 34 ngày lịch sử. Các ngày trước hoặc sau phạm vi dữ liệu không được xem là những ngày không hoạt động.
 
