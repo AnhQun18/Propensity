@@ -2,6 +2,12 @@
 
 ## 1. Tổng quan
 
+Ý nghĩa trường được bổ sung theo phần **Data Format** trên [trang tải Fliggy
+Transfer-Plans (140721)](https://tianchi.aliyun.com/dataset/140721).
+Quy mô và thời gian bên dưới lấy từ bản dữ liệu trong dự án;
+thứ tự trường trong tài liệu nguồn được phân biệt với vị trí cột đã đọc
+trong CSV thực tế.
+
 **Bài toán.** Dự đoán xác suất một người dùng phát sinh ít nhất một log
 tương tác trong 7 ngày tiếp theo, dựa trên lịch sử tương tác với các phương
 án di chuyển/nối chuyến trước thời điểm dự đoán (cutoff). Bộ dữ liệu gốc
@@ -27,9 +33,10 @@ cutoff.
 
 - Nhãn 0 chỉ có nghĩa là *không ghi nhận tương tác trong khoảng nhãn*,
   không chứng minh người dùng không đi du lịch hoặc được quan sát đầy đủ.
-- Chưa xác minh mã `behavior=1/2/3` tương ứng hành vi nào, nên chưa thể gọi
-  đầu ra là xác suất mua hoặc đặt dịch vụ. Cần bảng quy đổi trước khi đặt
-  nhãn nghiệp vụ cụ thể.
+- Nguồn mô tả ba loại hành vi `browsing`, `purchasing`, `reference`, nhưng
+  file thực tế chứa mã số `1/2/3` và chưa có bảng quy đổi giữa chúng. Chưa
+  thể gọi đầu ra là xác suất mua hoặc đặt dịch vụ; không gán mã mua chỉ từ
+  thứ tự liệt kê các loại hành vi.
 
 ## 2. Quy mô
 
@@ -43,48 +50,83 @@ Bản hiện có tại `data/Fliggy/` gồm ba file CSV không có header.
 | `user_profile.csv` | 2.522.986 | Dòng hồ sơ người dùng |
 | `user_id` duy nhất trong hồ sơ | 2.522.895 | Người dùng |
 | `transfer_plan_profile.csv` | 7.630.547 | Dòng hồ sơ phương án |
-| `plan_id` duy nhất trong hồ sơ phương án | 3.588.429 | ID phương án |
-| Cặp `query_id`, `plan_id` duy nhất trong hồ sơ | 3.592.800 | Cặp khóa theo schema đang đọc |
 
 Số dòng profile không phải số sự kiện bổ sung. **42.433.919 dòng log không phải số mẫu huấn luyện cho bài toán propensity.** Số mẫu phụ thuộc số cutoff, chiều dài lịch sử, khoảng nhãn và điều kiện chọn người dùng.
+
+Mô tả nguồn nêu khoảng 5 triệu hồ sơ người dùng và 69 triệu phương án,
+đồng thời có cách ghi quy mô log không rõ ràng (`48.8M million random users`).
+Các con số giới thiệu đó không thay thế số đếm của bản đang có trong dự án.
+Số phương án duy nhất và số cặp truy vấn–phương án trong profile cần xác
+minh lại sau khi xác định đúng thứ tự cột thực tế.
 
 ## 3. Có những feature/cột nào?
 
 ### Log hành vi — `user_behavior_transfer_plans.csv`
 
-Toàn bộ log đã được kiểm tra đọc thành **năm trường số nguyên**, không có ô thiếu. CSV không lưu schema; tên cột do dự án gán khi đọc, cấu hình dùng int64.
+Toàn bộ log đã được kiểm tra đọc thành **năm trường số nguyên**, không có ô thiếu. CSV không lưu schema; tên cột do dự án gán khi đọc, cấu hình dùng int64. Nguồn mô tả `Behavior type` dạng chuỗi, khác với mã số trong bản thực tế.
 
 | Vị trí cột | Tên gán trong dự án | Định dạng đọc | Vai trò và ý nghĩa |
 |---:|---|---|---|
 | 1 | `user_id` | int64, ID | Khóa người dùng |
-| 2 | `query_id` | int64, ID | Mã truy vấn theo schema đang sử dụng |
-| 3 | `plan_id` | int64, ID | Mã phương án di chuyển theo schema đang sử dụng |
-| 4 | `behavior` | int64, mã phân loại | Mã hành vi 1, 2 hoặc 3; chưa xác minh ánh xạ nghiệp vụ |
+| 2 | `query_id` | int64, ID | OD Query ID: mã truy vấn chứa điểm đi và điểm đến |
+| 3 | `plan_id` | int64, ID | Transfer Plan ID: mã phương án di chuyển/nối chuyến |
+| 4 | `behavior` | int64, mã phân loại | Mã 1, 2 hoặc 3 trong CSV; nguồn nêu `browsing`, `purchasing`, `reference` nhưng chưa cung cấp ánh xạ mã |
 | 5 | `timestamp` | int64 → datetime UTC | Unix timestamp, đơn vị giây; dùng cắt lịch sử/nhãn |
 
 ### Hồ sơ người dùng — `user_profile.csv`
 
-File có **năm cột**, cấu hình đọc dùng int64. Các tên thuộc tính dưới đây theo schema của dự án; chưa có bảng giải mã giá trị.
+File có **năm cột**, cấu hình đọc dùng int64. Ý nghĩa các trường phù hợp với mô tả nguồn; các giá trị là mã định danh đã tuần tự hóa, chưa có bảng giải mã.
 
 | Vị trí cột | Tên gán | Ý nghĩa đang sử dụng |
 |---:|---|---|
 | 1 | `user_id` | Khóa nối log với hồ sơ |
-| 2 | `age` | Mã nhóm tuổi; không diễn giải trực tiếp thành tuổi thực |
+| 2 | `age` | Mã tuổi; không diễn giải trực tiếp thành tuổi thực hoặc tự gán khoảng tuổi |
 | 3 | `gender` | Mã giới tính; có giá trị âm chưa xác định ý nghĩa |
 | 4 | `occupation` | Mã nghề nghiệp |
-| 5 | `habitual_city` | Mã thành phố thường trú |
+| 5 | `habitual_city` | Mã thành phố thường trú, một giá trị cho mỗi hồ sơ |
+
+Phần giới thiệu nguồn có nhắc `crowd tag`, nhưng bảng định dạng chỉ liệt kê năm trường trên và bản CSV hiện có cũng có năm cột; không bổ sung cột này khi đọc file.
 
 ### Hồ sơ phương án — `transfer_plan_profile.csv`
 
-Dòng đầu được đối chiếu trực tiếp có **18 trường**. Kiểm tra toàn bộ bảng hiện có chỉ đọc hai cột khóa đầu, chưa xác minh schema đầy đủ hoặc số trường của mọi dòng.
+Nguồn mô tả **18 trường** cho truy vấn và phương án gồm hai chặng. Tên
+`snake_case` dưới đây được chuẩn hóa để dùng trong dự án; cột đầu là **thứ
+tự liệt kê trong tài liệu nguồn**, chưa phải ánh xạ vị trí CSV đã xác minh.
 
-| Vị trí cột | Cách đọc hiện tại | Trạng thái sử dụng |
-|---:|---|---|
-| 1 | `query_id` | Giả định khóa truy vấn theo schema dự án |
-| 2 | `plan_id` | Giả định khóa phương án theo schema dự án |
-| 3–18 | Chưa gán tên nghiệp vụ đã xác minh | Chưa đưa vào feature; cần từ điển nguồn trước khi diễn giải |
+| Thứ tự theo nguồn | Trường nguồn → tên chuẩn hóa | Định dạng theo nguồn | Vai trò và ý nghĩa |
+|---:|---|---|---|
+| 1 | Query ID → `query_id` | integer, ID | Mã truy vấn chứa điểm đi và điểm đến |
+| 2 | Query Depart City ID → `query_depart_city_id` | integer, ID | Mã thành phố xuất phát của truy vấn |
+| 3 | Query Arrive City ID → `query_arrive_city_id` | integer, ID | Mã thành phố đích của truy vấn |
+| 4 | Transfer Plan ID → `plan_id` | integer, ID | Mã phương án di chuyển/nối chuyến |
+| 5 | First Train ID → `first_train_id` | integer, ID | Mã số hiệu tàu của chặng thứ nhất |
+| 6 | First Depart City ID → `first_depart_city_id` | integer, ID | Mã thành phố xuất phát của chặng thứ nhất |
+| 7 | First Arrive City ID → `first_arrive_city_id` | integer, ID | Mã thành phố đến của chặng thứ nhất |
+| 8 | First Depart Time → `first_depart_time` | string | Giờ khởi hành chặng thứ nhất |
+| 9 | First Arrive Time → `first_arrive_time` | string | Giờ đến chặng thứ nhất |
+| 10 | First Cost Price → `first_cost_price` | integer | Giá chặng thứ nhất; chưa xác nhận đơn vị tiền tệ |
+| 11 | Second Train ID → `second_train_id` | integer, ID | Mã số hiệu tàu của chặng thứ hai |
+| 12 | Second Depart City ID → `second_depart_city_id` | integer, ID | Mã thành phố xuất phát của chặng thứ hai |
+| 13 | Second Arrive City ID → `second_arrive_city_id` | integer, ID | Mã thành phố đến của chặng thứ hai |
+| 14 | Second Depart Time → `second_depart_time` | string | Giờ khởi hành chặng thứ hai |
+| 15 | Second Arrive Time → `second_arrive_time` | string | Giờ đến chặng thứ hai |
+| 16 | Second Cost Price → `second_cost_price` | integer | Giá chặng thứ hai; chưa xác nhận đơn vị tiền tệ |
+| 17 | Total Cost Time → `total_cost_time` | integer | Tổng thời gian của phương án; chưa xác nhận đơn vị |
+| 18 | Total Cost Price → `total_cost_price` | integer | Tổng giá của phương án; chưa xác nhận đơn vị tiền tệ |
 
-Chưa đủ bằng chứng để đặt tên cụ thể cho các cột 3–18 như giá, thời lượng hay điểm đi/đến. Cặp khóa cũng cần kiểm tra tính duy nhất và cách nối trước khi bổ sung profile vào log.
+**Thứ tự CSV thực tế cần xác minh.** Ba dòng đầu đã đối chiếu đều có 18
+trường, nhưng giờ dạng `HH:MM` xuất hiện ở cột 6, 7, 13, 14, trong khi bảng
+nguồn đặt các trường giờ ở vị trí 8, 9, 14, 15. Vì vậy, không dùng trực tiếp
+thứ tự nguồn làm danh sách tên cột cho bản CSV này, cũng không tự suy ra vị
+trí các trường còn lại. Chưa kiểm tra số trường của mọi dòng hoặc xác nhận
+định dạng giờ trên toàn bộ bảng.
+
+Theo tài liệu nguồn, `plan_id` được liệt kê thứ 4, còn các script kiểm tra
+và cấu hình EDA hiện có đang đọc cột CSV thứ 2 là `plan_id`. Cần xác nhận
+ánh xạ cột thực tế, cập nhật cách đọc nếu cần rồi kiểm tra lại khóa trước khi ghép log
+với profile. Khóa dự kiến là `log.user_id = user_profile.user_id` và
+`log.(query_id, plan_id) = transfer_plan_profile.(query_id, plan_id)`;
+tính duy nhất của khóa profile phải được kiểm tra trước khi nối.
 
 Không có cột nhãn “sẽ tương tác trong 7 ngày” trong ba CSV này. ID dùng để liên kết/tổng hợp dữ liệu; các đặc trưng lịch sử cần được tính theo từng cutoff, còn thuộc tính profile chỉ dùng khi đã xác minh schema và cách nối.
 
@@ -97,6 +139,10 @@ Không có cột nhãn “sẽ tương tác trong 7 ngày” trong ba CSV này. 
 | Số ngày theo UTC+8 | **34 ngày**, không có ngày trống trên toàn bộ log |
 
 **UTC+8 là giả định chia ngày của dự án**, chưa phải timezone nguồn đã xác nhận. Chia theo UTC sẽ có 35 ngày lịch, với hai ngày biên không trọn vẹn.
+
+Phần giới thiệu nguồn nêu khoảng 16/08–17/09/2022, khác với ngày cuối
+18/09/2022 khi chuyển timestamp của bản hiện có sang UTC+8. Giữ nguyên
+phạm vi đo từ file và ghi nhận khác biệt; chưa có cơ sở kết luận nguyên nhân.
 
 Lịch sử theo người dùng khá thưa:
 
@@ -118,14 +164,16 @@ Lịch sử theo người dùng khá thưa:
 | 2 | 1.235.624 | 2,9119% |
 | 3 | 70.464 | 0,1661% |
 
-Không suy luận mã nào là mua chỉ từ tần suất hoặc thứ tự mô tả hành vi trên trang nguồn.
+Nguồn liệt kê `browsing`, `purchasing`, `reference`; phần giới thiệu còn
+nhắc clicks, favorites, adding và purchases nhưng không giải thích cách
+quy đổi. Không suy luận mã nào là mua chỉ từ tần suất hoặc thứ tự mô tả,
+và chưa dịch `reference` thành một hành vi nghiệp vụ cụ thể.
 
 ### Profile cần xử lý trước khi ghép
 
 - Hồ sơ người dùng có **91 dòng trùng hoàn toàn**, thuộc 11 ID; chưa thấy profile xung đột sau khi bỏ trùng hoàn toàn. Có **2.100 người trong log thiếu profile**.
 - Cột `gender` theo schema hiện tại có **42.924 giá trị âm**; không tự gán giới tính, giữ như mã chưa rõ cho tới khi có từ điển.
-- Hồ sơ phương án có **4.037.747 dòng lặp cặp khóa** `query_id`, `plan_id`. Chưa kiểm tra các thuộc tính còn lại để kết luận là trùng hoàn toàn hay nhiều phiên bản.
-- Theo phép kiểm tra **sự hiện diện của `plan_id`**, chỉ **9.524.546/42.433.919 dòng log (22,45%)** có ID phương án xuất hiện trong profile; **32.909.373 dòng (77,55%)** không khớp. Đây chưa phải bảo đảm ghép đúng và duy nhất theo cặp khóa.
-- Dùng inner join có thể loại phần lớn log; nối vào khóa chưa duy nhất có thể nhân số dòng. Cần xác minh schema, chuẩn hóa và kiểm tra khóa trước; bài toán chỉ dùng log vẫn có thể triển khai độc lập.
+- **Các thống kê khóa phương án cũ chưa được xác thực theo schema nguồn.** Số 3.588.429 ID, 3.592.800 cặp khóa, 4.037.747 dòng lặp cặp khóa và độ phủ 22,45% trong báo cáo cũ đều được tính với giả định hai cột CSV đầu là `query_id`, `plan_id`. Khi thứ tự trường thực tế chưa được xác minh, không dùng chúng để kết luận số phương án, mức trùng khóa hoặc tỷ lệ log thiếu profile.
+- Sau khi xác nhận ánh xạ, cần tính lại tính duy nhất và độ phủ khóa. Nối vào khóa chưa duy nhất có thể nhân số dòng, còn inner join có thể loại các log không khớp. Bài toán chỉ dùng log vẫn có thể triển khai độc lập trong lúc chờ xác minh profile.
 
 Chưa kiểm tra trùng nguyên bản ghi hành vi trên toàn bộ log. Dữ liệu ngắn và người dùng ít quay lại làm hạn chế đánh giá tính ổn định dài hạn. Chia train/validation/test theo thời gian, chỉ dùng dữ liệu trước cutoff làm feature và giữ đủ 7 ngày quan sát nhãn.
