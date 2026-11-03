@@ -2,6 +2,20 @@
 
 Repository lưu trữ tài liệu, notebook phân tích dữ liệu khám phá (EDA), mã nguồn core và dữ liệu ví dụ cho dự án propensity.
 
+## Package thống kê mô tả và EDA
+
+Mã nguồn tái sử dụng nằm trong `src/eda/`, gồm `descriptive`, `analysis`,
+`visualization`, đọc CSV/Parquet, kiểm tra quan hệ bảng và xuất báo cáo vào
+`docs/<dataset>/`. Xem [hướng dẫn API, cấu trúc và giới hạn tính toán](docs/eda_package.md).
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[plots,notebook]"
+.\.venv\Scripts\propensity-eda.exe --config configs/eda_ecommerce.json --plots
+```
+
+Cấu hình mẫu cho cả ba bộ nằm trong `configs/eda_*.json`. Các lệnh này quét
+nguồn dữ liệu lớn; xem chế độ exact/approximate trong hướng dẫn trước khi chạy.
+
 ## Cấu trúc thư mục
 
 ```text

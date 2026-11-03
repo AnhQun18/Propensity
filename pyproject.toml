@@ -1,6 +1,11 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "new-propensity"
 version = "0.1.0"
+requires-python = ">=3.10"
 description = "Dự án phân tích dữ liệu và mô hình propensity."
 readme = "README.md"
 dependencies = [
@@ -8,9 +13,20 @@ dependencies = [
     "kagglehub>=1.0,<2.0",
     "pandas>=2.2",
     "pyarrow>=21.0",
+    "numpy>=1.24",
+    "scipy>=1.10",
 ]
 
+[project.scripts]
+propensity-eda = "eda.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["eda*"]
+
 [project.optional-dependencies]
+plots = ["matplotlib>=3.10"]
+dev = ["build>=1.0"]
 notebook = [
     "ipykernel>=6.0",
     "nbformat>=5.0",

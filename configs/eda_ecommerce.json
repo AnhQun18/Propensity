@@ -1,0 +1,26 @@
+{
+  "source": {
+    "paths": ["../data/ecommerce/2019-Oct.csv", "../data/ecommerce/2019-Nov.csv"],
+    "format": "csv",
+    "read_options": {
+      "dtype": {"user_id": "Int64", "product_id": "Int64", "category_id": "Int64", "price": "float64", "event_type": "string", "category_code": "string", "brand": "string", "user_session": "string", "event_time": "string"}
+    }
+  },
+  "spec": {
+    "dataset": "ecommerce",
+    "row_unit": "user-product event",
+    "id_columns": ["user_id", "product_id", "user_session"],
+    "numeric_columns": ["price"],
+    "categorical_columns": ["event_type", "category_id", "category_code", "brand"],
+    "datetime_columns": {"event_time": {"format": "%Y-%m-%d %H:%M:%S UTC", "timezone": "UTC"}},
+    "group_columns": ["event_type"],
+    "event_user": "user_id",
+    "event_time": "event_time",
+    "event_type": "event_type",
+    "valid_ranges": {"price": [0, null]},
+    "mode": "approximate",
+    "sample_size": 50000,
+    "chunk_size": 100000,
+    "hash_sources": false
+  }
+}

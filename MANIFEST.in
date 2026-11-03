@@ -1,0 +1,4 @@
+include README.md DATASETS.md
+include docs/eda_package.md
+recursive-include configs eda_*.json
+recursive-include tests *.py

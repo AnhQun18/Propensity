@@ -1,0 +1,49 @@
+{
+  "dataset": "mbd_mini",
+  "tables": {
+    "clients": {
+      "source": {"paths": ["../data/MBD-mini/client_split"], "format": "parquet"},
+      "spec": {"row_unit": "client", "id_columns": ["client_id"], "categorical_columns": ["fold"], "hash_sources": false}
+    },
+    "targets": {
+      "source": {"paths": ["../data/MBD-mini/targets"], "format": "parquet"},
+      "spec": {
+        "row_unit": "client-month", "id_columns": ["client_id"],
+        "datetime_columns": {"mon": {"format": "%Y-%m-%d"}}, "time_frequency": "ME",
+        "targets": {"target_1": "binary", "target_2": "binary", "target_3": "binary", "target_4": "binary"},
+        "categorical_columns": ["fold"], "group_columns": ["fold"],
+        "exclude_columns": ["trans_count", "diff_trans_date"], "hash_sources": false
+      }
+    },
+    "transactions": {
+      "source": {"paths": ["../data/MBD-mini/detail/trx"], "format": "parquet"},
+      "spec": {
+        "row_unit": "transaction event", "id_columns": ["client_id"], "numeric_columns": ["amount"],
+        "categorical_columns": ["event_type", "event_subtype", "currency", "src_type11", "src_type12", "dst_type11", "dst_type12", "src_type21", "src_type22", "src_type31", "src_type32", "fold"],
+        "datetime_columns": {"event_time": {}}, "event_user": "client_id", "event_time": "event_time", "event_type": "event_type",
+        "mode": "approximate", "sample_size": 10000, "hash_sources": false
+      }
+    },
+    "geo": {
+      "source": {"paths": ["../data/MBD-mini/detail/geo"], "format": "parquet"},
+      "spec": {
+        "row_unit": "location event", "id_columns": ["client_id"],
+        "categorical_columns": ["geohash_4", "geohash_5", "geohash_6", "fold"],
+        "datetime_columns": {"event_time": {}}, "event_user": "client_id", "event_time": "event_time",
+        "mode": "approximate", "sample_size": 10000, "hash_sources": false
+      }
+    },
+    "dialog": {
+      "source": {"paths": ["../data/MBD-mini/detail/dialog"], "format": "parquet"},
+      "spec": {
+        "row_unit": "dialog event", "id_columns": ["client_id"],
+        "categorical_columns": ["fold"], "exclude_columns": ["embedding"],
+        "datetime_columns": {"event_time": {}}, "event_user": "client_id", "event_time": "event_time",
+        "mode": "approximate", "sample_size": 10000, "hash_sources": false
+      }
+    }
+  },
+  "relationships": [
+    {"name": "targets_clients", "left": "targets", "right": "clients", "left_on": ["client_id"], "right_on": ["client_id"], "cardinality": "many_to_one"}
+  ]
+}
