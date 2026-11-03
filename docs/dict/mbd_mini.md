@@ -19,7 +19,7 @@ một sự kiện, và các bảng `ptls`, nơi mỗi dòng là một chuỗi c�
 - Cần xác định khoảng nhãn và cutoff tương ứng với `mon` trước khi lấy
   lịch sử đầu vào.
 
-**Đầu ra.** Mô hình trả về bốn xác suất `p_target_1`–`p_target_4 ∈ [0, 1]`
+**Đầu ra.** Mô hình trả về 1 trong 4 xác suất `p_target_1`–`p_target_4 ∈ [0, 1]`
 cho mỗi khách hàng tại cutoff. Đây là bài toán nhiều nhãn: một khách có thể
 có nhiều nhãn dương, nên tổng bốn xác suất không bắt buộc bằng 1.
 
