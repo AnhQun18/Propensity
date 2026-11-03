@@ -26,10 +26,6 @@ cho mỗi khách hàng tại cutoff. Đây là bài toán nhiều nhãn, để x
 
 - Nhãn 0 chỉ có nghĩa là *không ghi nhận mua sản phẩm tương ứng trong khoảng
   nhãn*, không phải khách hàng không có ý định mua.
-- Tài liệu nguồn được dẫn trong báo cáo hiện có mô tả dự đoán tháng sau ngày
-  báo cáo và có dịch khoảng ngày trong bảng nhãn. Chưa được mặc định `mon`
-  là cutoff cuối phần feature. Phải đối chiếu pipeline benchmark để xác định
-  đầu khoảng nhãn; mọi sự kiện đầu vào phải xảy ra trước mốc đó.
 
 ## 2. Quy mô
 
