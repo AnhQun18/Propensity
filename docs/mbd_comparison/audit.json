@@ -1,0 +1,338 @@
+{
+  "checked_date": "2026-11-04",
+  "remote": {
+    "MBD": {
+      "revision": "7c1642ca66eb460b0a2097e63afbed2eece739fa",
+      "files": {
+        ".gitattributes": 2419,
+        "README.md": 6620,
+        "client_split.tar.gz": 39347050,
+        "detail.tar.gz": 38152722722,
+        "ptls.tar.gz": 30718132724,
+        "targets.tar.gz": 62157476
+      }
+    },
+    "MBD-mini": {
+      "revision": "4b0d5b4c0b014e02af6c2e6b7b27851e6fb0d5c3",
+      "files": {
+        ".gitattributes": 2419,
+        "README.md": 6083,
+        "client_split.tar.gz": 4182641,
+        "detail.tar.gz": 1968727441,
+        "ptls.tar.gz": 1396973525,
+        "targets.tar.gz": 7931957
+      }
+    }
+  },
+  "scope": "Read all full MBD client_split and targets, compare to local mini. Full event archives not downloaded.",
+  "full_split": {
+    "rows": 1000000,
+    "unique_clients": 1000000,
+    "columns": [
+      "client_id",
+      "is_balanced",
+      "fold"
+    ],
+    "balanced_counts": {
+      "0.0": 929468,
+      "1.0": 70532
+    },
+    "fold_counts": {
+      "1": 200005,
+      "2": 200004,
+      "3": 200000,
+      "4": 199996,
+      "0": 199995
+    }
+  },
+  "mini_split": {
+    "rows": 100224,
+    "unique_clients": 100224,
+    "columns": [
+      "client_id",
+      "fold"
+    ],
+    "fold_counts": {
+      "0": 20328,
+      "4": 20060,
+      "3": 20017,
+      "2": 19917,
+      "1": 19902
+    },
+    "clients_absent_from_full": 0,
+    "fold_mismatch_rows": 80268,
+    "full_balanced_counts_for_mini": {
+      "0.0": 93089,
+      "1.0": 7135
+    },
+    "fold_cross_tab_mini_rows_full_columns": {
+      "0": {
+        "0": 4048,
+        "1": 4112,
+        "2": 4072,
+        "3": 4038,
+        "4": 4058
+      },
+      "1": {
+        "0": 4081,
+        "1": 3882,
+        "2": 3914,
+        "3": 4061,
+        "4": 3964
+      },
+      "2": {
+        "0": 4030,
+        "1": 4029,
+        "2": 3955,
+        "3": 3939,
+        "4": 3964
+      },
+      "3": {
+        "0": 3951,
+        "1": 4030,
+        "2": 4015,
+        "3": 3999,
+        "4": 4022
+      },
+      "4": {
+        "0": 3943,
+        "1": 3991,
+        "2": 4123,
+        "3": 3931,
+        "4": 4072
+      }
+    }
+  },
+  "label_mapping_full_to_mini": {
+    "bcard_target": "target_1",
+    "cred_target": "target_2",
+    "zp_target": "target_3",
+    "acquiring_target": "target_4"
+  },
+  "label_pair_mismatch_counts": {
+    "target_1": {
+      "bcard_target": 0,
+      "cred_target": 5841,
+      "zp_target": 9366,
+      "acquiring_target": 8012
+    },
+    "target_2": {
+      "bcard_target": 5841,
+      "cred_target": 0,
+      "zp_target": 5043,
+      "acquiring_target": 3589
+    },
+    "target_3": {
+      "bcard_target": 9366,
+      "cred_target": 5043,
+      "zp_target": 0,
+      "acquiring_target": 7328
+    },
+    "target_4": {
+      "bcard_target": 8012,
+      "cred_target": 3589,
+      "zp_target": 7328,
+      "acquiring_target": 0
+    }
+  },
+  "full_targets": {
+    "files": 5,
+    "rows": 12000000,
+    "unique_clients": 1000000,
+    "schemas": [
+      [
+        "client_id",
+        "mon",
+        "bcard_target",
+        "cred_target",
+        "zp_target",
+        "acquiring_target",
+        "trans_count",
+        "diff_trans_date",
+        "is_balanced",
+        "fold"
+      ]
+    ],
+    "months": {
+      "2022-02-28": 1000000,
+      "2022-03-31": 1000000,
+      "2022-04-30": 1000000,
+      "2022-05-31": 1000000,
+      "2022-06-30": 1000000,
+      "2022-07-31": 1000000,
+      "2022-08-31": 1000000,
+      "2022-09-30": 1000000,
+      "2022-10-31": 1000000,
+      "2022-11-30": 1000000,
+      "2022-12-31": 1000000,
+      "2023-01-31": 1000000
+    },
+    "positive_counts": {
+      "bcard_target": 53774,
+      "cred_target": 5986,
+      "zp_target": 44980,
+      "acquiring_target": 30389
+    },
+    "positive_rates": {
+      "bcard_target": 0.004481166666666666,
+      "cred_target": 0.0004988333333333333,
+      "zp_target": 0.003748333333333333,
+      "acquiring_target": 0.0025324166666666668
+    },
+    "balanced_rows": {
+      "0": 11153616,
+      "1": 846384
+    },
+    "balanced_positive_counts": {
+      "0.0:bcard_target": 47870,
+      "0.0:cred_target": 5030,
+      "0.0:zp_target": 39106,
+      "0.0:acquiring_target": 24143,
+      "1.0:bcard_target": 5904,
+      "1.0:cred_target": 956,
+      "1.0:zp_target": 5874,
+      "1.0:acquiring_target": 6246
+    },
+    "clients_absent_from_split": 0
+  },
+  "mini_targets_comparison": {
+    "mini_rows": 1202688,
+    "full_rows_for_mini_clients": 1202688,
+    "mini_duplicate_client_months": 0,
+    "full_subset_duplicate_client_months": 0,
+    "column_mismatch_counts_after_sort": {
+      "client_id": 0,
+      "diff_trans_date": 0,
+      "fold": 963216,
+      "mon": 0,
+      "target_1": 0,
+      "target_2": 0,
+      "target_3": 0,
+      "target_4": 0,
+      "trans_count": 0
+    },
+    "mini_positive_counts": {
+      "target_1": 5362,
+      "target_2": 577,
+      "target_3": 4530,
+      "target_4": 3060
+    },
+    "mini_positive_rates": {
+      "target_1": 0.004458346636866752,
+      "target_2": 0.00047975867390378883,
+      "target_3": 0.0037665628991060025,
+      "target_4": 0.0025443007662835247
+    }
+  },
+  "mini_physical_schema_variants": {
+    "client_split": [
+      {
+        "columns": [
+          "client_id"
+        ],
+        "files": 1000
+      }
+    ],
+    "targets": [
+      {
+        "columns": [
+          "client_id",
+          "mon",
+          "target_1",
+          "target_2",
+          "target_3",
+          "target_4",
+          "trans_count",
+          "diff_trans_date"
+        ],
+        "files": 435
+      }
+    ],
+    "detail/trx": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "amount",
+          "event_type",
+          "event_subtype",
+          "currency",
+          "src_type11",
+          "src_type12",
+          "dst_type11",
+          "dst_type12",
+          "src_type21",
+          "src_type22",
+          "src_type31",
+          "src_type32"
+        ],
+        "files": 400
+      }
+    ],
+    "detail/geo": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "geohash_4",
+          "geohash_5",
+          "geohash_6"
+        ],
+        "files": 460
+      }
+    ],
+    "detail/dialog": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "embedding"
+        ],
+        "files": 415
+      }
+    ],
+    "ptls/trx": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "amount",
+          "event_type",
+          "event_subtype",
+          "currency",
+          "src_type11",
+          "src_type12",
+          "dst_type11",
+          "dst_type12",
+          "src_type21",
+          "src_type22",
+          "src_type31",
+          "src_type32"
+        ],
+        "files": 335
+      }
+    ],
+    "ptls/geo": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "geohash_4",
+          "geohash_5",
+          "geohash_6"
+        ],
+        "files": 365
+      }
+    ],
+    "ptls/dialog": [
+      {
+        "columns": [
+          "client_id",
+          "event_time",
+          "embedding"
+        ],
+        "files": 410
+      }
+    ]
+  }
+}
