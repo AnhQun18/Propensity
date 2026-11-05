@@ -67,12 +67,12 @@ Mở `configs/mbd_mini_eda.local.json`, đổi `data_root`. Có thể dùng cấ
 {
   "data_root": "D:/Datasets/MBD-mini",
   "output_dir": "../docs/mbd_mini_eda",
-  "batch_size": 100000,
-  "history_days": [30, 84, 180],
+  "batch_size": 250000,
+  "dialog_batch_size": 4096,
+  "sqlite_cache_mb": 256,
   "random_seed": 42,
   "sample_size": 5000,
-  "duplicate_mode": "sample",
-  "label_alignment": "calendar_month"
+  "duplicate_mode": "sample"
 }
 ```
 
@@ -81,8 +81,10 @@ dấu `/` như ví dụ hoặc viết `\\` nếu dùng dấu gạch chéo Window
 Đường dẫn tương đối trong cấu hình được tính từ thư mục chứa JSON.
 File `*.local.json` được Git bỏ qua để đường dẫn riêng của máy không được commit.
 
-`calendar_month` dùng tháng chứa `mon` làm tháng nhãn, lấy cutoff đầu tháng;
-xem [quy ước và giới hạn](propensity_feasibility/mon_research.md).
+Phiên bản 0.2.0 chỉ thực hiện 7 bước thống kê mô tả. JSON cũ có `history_days`
+hoặc `label_alignment` vẫn được đọc, kèm thông báo bỏ qua các lựa chọn ngoài phạm vi.
+Giữ `data_root` của máy khi cập nhật config; có thể thêm `dialog_batch_size`
+và `sqlite_cache_mb` như ví dụ. Nếu không thêm, package dùng giá trị mặc định.
 
 ## 4. Kiểm tra setup trước khi chạy toàn bộ
 
@@ -92,7 +94,7 @@ xem [quy ước và giới hạn](propensity_feasibility/mon_research.md).
 ```
 
 Kiểm thử cần kết thúc với `OK`. Kiểm thử dùng Parquet tổng hợp, không quét
-dữ liệu thật. `plan` kiểm tra việc nạp cấu hình và liệt kê 16 bước; lệnh này
+dữ liệu thật. `plan` kiểm tra việc nạp cấu hình và liệt kê 7 bước; lệnh này
 cũng không quét dữ liệu thật.
 
 ## 5. Chạy phân tích
@@ -124,6 +126,8 @@ docs/mbd_mini_eda/           # Hoặc thư mục chọn bằng --output-dir
 `descriptive.quality` thực hiện quét các nguồn và tạo kho tổng hợp tạm nên có
 thể chạy lâu. `sample_size=5000` chỉ giới hạn mẫu cho một số thống kê; cấu hình
 trên vẫn quét toàn bộ nguồn. Xem [phạm vi từng phép tính](mbd_mini_eda_package.md).
+Terminal báo số dòng đã quét theo nguồn; thời gian nguồn và từng bước được
+ghi trong `metadata.json`. Batch hội thoại được giới hạn riêng để kiểm soát RAM.
 
 Sau khi cập nhật mã từ GitHub, chạy lại `python -m pip install ".[plots]"`
 bằng Python của venv để bản cài đặt nhận mã mới.

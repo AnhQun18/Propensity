@@ -1,6 +1,8 @@
 # New Propensity
 
-Repository chứa package thống kê mô tả, khai phá dữ liệu và tài liệu nghiên cứu propensity cho MBD-mini.
+Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
+Phiên bản 0.2.0 bỏ pipeline đặc trưng khách hàng–tháng và khai phá mở rộng;
+cấu hình mặc định dành cho máy RAM 16 GB, đọc dữ liệu theo batch.
 
 ## Setup trên máy khác
 
@@ -53,7 +55,7 @@ Các dependency được khai báo trong `pyproject.toml`. Cài package và ph�
 Bộ [MBD-mini](https://huggingface.co/datasets/ai-lab/MBD-mini) đã tải và giải nén
 trước đó nằm riêng tại `data/MBD-mini/`.
 
-Package thống kê mô tả và khai phá dữ liệu MBD-mini nằm tại
+Package thống kê mô tả MBD-mini nằm tại
 [`src/mbd_mini_eda/`](src/mbd_mini_eda/). Xem
 [cấu trúc, giao diện và thứ tự triển khai](docs/mbd_mini_eda_package.md).
 CLI hỗ trợ xem kế hoạch và chạy phân tích, xuất bảng CSV, biểu đồ PNG và báo cáo:

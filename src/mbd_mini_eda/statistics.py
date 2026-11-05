@@ -45,8 +45,15 @@ class UniformSample:
         self.priorities = np.empty(0)
 
     def update(self, frame):
-        weights = np.concatenate([self.priorities, self.random.random(len(frame))])
-        combined = pd.concat([self.frame, frame], ignore_index=True) if len(self.frame) else frame.reset_index(drop=True)
+        if frame.empty:
+            return
+        # Chọn ứng viên trước khi copy/concat: tối đa 2*k dòng thay vì cả batch.
+        incoming = self.random.random(len(frame))
+        candidates = (np.argpartition(incoming, self.size - 1)[:self.size]
+                      if len(frame) > self.size else np.arange(len(frame)))
+        weights = np.concatenate([self.priorities, incoming[candidates]])
+        selected = frame.iloc[candidates]
+        combined = pd.concat([self.frame, selected], ignore_index=True) if len(self.frame) else selected.reset_index(drop=True)
         keep = np.argpartition(weights, self.size - 1)[:self.size] if len(weights) > self.size else np.arange(len(weights))
         order = keep[np.argsort(weights[keep])]
         self.frame = combined.iloc[order].reset_index(drop=True).copy()
@@ -54,6 +61,13 @@ class UniformSample:
 
 
 def canonical(value):
+    if isinstance(value, np.ndarray) and value.dtype.kind in "biuf":
+        # Embedding Arrow -> numpy: chuẩn hóa null theo mảng, tránh gọi Python
+        # cho từng phần tử của vector 768 chiều khi kiểm tra trùng.
+        items = value.astype(object)
+        if value.dtype.kind == "f":
+            items[np.isnan(value)] = None
+        return items.tolist()
     if isinstance(value, (list, tuple, np.ndarray)):
         return [canonical(v) for v in value]
     if isinstance(value, dict):
@@ -90,7 +104,7 @@ def numeric_columns(frame):
     return [c for c in frame.select_dtypes(include=["number", "bool"]) if c not in excluded and not c.startswith("target_")]
 
 
-def target_rates(frame, groups, targets, *, window=None):
+def target_rates(frame, groups, targets):
     rows = []
     for group, part in frame.groupby(groups, dropna=False, observed=True, sort=True):
         group = group if isinstance(group, tuple) else (group,)
@@ -99,7 +113,7 @@ def target_rates(frame, groups, targets, *, window=None):
             n, positive = int(part[target].notna().sum()), int(part[target].eq(1).sum())
             rows.append({**keys, "target": target, "rows": len(part), "customers": part.client_id.nunique(),
                          "labelled_n": n, "positive_n": positive, "missing_n": len(part) - n,
-                         "rate": positive / n if n else np.nan, **({"history_days": window} if window is not None else {})})
+                         "rate": positive / n if n else np.nan})
     return pd.DataFrame(rows)
 
 

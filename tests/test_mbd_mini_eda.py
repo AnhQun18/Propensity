@@ -1,4 +1,4 @@
-"""Đối chiếu với dữ liệu tự tính, cutoff, partition và thống kê xuyên batch."""
+"""Đối chiếu bảy bước mô tả với pandas, xuyên batch/shard và giới hạn bộ nhớ."""
 
 from dataclasses import replace
 import hashlib
@@ -16,11 +16,12 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from mbd_mini_eda import MBDMiniConfig, run_analysis, load_config, build_plan
-from mbd_mini_eda.io import iter_batches, source_paths, read_reference_tables, validate_label_windows
+from mbd_mini_eda.io import iter_batches, source_paths, read_reference_tables
 from mbd_mini_eda.models import AnalysisContext
-from mbd_mini_eda.features import customers, customer_month
+from mbd_mini_eda.aggregation import customer_table
+from mbd_mini_eda.engine import engine
 from mbd_mini_eda.reporting import export_report
-from mbd_mini_eda.statistics import UniformSample
+from mbd_mini_eda.statistics import UniformSample, canonical, row_keys
 
 
 class MBDMiniTests(unittest.TestCase):
@@ -65,8 +66,8 @@ class MBDMiniTests(unittest.TestCase):
         dialog["fold"] = dialog.client_id.map(self.folds)
         self.write("detail/dialog",dialog)
         self.config = MBDMiniConfig(data_root=self.data,output_dir=self.root/"report",work_dir=self.root/"work",
-            batch_size=2,history_days=(30,84),sample_size=100,embedding_size=3,
-            duplicate_mode="exact",label_alignment="calendar_month")
+            batch_size=2,sample_size=100,embedding_size=3,sqlite_cache_mb=8,
+            duplicate_mode="exact")
 
     def tearDown(self):
         self.temp.cleanup()
@@ -85,10 +86,6 @@ class MBDMiniTests(unittest.TestCase):
         config=config or self.config
         context=AnalysisContext(config,source_paths(config.data_root))
         context.artifacts.update(read_reference_tables(context.sources))
-        months=pd.to_datetime(sorted(self.labels.mon.unique()))
-        starts=months.to_period("M").to_timestamp()
-        context.artifacts["label_windows"]=pd.DataFrame({"mon":months.strftime("%Y-%m-%d"),
-            "cutoff":starts,"label_start":starts,"label_end":starts+pd.offsets.MonthBegin(1)})
         return context
 
     def test_partition_projection_and_cross_shard_schema(self):
@@ -105,34 +102,33 @@ class MBDMiniTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Schema"):
             list(iter_batches(broken))
 
-    def test_cutoff_history_cardinality_and_missing_features(self):
+    def test_customer_aggregation_cardinality_and_zero_log_clients(self):
         with self.context() as context:
-            customers.run(context)
-            customer_month.run(context)
-            frame=context.artifacts["customer_month_features"]
-            self.assertEqual(len(frame),len(self.labels))
-            self.assertFalse(frame.duplicated(["client_id","mon"]).any())
-            a=frame[frame.client_id.eq("a") & frame.mon.eq("2022-02-28")].iloc[0]
-            self.assertEqual(a.trx_event_count_30d,2)
-            self.assertEqual(a.trx_amount_sum_30d,40)
-            self.assertEqual(a.trx_event_count_84d,3)
-            self.assertEqual(a.geo_unique_locations_30d,1)
-            self.assertEqual(a.trx_active_days_30d,1)
-            self.assertEqual(a.any_active_days_30d,3)
-            self.assertLess(a.trx_last_event_30d,a.cutoff)
+            frame=customer_table(context)
+            self.assertEqual(len(frame),4)
+            self.assertFalse(frame.client_id.duplicated().any())
+            a=frame[frame.client_id.eq("a")].iloc[0]
+            self.assertEqual(a.trx_event_count,5)
+            self.assertEqual(a.trx_amount_sum,180)
+            self.assertEqual(a.trx_active_days,4)
+            self.assertEqual(a.geo_unique_locations,2)
+            self.assertEqual(a.any_active_days,6)
+            self.assertEqual(a.trx_first_event,pd.Timestamp("2022-01-01 12:00"))
+            self.assertEqual(a.trx_last_event,pd.Timestamp("2022-02-20 12:00"))
+            self.assertEqual(a.trx_mean_gap_seconds,50*86400/4)
             d=frame[frame.client_id.eq("d")].iloc[0]
-            self.assertEqual(d.trx_event_count_30d,0)
-            self.assertTrue(pd.isna(d.trx_amount_mean_30d))
-            self.assertTrue(pd.isna(d.trx_recency_days_30d))
+            self.assertEqual(d.trx_event_count,0)
+            self.assertTrue(pd.isna(d.trx_amount_mean))
+            self.assertTrue(pd.isna(d.trx_first_event))
             self.assertNotIn("trans_count",frame)
-            report=customer_month.run(context).tables["source_window_coverage"]
-            self.assertFalse(report.observation_continuity_verified.any())
-            self.assertTrue((report.days_within_global_source_bounds<=report.window_days).all())
+            self.assertNotIn("z",set(frame.client_id))
+            # Vị trí 10 lặp ở hai ngày khác nhau chỉ tính một lần trên toàn lịch sử.
+            self.assertEqual(engine(context).db.execute("SELECT COUNT(*) FROM locations WHERE client_id='a'").fetchone()[0],2)
         self.assertEqual(list((self.root/"work").iterdir()),[])
 
     def test_full_pipeline_exact_moments_duplicates_and_labels(self):
         analysis=run_analysis(self.config)
-        self.assertEqual(len(analysis.sections),16)
+        self.assertEqual(len(analysis.sections),7)
         self.assertTrue(all(v.metadata["status"]=="completed" for v in analysis.sections.values()))
         quality=analysis.sections["descriptive.quality"].tables
         duplicates=quality["duplicates"]
@@ -142,6 +138,8 @@ class MBDMiniTests(unittest.TestCase):
         self.assertAlmostEqual(amounts["mean"],finite.mean())
         self.assertAlmostEqual(amounts["std"],finite.std())
         self.assertAlmostEqual(amounts["median"],finite.median())
+        self.assertEqual(amounts.whisker_low,0)
+        self.assertEqual(amounts.whisker_high,30)
         labels=analysis.sections["descriptive.targets"].tables["target_prevalence"].set_index("target")
         self.assertEqual(labels.loc["target_2","labelled_n"],11)
         self.assertEqual(labels.loc["target_2","positive_n"],1)
@@ -152,11 +150,9 @@ class MBDMiniTests(unittest.TestCase):
 
     def test_batch_boundary_invariance(self):
         with self.context(replace(self.config,batch_size=1)) as left:
-            customers.run(left)
-            first=left.artifacts["customer_features"]
+            first=customer_table(left)
         with self.context(replace(self.config,batch_size=7)) as right:
-            customers.run(right)
-            second=right.artifacts["customer_features"]
+            second=customer_table(right)
         pd.testing.assert_frame_equal(first,second)
         source=pd.DataFrame({"x":range(100)})
         one,two=UniformSample(9,42),UniformSample(9,42)
@@ -165,28 +161,41 @@ class MBDMiniTests(unittest.TestCase):
             two.update(source.iloc[start:start+7])
         pd.testing.assert_frame_equal(one.frame,two.frame)
 
-    def test_unresolved_windows_keep_independent_analyses(self):
-        analysis=run_analysis(replace(self.config,label_alignment="unresolved"))
-        self.assertEqual(analysis.sections["features.customer_month"].metadata["status"],"skipped")
-        self.assertEqual(analysis.sections["exploration.temporal"].metadata["status"],"completed")
-        self.assertEqual(analysis.sections["exploration.missingness"].metadata["status"],"completed")
-        self.assertEqual(analysis.sections["exploration.stability"].metadata["status"],"skipped")
+    def test_seven_steps_progress_and_embedding_batch_limit(self):
+        progress=[]
+        analysis=run_analysis(replace(self.config,batch_size=7,dialog_batch_size=1),progress=progress.append)
+        expected=["structure","quality","temporal","transactions","modalities","customers","targets"]
+        self.assertEqual(list(analysis.sections),["descriptive."+s for s in expected])
+        self.assertEqual(analysis.metadata["sources"]["dialog"]["batch_size"],1)
+        self.assertEqual(analysis.metadata["sources"]["dialog"]["scanned_rows"],4)
+        self.assertEqual(analysis.metadata["sources"]["transactions"]["scanned_rows"],len(self.trx))
+        self.assertTrue(any("dòng" in message for message in progress))
+        self.assertTrue(all(s.metadata["duration_seconds"]>=0 for s in analysis.sections.values()))
 
-    def test_window_validation_and_config_paths(self):
-        frame=pd.DataFrame({"mon":["2022-02-28"],"cutoff":["2022-02-01 12:00"],
-            "label_start":["2022-02-01 12:00"],"label_end":["2022-03-01"]})
-        with self.assertRaises(ValueError):
-            validate_label_windows(frame)
-        frame["cutoff"]="2022-02-01"
-        valid=validate_label_windows(frame)
-        self.assertEqual(valid.cutoff.iloc[0],pd.Timestamp("2022-02-01"))
-        with self.assertRaisesRegex(ValueError,"duy nhất"):
-            validate_label_windows(pd.concat([frame,frame]))
+    def test_embedding_duplicate_keys_match_array_and_list_content(self):
+        rows=pd.DataFrame({"client_id":["a","a","a"],
+                           "embedding":[np.array([1.,np.nan]),[1.,None],np.array([1.,2.])]})
+        keys=list(row_keys(rows))
+        self.assertEqual(keys[0],keys[1])
+        self.assertNotEqual(keys[0],keys[2])
+        self.assertEqual(canonical(np.array([[1.,np.nan],[2.,3.]])),[[1.,None],[2.,3.]])
+
+    def test_legacy_config_paths_and_memory_validation(self):
         config=self.root/"config.json"
-        config.write_text(json.dumps({"data_root":"data","output_dir":"out"}),encoding="utf-8")
-        loaded=load_config(config)
+        config.write_text(json.dumps({"data_root":"data","output_dir":"out","history_days":[30,84,180],
+                                      "label_alignment":"explicit","label_windows_path":"missing.csv"}),encoding="utf-8")
+        with self.assertWarnsRegex(UserWarning,"7 bước"):
+            loaded=load_config(config)
         self.assertEqual(loaded.data_root,self.data)
+        self.assertEqual(loaded.output_dir,self.root/"out")
         self.assertFalse(build_plan(loaded)["reads_raw_data"])
+        self.assertEqual(len(build_plan(loaded)["steps"]),7)
+        self.assertNotIn("history_days",loaded.to_dict())
+        for key in ("batch_size","dialog_batch_size","sqlite_cache_mb"):
+            with self.assertRaisesRegex(ValueError,key):
+                replace(self.config,**{key:0})
+        with self.context() as context:
+            self.assertEqual(engine(context).db.execute("PRAGMA cache_size").fetchone()[0],-8192)
 
     def test_export_cli_figures_and_raw_unchanged(self):
         before={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in self.data.rglob("*.parquet")}
@@ -195,6 +204,9 @@ class MBDMiniTests(unittest.TestCase):
         self.assertTrue((output/"report.md").exists())
         manifest=json.loads((output/"manifest.json").read_text(encoding="utf-8"))
         self.assertGreater(len(manifest["figures"]),10)
+        self.assertIn("figures/amount_boxplot.png",manifest["figures"])
+        self.assertIn("figures/source_timeline.png",manifest["figures"])
+        self.assertIn("erDiagram",(output/"report.md").read_text(encoding="utf-8"))
         from PIL import Image
         for name in manifest["figures"]:
             with Image.open(output/name) as image:
@@ -223,7 +235,7 @@ class MBDMiniTests(unittest.TestCase):
         analysis=run_analysis(self.config)
         self.assertEqual(analysis.metadata["sources"]["transactions"]["scanned_rows"],0)
 
-    def test_sample_scope_explicit_mapping_and_source_protection(self):
+    def test_sample_scope_timezone_and_source_protection(self):
         analysis=run_analysis(replace(self.config,sample_size=2,duplicate_mode="sample",timezone="UTC"))
         amounts=analysis.sections["descriptive.transactions"].tables["amount_summary"].iloc[0]
         self.assertEqual(amounts.quantile_scope,"uniform_row_sample")
@@ -231,17 +243,10 @@ class MBDMiniTests(unittest.TestCase):
         self.assertAlmostEqual(amounts["mean"],self.trx.amount.replace(np.inf,np.nan).mean())
         with self.assertRaisesRegex(ValueError,"dữ liệu nguồn"):
             export_report(analysis,self.data/"output")
-        with self.context() as context:
-            windows=context.artifacts["label_windows"].copy()
-        provided=run_analysis(replace(self.config,label_alignment="unresolved"),label_windows=windows)
-        self.assertEqual(provided.sections["features.customer_month"].metadata["label_alignment"],"provided_windows")
-        self.assertEqual(provided.metadata["label_alignment"],"provided_windows")
-        path=self.root/"windows.csv"
-        windows.to_csv(path,index=False)
-        explicit=replace(self.config,label_alignment="explicit",label_windows_path=path,analysis_months=("2022-02-28",))
-        outcome=run_analysis(explicit)
-        checks=outcome.sections["features.customer_month"].tables["customer_month_checks"]
-        self.assertEqual(set(checks.mon),{"2022-02-28"})
+        with self.context(replace(self.config,timezone="UTC")) as context:
+            self.assertEqual(str(customer_table(context).trx_first_event.dt.tz),"UTC")
+        with self.assertRaisesRegex(ValueError,"dữ liệu nguồn"):
+            run_analysis(replace(self.config,work_dir=self.data/"scratch"))
         with self.assertRaisesRegex(ValueError,"khóa"):
             path=self.data/"targets"/"fold=0"/"extra.parquet"
             bad=self.labels[self.labels.fold.eq(0)].drop(columns="fold")

@@ -18,7 +18,8 @@ def source_paths(data_root: str | Path) -> dict[str, Path]:
 def parquet_files(path: str | Path) -> list[Path]:
     path = Path(path)
     if not path.exists():
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(f"Không tìm thấy nguồn dữ liệu: {path}. Kiểm tra data_root trong JSON; "
+                                "thư mục gốc phải chứa client_split, targets và detail.")
     files = [path] if path.is_file() else sorted(path.rglob("*.parquet"))
     if not files:
         raise ValueError(f"Không có file Parquet: {path}")
@@ -91,39 +92,6 @@ def read_reference_tables(sources: dict[str, Path]) -> dict[str, pd.DataFrame]:
     if joined._merge.ne("both").any() or joined.fold_target.ne(joined.fold_client).any():
         raise ValueError("targets có client_id ngoài client_split hoặc fold không khớp")
     return result
-
-
-def load_label_windows(config, targets: pd.DataFrame) -> pd.DataFrame | None:
-    if config.label_alignment == "unresolved":
-        return None
-    if config.label_alignment == "explicit":
-        path = config.label_windows_path
-        frame = pd.read_parquet(path) if path.suffix.lower() == ".parquet" else pd.read_csv(path)
-    else:
-        months = pd.to_datetime(sorted(targets.mon.unique()))
-        starts = months.to_period("M").to_timestamp()
-        frame = pd.DataFrame({"mon": months.strftime("%Y-%m-%d"), "cutoff": starts,
-                              "label_start": starts, "label_end": starts + pd.offsets.MonthBegin(1)})
-    return validate_label_windows(frame, config.timezone)
-
-
-def validate_label_windows(frame: pd.DataFrame, timezone: str | None = None) -> pd.DataFrame:
-    required = ["mon", "cutoff", "label_start", "label_end"]
-    if set(required) - set(frame):
-        raise ValueError(f"label_windows cần {required}")
-    result = frame[required].copy()
-    result["mon"] = pd.to_datetime(result.mon, errors="raise").dt.strftime("%Y-%m-%d")
-    if result.mon.isna().any() or result.mon.duplicated().any():
-        raise ValueError("label_windows cần một mapping duy nhất mỗi mon")
-    for col in required[1:]:
-        result[col] = parse_times(result[col], timezone)
-    if result.isna().any().any():
-        raise ValueError("label_windows có mốc thời gian không hợp lệ")
-    if not ((result.cutoff <= result.label_start) & (result.label_start < result.label_end)).all():
-        raise ValueError("Cần cutoff <= label_start < label_end")
-    if not result.cutoff.eq(result.cutoff.dt.normalize()).all():
-        raise ValueError("Cutoff phải ở đầu ngày để tổng hợp chính xác từ dữ liệu theo ngày")
-    return result.sort_values("mon").reset_index(drop=True)
 
 
 def parse_times(values, timezone=None) -> pd.Series:

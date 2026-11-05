@@ -48,6 +48,29 @@ def descriptive_figures(result):
         ax.set_yticks([])
         ax.text(r["median"],1.04,"median"); ax.text(r.p95,.96,"P95"); ax.text(r.p99,1.04,"P99")
         figures["amount_quantiles"]=fig
+        fig,ax=figure("Amount boxplot ("+str(r.quantile_scope)+"; outlier points omitted)","Stored amount","")
+        ax.bxp([dict(med=r["median"],q1=r.p25,q3=r.p75,whislo=r.whisker_low,
+                     whishi=r.whisker_high,fliers=[])],showfliers=False,orientation="horizontal")
+        ax.set_yticks([])
+        figures["amount_boxplot"]=fig
+    categories=table(result,"descriptive.transactions","transaction_categories")
+    if not categories.empty:
+        part=categories[categories.kind.eq("value") & categories.column.eq("event_type")].head(20)
+        if not part.empty:
+            figures["transaction_event_types"]=bars(part,"value","n","Transaction event types")
+    ranges=table(result,"descriptive.temporal","source_time_ranges")
+    if not ranges.empty:
+        part=ranges.dropna(subset=["first_event","last_event"])
+        if not part.empty:
+            from matplotlib import dates
+            first=dates.date2num(pd.to_datetime(part.first_event).dt.to_pydatetime())
+            last=dates.date2num(pd.to_datetime(part.last_event).dt.to_pydatetime())
+            fig,ax=figure("Observed time range by source","Date","Source")
+            ax.barh(part.source,last-first,left=first,color=COLORS[0])
+            ax.xaxis_date()
+            ax.xaxis.set_major_formatter(dates.DateFormatter("%Y-%m"))
+            ax.tick_params(axis="x",rotation=45)
+            figures["source_timeline"]=fig
     monthly=table(result,"descriptive.temporal","monthly_activity")
     if not monthly.empty:
         fig,ax=figure("Events by month","Month","Events with valid ID/time")
@@ -84,74 +107,4 @@ def descriptive_figures(result):
         part=embeddings[embeddings.check.str.startswith("dimension_")].copy()
         if not part.empty:
             figures["embedding_dimensions"]=bars(part,"check","n","Embedding dimensions")
-    return figures
-
-def exploration_figures(result):
-    figures={}
-    calendar=table(result,"exploration.temporal","temporal_patterns")
-    if not calendar.empty:
-        source=calendar.source.iloc[0]
-        part=calendar[calendar.source.eq(source)]
-        matrix=part.pivot(index="weekday",columns="hour",values="share").reindex(index=range(7),columns=range(24),fill_value=0).fillna(0)
-        fig,ax=figure("Weekday/hour activity: "+source,"Hour","Weekday (Monday=0)")
-        im=ax.imshow(matrix,aspect="auto",cmap="Blues")
-        fig.colorbar(im,ax=ax,label="Fraction of valid-time events")
-        figures["weekday_hour"]=fig
-    for section,name,group,title in (
-        ("exploration.segments","segment_target_rates","segment","Target fraction by activity segment"),
-        ("exploration.modalities","modality_target_rates","combination","Target fraction by source combination")):
-        data=table(result,section,name)
-        if data.empty:
-            continue
-        data=data[data.history_days.eq(data.history_days.min())]
-        if "segment_feature" in data:
-            data=data[data.segment_feature.eq("trx_event_count")]
-        data=data.groupby([group,"target"],as_index=False)[["positive_n","labelled_n"]].sum()
-        fig,ax=figure(title+" (shortest window)",group,"Positive / observed")
-        for color,(target,part) in zip(COLORS,data.groupby("target")):
-            ax.plot(part[group].astype(str),part.positive_n/part.labelled_n.replace(0,np.nan),marker="o",label=target,color=color)
-        ax.legend(); ax.tick_params(axis="x",rotation=35)
-        figures[name]=fig
-    missing=table(result,"exploration.missingness","missingness_by_group")
-    if not missing.empty:
-        part=missing[missing.dimension.eq("month") & missing.column.eq("client_id")]
-        if not part.empty:
-            fig,ax=figure("Missing client ID over time","Month","Null fraction")
-            for color,(source,group) in zip(COLORS,part.groupby("source")):
-                ax.plot(group["group"],group.missing_rate,label=source,color=color)
-            ax.legend(); ax.tick_params(axis="x",rotation=45)
-            figures["missingness_by_month"]=fig
-    relations=table(result,"exploration.target_relationships","feature_by_target")
-    if not relations.empty:
-        part=relations[relations.feature.eq("trx_event_count") & relations.target.eq("target_1")]
-        part=part[part.history_days.eq(part.history_days.min())]
-        if not part.empty:
-            fig,ax=figure("Past transaction count by target_1","Label marker mon","Mean event count")
-            for label,group in part.groupby("label"):
-                ax.plot(group.mon,group["mean"],marker="o",label="label="+str(label))
-            ax.legend(); ax.tick_params(axis="x",rotation=45)
-            figures["past_behavior_by_target"]=fig
-    corr=table(result,"exploration.correlations","feature_correlations")
-    if not corr.empty:
-        part=corr[corr.mon.eq(corr.mon.iloc[0]) & corr.history_days.eq(corr.history_days.iloc[0])]
-        names=sorted(set(part.feature_a)|set(part.feature_b))
-        matrix=pd.DataFrame(np.nan,index=names,columns=names)
-        for row in part.itertuples(index=False):
-            matrix.loc[row.feature_a,row.feature_b]=row.spearman
-            matrix.loc[row.feature_b,row.feature_a]=row.spearman
-        fig,ax=figure("Spearman: first month/window (gray = undefined)","","")
-        from matplotlib import colormaps
-        cmap=colormaps["coolwarm"].with_extremes(bad="#e5e7eb")
-        image=ax.imshow(matrix,vmin=-1,vmax=1,cmap=cmap)
-        ax.set_xticks(range(len(names)),names,rotation=60,ha="right",fontsize=7)
-        ax.set_yticks(range(len(names)),names,fontsize=7)
-        fig.colorbar(image,ax=ax)
-        figures["feature_correlations"]=fig
-    stability=table(result,"exploration.stability","pattern_stability")
-    if not stability.empty:
-        fig,ax=figure("Variation across month/fold cells","Observed labels per group","Max rate - min rate")
-        part=stability.head(1000)
-        ax.scatter(part.labelled_n,part.max_rate-part.min_rate,alpha=.5,s=12)
-        ax.set_xscale("symlog")
-        figures["pattern_stability"]=fig
     return figures

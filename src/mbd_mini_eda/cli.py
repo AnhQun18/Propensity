@@ -12,7 +12,7 @@ from .reporting import render_plan, export_report
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Khung thống kê mô tả và EDA cho MBD-mini")
+    parser = argparse.ArgumentParser(description="Bảy bước thống kê mô tả cho MBD-mini")
     commands = parser.add_subparsers(dest="command", required=True)
     plan_parser = commands.add_parser("plan", help="Xem kế hoạch; không đọc dữ liệu gốc")
     plan_parser.add_argument("--config", type=Path, help="JSON cấu hình, có thể bỏ để dùng mặc định")
@@ -21,7 +21,6 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--config", type=Path)
     run_parser.add_argument("--output-dir", type=Path)
     run_parser.add_argument("--plots", action="store_true", help="Xuất PNG (cần extra plots)")
-    run_parser.add_argument("--label-alignment", choices=("unresolved", "calendar_month", "explicit"))
     run_parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -36,8 +35,6 @@ def main(argv: list[str] | None = None) -> int:
         overrides = {}
         if args.output_dir is not None:
             overrides["output_dir"] = args.output_dir.resolve()
-        if args.label_alignment is not None:
-            overrides["label_alignment"] = args.label_alignment
         config = replace(config, **overrides)
         progress = None if args.quiet else lambda key: print(key, file=sys.stderr, flush=True)
         analysis = run_analysis(config, progress=progress)

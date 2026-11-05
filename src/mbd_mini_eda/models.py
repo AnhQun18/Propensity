@@ -16,13 +16,8 @@ class AnalysisContext:
 
     sources trỏ tới các thư mục Parquet, được đọc theo batch ở io.py.
     artifacts chỉ giữ bảng khóa, nhãn và bảng tổng hợp vừa RAM; không giữ toàn bộ
-    sự kiện. Tên artifact gồm clients, targets, customer_features,
-    label_windows và customer_month_features.
-    section_results giữ kết quả các bước trước để exploration.stability đối chiếu.
-
-    label_windows cần các cột mon, cutoff, label_start, label_end với khoảng
-    nhãn [label_start, label_end), cutoff <= label_start. Mapping này phải được
-    xác minh trước khi triển khai features.customer_month.
+    sự kiện. Tên artifact gồm clients, targets và customer_summary.
+    section_results giữ kết quả bảy mục thống kê mô tả.
     """
 
     config: MBDMiniConfig

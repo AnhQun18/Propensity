@@ -19,13 +19,14 @@ def run(context: AnalysisContext) -> SectionResult:
             missing.append(dict(source=name,column=column,rows=len(frame),missing_n=n,missing_rate=n/len(frame) if len(frame) else np.nan))
         keys = ["client_id", "mon"] if name == "targets" else ["client_id"]
         duplicates.append(dict(source=name,kind="unique_key",duplicate_n=int(frame.duplicated(keys).sum()),analyzed_rows=len(frame),scope="full"))
+    aggregates = store.aggregate()
     for name, stats in store.stats.items():
         for column, n in stats.missing.items():
             missing.append(dict(source=name,column=column,rows=stats.rows,missing_n=n,missing_rate=n/stats.rows if stats.rows else np.nan))
         invalid.extend(dict(source=name,check=k,n=v) for k,v in stats.invalid.items())
         duplicates.append(dict(source=name,kind="full_row",duplicate_n=stats.duplicate_n,
             analyzed_rows=stats.duplicate_rows,scope=stats.duplicate_scope))
-        ids = store.query("SELECT DISTINCT client_id FROM daily WHERE source=?", (name,)).client_id
+        ids = aggregates.loc[aggregates.source.eq(name), "client_id"]
         matched = int(clients.client_id.isin(ids).sum())
         coverage.append(dict(source=name,reference_customers=len(clients),customers_with_valid_time_log=matched,
             distinct_ids_with_valid_time=len(ids),

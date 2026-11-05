@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 import tempfile
+from time import perf_counter
 
 import numpy as np
 import pandas as pd
@@ -32,9 +33,9 @@ class SourceStats:
     amount: Moments = field(default_factory=Moments)
     norms: Moments = field(default_factory=Moments)
     embedding_lengths: Counter = field(default_factory=Counter)
-    calendar: Counter = field(default_factory=Counter)
-    missing_groups: Counter = field(default_factory=Counter)
-    group_rows: Counter = field(default_factory=Counter)
+    duration_seconds: float = 0.0
+    batch_size: int = 0
+    batches: int = 0
     location_column: str | None = None
     sample: object = None
     duplicate_n: int | None = None
@@ -55,18 +56,19 @@ class EventEngine:
             PRAGMA journal_mode=OFF;
             PRAGMA synchronous=OFF;
             PRAGMA temp_store=FILE;
-            PRAGMA cache_size=-32768;
             CREATE TABLE daily (source TEXT, client_id TEXT, day TEXT, event_n INTEGER,
                 first_ns INTEGER, last_ns INTEGER, amount_n INTEGER, amount_sum REAL,
                 PRIMARY KEY(source, client_id, day)) WITHOUT ROWID;
-            CREATE TABLE locations (client_id TEXT, day TEXT, value TEXT,
-                PRIMARY KEY(client_id, day, value)) WITHOUT ROWID;
+            CREATE TABLE locations (client_id TEXT, value TEXT,
+                PRIMARY KEY(client_id, value)) WITHOUT ROWID;
             CREATE TABLE categories (source TEXT, column_name TEXT, kind TEXT, value TEXT, n INTEGER,
                 PRIMARY KEY(source,column_name,kind,value)) WITHOUT ROWID;
             CREATE TABLE duplicate_rows (source TEXT, row_key BLOB, n INTEGER,
                 PRIMARY KEY(source,row_key)) WITHOUT ROWID;
         """)
+        self.db.execute(f"PRAGMA cache_size=-{context.config.sqlite_cache_mb * 1024}")
         self.stats = {}
+        self._cache = {}
         self.scanned = False
 
     def close(self):
@@ -82,13 +84,16 @@ class EventEngine:
         config = self.context.config
         clients = self.context.artifacts["clients"].set_index("client_id").fold
         for index, source in enumerate(EVENT_SOURCES):
+            started = perf_counter()
             state = SourceStats(sample=UniformSample(config.sample_size, config.random_seed + index))
+            state.batch_size = min(config.batch_size, config.dialog_batch_size) if source == "dialog" else config.batch_size
             self.stats[source] = state
             spec = next(t for t in TABLES if t.name == source)
-            batches = iter_batches(self.context.sources[source], batch_size=config.batch_size)
+            batches = iter_batches(self.context.sources[source], batch_size=state.batch_size)
             if config.max_batches_per_source is not None:
                 batches = islice(batches, config.max_batches_per_source)
             for frame in batches:
+                state.batches += 1
                 required = {"client_id", "event_time"} | ({"amount"} if source == "transactions" else set())
                 if source == "dialog":
                     required.add("embedding")
@@ -113,19 +118,6 @@ class EventEngine:
                 state.invalid["unknown_client_rows"] += int((ids.notna() & ~ids.isin(clients.index)).sum())
                 if "fold" in frame:
                     state.invalid["fold_mismatch_rows"] += int((mapped.notna() & frame.fold.ne(mapped)).sum())
-                month = times.dt.strftime("%Y-%m").fillna("<INVALID_TIME>")
-                dimensions = [("month", month)]
-                if "event_type" in frame:
-                    dimensions.append(("event_type", frame.event_type.map(lambda v: json.dumps(canonical(v)))))
-                for dimension, values in dimensions:
-                    size = frame.groupby(values, dropna=False).size()
-                    state.group_rows.update({(dimension, str(k)): int(v) for k, v in size.items()})
-                    grouped = frame.isna().groupby(values, dropna=False).sum()
-                    for key, row in grouped.iterrows():
-                        state.missing_groups.update({(dimension, str(key), c): int(n) for c, n in row.items()})
-                cells = pd.DataFrame({"weekday": times[valid_time].dt.day_of_week,
-                                      "hour": times[valid_time].dt.hour}).value_counts()
-                state.calendar.update({(int(day), int(hour)): int(n) for (day, hour), n in cells.items()})
                 categories = [c for c in spec.categorical_columns if c in frame]
                 for column in categories:
                     counts = frame[column].dropna().value_counts()
@@ -176,16 +168,19 @@ class EventEngine:
                     location = next((c for c in ("geohash_6", "geohash_5", "geohash_4") if c in frame), None)
                     state.location_column = location
                     if location:
-                        loc = frame.loc[valid & frame[location].notna(), ["client_id", location]].copy()
-                        loc["day"] = times.loc[loc.index].dt.strftime("%Y-%m-%d")
-                        loc = loc.drop_duplicates()
-                        self.db.executemany("INSERT OR IGNORE INTO locations VALUES (?,?,?)",
-                            ((str(r[0]), r[2], json.dumps(canonical(r[1]))) for r in loc.itertuples(index=False, name=None)))
+                        # Bước 5 cần vị trí khác nhau trên toàn lịch sử của từng khách.
+                        # Không lưu lại cùng vị trí cho từng ngày như pipeline cửa sổ cũ.
+                        loc = pd.DataFrame({"client_id": ids, "value": frame[location]})
+                        loc = loc.loc[valid & loc.value.notna()].drop_duplicates()
+                        self.db.executemany("INSERT OR IGNORE INTO locations VALUES (?,?)",
+                            ((str(r[0]), json.dumps(canonical(r[1]))) for r in loc.itertuples(index=False, name=None)))
                 if config.duplicate_mode == "exact":
                     self.db.executemany("""INSERT INTO duplicate_rows VALUES (?,?,1)
                         ON CONFLICT(source,row_key) DO UPDATE SET n=n+1""",
                         ((source, key) for key in row_keys(frame)))
                 self.db.commit()
+                if state.batches % 10 == 0:
+                    self._progress(f"  {source}: đã quét {state.rows:,} dòng ({perf_counter()-started:.1f}s)")
             state.duplicate_scope = config.duplicate_mode
             if config.duplicate_mode == "exact":
                 state.duplicate_n = self.db.execute("SELECT COALESCE(SUM(n-1),0) FROM duplicate_rows WHERE source=?", (source,)).fetchone()[0]
@@ -196,11 +191,16 @@ class EventEngine:
                 state.duplicate_n = len(keys) - len(set(keys))
                 state.duplicate_rows = len(keys)
                 state.duplicate_scope = "all_scanned_rows" if len(keys) == state.rows else "uniform_row_sample"
-        self.db.execute("CREATE INDEX daily_day ON daily(day,source)")
-        self.db.execute("CREATE INDEX locations_day ON locations(day)")
+            state.duration_seconds = round(perf_counter() - started, 3)
+            self._progress(f"  {source}: {state.rows:,} dòng, hoàn thành trong {state.duration_seconds:.1f}s")
         self.db.commit()
         self.scanned = True
         return self
+
+    def _progress(self, message):
+        callback = self.context.runtime.get("progress")
+        if callback is not None:
+            callback(message)
 
     def categories(self, source):
         rows = []
@@ -217,28 +217,23 @@ class EventEngine:
         frame["rate"] = frame.n / frame.rows.replace(0, np.nan)
         return frame
 
-    def aggregate(self, start=None, end=None):
-        where, params = "", []
-        if start is not None:
-            where = " WHERE day>=? AND day<?"
-            params = [pd.Timestamp(start).strftime("%Y-%m-%d"), pd.Timestamp(end).strftime("%Y-%m-%d")]
-        return self.query("""SELECT source,client_id,SUM(event_n) event_count,COUNT(*) active_days,
-            MIN(first_ns) first_ns,MAX(last_ns) last_ns,SUM(amount_n) amount_n,SUM(amount_sum) amount_sum
-            FROM daily""" + where + " GROUP BY source,client_id", params)
+    def aggregate(self):
+        if "customers" not in self._cache:
+            self._cache["customers"] = self.query("""SELECT source,client_id,SUM(event_n) event_count,
+                COUNT(*) active_days,MIN(first_ns) first_ns,MAX(last_ns) last_ns,
+                SUM(amount_n) amount_n,SUM(amount_sum) amount_sum
+                FROM daily GROUP BY source,client_id""")
+        return self._cache["customers"].copy()
 
-    def active_days(self, start=None, end=None):
-        where, params = "", []
-        if start is not None:
-            where = " WHERE day>=? AND day<?"
-            params = [pd.Timestamp(start).strftime("%Y-%m-%d"), pd.Timestamp(end).strftime("%Y-%m-%d")]
-        return self.query("SELECT client_id,COUNT(DISTINCT day) any_active_days FROM daily" + where + " GROUP BY client_id", params)
+    def active_days(self):
+        if "days" not in self._cache:
+            self._cache["days"] = self.query("SELECT client_id,COUNT(DISTINCT day) any_active_days FROM daily GROUP BY client_id")
+        return self._cache["days"].copy()
 
-    def unique_locations(self, start=None, end=None):
-        where, params = "", []
-        if start is not None:
-            where = " WHERE day>=? AND day<?"
-            params = [pd.Timestamp(start).strftime("%Y-%m-%d"), pd.Timestamp(end).strftime("%Y-%m-%d")]
-        return self.query("SELECT client_id,COUNT(DISTINCT value) geo_unique_locations FROM locations" + where + " GROUP BY client_id", params)
+    def unique_locations(self):
+        if "locations" not in self._cache:
+            self._cache["locations"] = self.query("SELECT client_id,COUNT(*) geo_unique_locations FROM locations GROUP BY client_id")
+        return self._cache["locations"].copy()
 
 
 def engine(context, *, scan=True):

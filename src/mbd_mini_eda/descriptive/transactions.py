@@ -20,6 +20,8 @@ def run(context: AnalysisContext) -> SectionResult:
         "p75":q.loc[.75],"p95":q.loc[.95],"p99":q.loc[.99],
         "moments_scope":"all_scanned_finite_amounts","quantile_scope":scope}
     lower,upper=q.loc[.25]-1.5*(q.loc[.75]-q.loc[.25]),q.loc[.75]+1.5*(q.loc[.75]-q.loc[.25])
+    inside=values[values.between(lower,upper)]
+    summary.update(whisker_low=inside.min(),whisker_high=inside.max())
     outliers=pd.DataFrame([dict(lower=lower,upper=upper,outlier_n=int(((values<lower)|(values>upper)).sum()),
         analyzed_finite_n=len(values),scope=scope)])
     if len(values):

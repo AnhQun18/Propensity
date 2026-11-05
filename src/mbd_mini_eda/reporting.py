@@ -64,7 +64,7 @@ def _json_value(value):
 
 def export_report(result: AnalysisResult, output_dir: str | Path | None = None, *, plots=False) -> Path:
     """Xuất kết quả đã tính; manifest.json chỉ rõ các file của lần xuất hiện tại."""
-    from .visualization import descriptive_figures, exploration_figures
+    from .visualization import descriptive_figures
 
     destination = Path(output_dir or result.config.output_dir).resolve()
     if destination.is_relative_to(result.config.data_root.resolve()):
@@ -72,7 +72,6 @@ def export_report(result: AnalysisResult, output_dir: str | Path | None = None, 
     figures = {}
     if plots:
         figures.update(descriptive_figures(result))
-        figures.update(exploration_figures(result))
     # Kiểm tra trước khi ghi để tránh xuất một báo cáo chứa bảng cấp cá nhân.
     for section, item in result.sections.items():
         _safe_name(section)
@@ -82,13 +81,16 @@ def export_report(result: AnalysisResult, output_dir: str | Path | None = None, 
                 raise ValueError(f"Chỉ xuất bảng tổng hợp, không xuất client_id: {section}.{name}")
     destination.mkdir(parents=True, exist_ok=True)
     manifest = {"tables": [], "figures": [], "metadata": "metadata.json", "report": "report.md"}
-    lines = ["# Thống kê mô tả và EDA MBD-mini", "",
+    lines = ["# Bảy bước thống kê mô tả MBD-mini", "",
              "Phạm vi sự kiện: **" + result.metadata.get("event_scope", "unknown") + "**.", "",
              "Bảng khách hàng và nhãn được đọc toàn bộ. Mỗi mục ghi grain và scope trong metadata.json.",
              "Mean/std/min/max số tiền dùng toàn bộ giá trị hữu hạn đã quét; phân vị, outlier và histogram dùng mẫu ngẫu nhiên được khai báo.",
              "Kiểm tra trùng có scope riêng; số trùng trên mẫu không suy rộng thành số trùng toàn bộ.", "",
-             "Mapping nhãn: **" + result.metadata.get("label_alignment", result.config.label_alignment) + "**; timezone: **"
-             + (result.config.timezone or "naive_as_stored") + "**.", ""]
+             "Timezone: **" + (result.config.timezone or "naive_as_stored") + "**.",
+             "Thời gian phân tích: " + str(result.metadata.get("duration_seconds", "unknown")) + " giây (chưa gồm xuất báo cáo).", "",
+             "## Quan hệ dữ liệu", "", "```mermaid", "erDiagram",
+             "    clients ||--o{ targets : client_id", "    clients ||--o{ transactions : client_id",
+             "    clients ||--o{ geo : client_id", "    clients ||--o{ dialog : client_id", "```", ""]
     if result.metadata.get("event_scope") == "prefix":
         lines.extend(["**Đây là lần chạy thử trên prefix sự kiện, không đại diện cho quần thể.**", ""])
     quality = result.sections.get("descriptive.quality")

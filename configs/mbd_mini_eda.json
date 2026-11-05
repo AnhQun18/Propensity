@@ -1,10 +1,10 @@
 {
   "data_root": "../data/MBD-mini",
   "output_dir": "../docs/mbd_mini_eda",
-  "batch_size": 100000,
-  "history_days": [30, 84, 180],
+  "batch_size": 250000,
+  "dialog_batch_size": 4096,
+  "sqlite_cache_mb": 256,
   "random_seed": 42,
   "sample_size": 5000,
-  "duplicate_mode": "sample",
-  "label_alignment": "calendar_month"
+  "duplicate_mode": "sample"
 }
