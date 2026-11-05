@@ -1,0 +1,1399 @@
+{
+  "status": "passed",
+  "checks_passed": 263,
+  "tables": 34,
+  "figures": 18,
+  "population": 100224,
+  "target_rows": 1202688,
+  "event_rows": {
+    "transactions": 38764930,
+    "geo": 66295724,
+    "dialog": 217205
+  },
+  "raw_supplements": {
+    "status": "completed",
+    "script_version": "1.0.0",
+    "created_at": "2026-11-05T19:06:26.746305+00:00",
+    "data_root": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\data\\MBD-mini",
+    "duckdb_version": "2.0.0",
+    "duration_seconds": 474.713,
+    "memory_limit": "3GB",
+    "threads": 2,
+    "exact_duplicates": true,
+    "full_amount_quantiles": true,
+    "full_categorical_frequencies": true,
+    "first_last_event_month": true,
+    "raw_validation": "schema_row_counts_reference_keys_label_totals"
+  },
+  "checks": [
+    {
+      "check": "seven_sections_completed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "full_raw_completed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "all_supplements_exact",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/customer_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/customer_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/customer_aggregation_checks.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/customer_aggregation_checks.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/first_last_event_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/first_last_event_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/first_last_event_month.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/first_last_event_month.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/modality_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/modality_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.customers/source_count_distribution.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.customers/source_count_distribution.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.modalities/dialog_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.modalities/dialog_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.modalities/embedding_quality.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.modalities/embedding_quality.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.modalities/geo_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.modalities/geo_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.modalities/location_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.modalities/location_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.modalities/location_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.modalities/location_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.quality/duplicates.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.quality/duplicates.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.quality/invalid_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.quality/invalid_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.quality/key_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.quality/key_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.quality/missing_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.quality/missing_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.structure/column_roles.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.structure/column_roles.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.structure/relationship_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.structure/relationship_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.structure/table_inventory.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.structure/table_inventory.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/customer_positive_history.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/customer_positive_history.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/label_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/label_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/positive_labels_per_row.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/positive_labels_per_row.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/target_by_month_fold.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/target_by_month_fold.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/target_cooccurrence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/target_cooccurrence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.targets/target_prevalence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.targets/target_prevalence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.temporal/history_length_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.temporal/history_length_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.temporal/monthly_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.temporal/monthly_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.temporal/source_time_ranges.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.temporal/source_time_ranges.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/amount_by_currency.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/amount_by_currency.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/amount_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/amount_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/amount_log_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/amount_log_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/amount_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/amount_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/transaction_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/transaction_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/transaction_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/transaction_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "shape:tables/descriptive.transactions/transaction_outliers.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_client_id:tables/descriptive.transactions/transaction_outliers.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "PNG_dimensions:figures/amount_boxplot.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/amount_histogram.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/amount_log_histogram.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/amount_quantiles.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/customer_event_medians.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/embedding_dimensions.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/first_event_month.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/last_event_month.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/location_codes.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/missing_attributes.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/monthly_activity.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/monthly_customers.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/source_count_distribution.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/source_coverage.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/source_timeline.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/target_by_month.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/target_prevalence.png",
+      "passed": true,
+      "detail": [
+        1350,
+        750
+      ]
+    },
+    {
+      "check": "PNG_dimensions:figures/transaction_event_types.png",
+      "passed": true,
+      "detail": [
+        1350,
+        720
+      ]
+    },
+    {
+      "check": "manifest_no_missing_or_stale_files",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "report_link:tables/descriptive.structure/column_roles.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.structure/relationship_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.structure/table_inventory.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.quality/duplicates.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.quality/invalid_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.quality/key_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.quality/missing_values.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.temporal/history_length_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.temporal/monthly_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.temporal/source_time_ranges.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/amount_by_currency.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/amount_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/amount_log_histogram.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/amount_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/transaction_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/transaction_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.transactions/transaction_outliers.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.modalities/dialog_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.modalities/embedding_quality.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.modalities/geo_summary.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.modalities/location_categories.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.modalities/location_categories_full.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/customer_activity.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/customer_aggregation_checks.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/first_last_event_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/first_last_event_month.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/modality_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.customers/source_count_distribution.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/customer_positive_history.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/label_coverage.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/positive_labels_per_row.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/target_by_month_fold.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/target_cooccurrence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:tables/descriptive.targets/target_prevalence.csv",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/amount_boxplot.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/amount_histogram.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/amount_log_histogram.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/amount_quantiles.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/customer_event_medians.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/embedding_dimensions.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/first_event_month.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/last_event_month.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/location_codes.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/missing_attributes.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/monthly_activity.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/monthly_customers.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/source_count_distribution.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/source_coverage.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/source_timeline.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/target_by_month.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/target_prevalence.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "report_link:figures/transaction_event_types.png",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "monthly_event_sum:transactions",
+      "passed": true,
+      "detail": 38764930
+    },
+    {
+      "check": "base_scanned_rows:transactions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_orphan_or_null_ids:transactions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "first_last_coverage:transactions:first",
+      "passed": true,
+      "detail": 98721
+    },
+    {
+      "check": "first_last_coverage:transactions:last",
+      "passed": true,
+      "detail": 98721
+    },
+    {
+      "check": "monthly_event_sum:geo",
+      "passed": true,
+      "detail": 66295724
+    },
+    {
+      "check": "base_scanned_rows:geo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_orphan_or_null_ids:geo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "first_last_coverage:geo:first",
+      "passed": true,
+      "detail": 72573
+    },
+    {
+      "check": "first_last_coverage:geo:last",
+      "passed": true,
+      "detail": 72573
+    },
+    {
+      "check": "monthly_event_sum:dialog",
+      "passed": true,
+      "detail": 217205
+    },
+    {
+      "check": "base_scanned_rows:dialog",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "no_orphan_or_null_ids:dialog",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "first_last_coverage:dialog:first",
+      "passed": true,
+      "detail": 46320
+    },
+    {
+      "check": "first_last_coverage:dialog:last",
+      "passed": true,
+      "detail": 46320
+    },
+    {
+      "check": "category_full_total:currency",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:currency",
+      "passed": true,
+      "detail": 13
+    },
+    {
+      "check": "category_integer_canonical:currency",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:currency",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:currency",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:dst_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:dst_type11",
+      "passed": true,
+      "detail": 66
+    },
+    {
+      "check": "category_integer_canonical:dst_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:dst_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:dst_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:dst_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:dst_type12",
+      "passed": true,
+      "detail": 322
+    },
+    {
+      "check": "category_integer_canonical:dst_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:dst_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:dst_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:event_subtype",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:event_subtype",
+      "passed": true,
+      "detail": 60
+    },
+    {
+      "check": "category_integer_canonical:event_subtype",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:event_subtype",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:event_subtype",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:event_type",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:event_type",
+      "passed": true,
+      "detail": 55
+    },
+    {
+      "check": "category_integer_canonical:event_type",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:event_type",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:event_type",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:fold",
+      "passed": true,
+      "detail": 5
+    },
+    {
+      "check": "category_integer_canonical:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type11",
+      "passed": true,
+      "detail": 60
+    },
+    {
+      "check": "category_integer_canonical:src_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type12",
+      "passed": true,
+      "detail": 262
+    },
+    {
+      "check": "category_integer_canonical:src_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type21",
+      "passed": true,
+      "detail": 10081
+    },
+    {
+      "check": "category_integer_canonical:src_type21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type22",
+      "passed": true,
+      "detail": 85
+    },
+    {
+      "check": "category_integer_canonical:src_type22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type31",
+      "passed": true,
+      "detail": 1722
+    },
+    {
+      "check": "category_integer_canonical:src_type31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:src_type32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:src_type32",
+      "passed": true,
+      "detail": 86
+    },
+    {
+      "check": "category_integer_canonical:src_type32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:src_type32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:src_type32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "currency_11_merged",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:fold",
+      "passed": true,
+      "detail": 5
+    },
+    {
+      "check": "category_integer_canonical:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:fold",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:geohash_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:geohash_4",
+      "passed": true,
+      "detail": 18948
+    },
+    {
+      "check": "category_integer_canonical:geohash_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:geohash_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:geohash_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:geohash_5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:geohash_5",
+      "passed": true,
+      "detail": 122982
+    },
+    {
+      "check": "category_integer_canonical:geohash_5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:geohash_5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:geohash_5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_full_total:geohash_6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_distinct:geohash_6",
+      "passed": true,
+      "detail": 610866
+    },
+    {
+      "check": "category_integer_canonical:geohash_6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_top_total:geohash_6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "category_scope:geohash_6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_full_finite_count",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_quantile_scope",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_order",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_histogram:sum",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_histogram:nonnegative_bins",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_log_histogram:sum",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "amount_log_histogram:nonnegative_bins",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "currency_amount_counts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "currency_weighted_mean",
+      "passed": true,
+      "detail": 1304901.246744536
+    },
+    {
+      "check": "exact_duplicates:clients",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "exact_duplicates:targets",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "exact_duplicates:transactions",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "exact_duplicates:geo",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "exact_duplicates:dialog",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "labels_count:target_1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_month_fold:target_1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_count:target_2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_month_fold:target_2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_count:target_3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_month_fold:target_3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_count:target_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "labels_month_fold:target_4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "customer_combinations",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "zero_log_cohort",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "all_files_below_github_limit",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

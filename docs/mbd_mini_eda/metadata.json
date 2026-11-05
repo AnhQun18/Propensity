@@ -1,0 +1,139 @@
+{
+  "created_at": "2026-11-05T17:20:22.956890+00:00",
+  "python": "3.14.10",
+  "pandas": "3.1.0",
+  "pyarrow": "26.0.1",
+  "config": {
+    "data_root": "C:\\Users\\quanta11\\Documents\\Propensity-main\\data\\raw\\MBD-mini",
+    "output_dir": "C:\\Users\\quanta11\\Documents\\Propensity-main\\docs\\mbd_mini_eda",
+    "batch_size": 250000,
+    "dialog_batch_size": 4096,
+    "sqlite_cache_mb": 256,
+    "random_seed": 42,
+    "sample_size": 5000,
+    "max_categories": 20,
+    "embedding_size": 768,
+    "duplicate_mode": "sample",
+    "max_batches_per_source": null,
+    "work_dir": null,
+    "timezone": null
+  },
+  "analysis_scope": "seven_descriptive_steps",
+  "duration_seconds": 2145.355,
+  "event_scope": "full",
+  "sources": {
+    "transactions": {
+      "scanned_rows": 38764930,
+      "sample_rows": 5000,
+      "sample_seed": 42,
+      "sampling": "uniform_bottom_k_random_priorities",
+      "duration_seconds": 647.278,
+      "batch_size": 250000,
+      "batches": 408
+    },
+    "geo": {
+      "scanned_rows": 66295724,
+      "sample_rows": 5000,
+      "sample_seed": 43,
+      "sampling": "uniform_bottom_k_random_priorities",
+      "duration_seconds": 748.869,
+      "batch_size": 250000,
+      "batches": 460
+    },
+    "dialog": {
+      "scanned_rows": 217205,
+      "sample_rows": 5000,
+      "sample_seed": 44,
+      "sampling": "uniform_bottom_k_random_priorities",
+      "duration_seconds": 403.986,
+      "batch_size": 4096,
+      "batches": 415
+    }
+  },
+  "sections": {
+    "descriptive.structure": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "table",
+      "scope": "full_file_metadata",
+      "status": "completed",
+      "duration_seconds": 1.942
+    },
+    "descriptive.quality": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "column / key",
+      "duplicate_mode": "exact",
+      "status": "completed",
+      "duration_seconds": 1860.767
+    },
+    "descriptive.temporal": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "source / month / customer",
+      "status": "completed",
+      "duration_seconds": 127.768
+    },
+    "descriptive.transactions": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "transaction event",
+      "quantile_scope": "all_scanned_finite_amounts",
+      "status": "completed",
+      "duration_seconds": 0.066
+    },
+    "descriptive.modalities": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "event / customer",
+      "location_column": "geohash_6",
+      "embedding_size": 768,
+      "status": "completed",
+      "duration_seconds": 22.164
+    },
+    "descriptive.customers": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "customer",
+      "population": 100224,
+      "status": "completed",
+      "duration_seconds": 126.319
+    },
+    "descriptive.targets": {
+      "event_scope": "full",
+      "reference_scope": "full",
+      "timezone": "naive_as_stored",
+      "grain": "customer-month / customer",
+      "scope": "full_reference_rows",
+      "status": "completed",
+      "duration_seconds": 1.38
+    }
+  },
+  "raw_supplements": {
+    "status": "completed",
+    "script_version": "1.0.0",
+    "created_at": "2026-11-05T19:06:26.746305+00:00",
+    "data_root": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\data\\MBD-mini",
+    "duckdb_version": "2.0.0",
+    "duration_seconds": 474.713,
+    "memory_limit": "3GB",
+    "threads": 2,
+    "exact_duplicates": true,
+    "full_amount_quantiles": true,
+    "full_categorical_frequencies": true,
+    "first_last_event_month": true,
+    "raw_validation": "schema_row_counts_reference_keys_label_totals"
+  },
+  "export_revision": {
+    "version": "1.0.0",
+    "revised_at": "2026-11-05T19:13:15.265932+00:00",
+    "tables": 34,
+    "figures": 18
+  }
+}

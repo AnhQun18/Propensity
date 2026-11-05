@@ -1,0 +1,7 @@
+﻿left,right,observed_pairs,both_positive
+target_1,target_2,1202688,49
+target_1,target_3,1202688,263
+target_1,target_4,1202688,205
+target_2,target_3,1202688,32
+target_2,target_4,1202688,24
+target_3,target_4,1202688,131

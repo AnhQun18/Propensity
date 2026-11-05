@@ -73,9 +73,12 @@ def descriptive_figures(result):
             figures["source_timeline"]=fig
     monthly=table(result,"descriptive.temporal","monthly_activity")
     if not monthly.empty:
+        from matplotlib import dates
         fig,ax=figure("Events by month","Month","Events with valid ID/time")
         for color,(source,part) in zip(COLORS,monthly.groupby("source")):
+            part=part.assign(month=pd.to_datetime(part.month)).sort_values("month")
             ax.plot(part.month,part.events,label=source,color=color)
+        ax.xaxis.set_major_formatter(dates.DateFormatter("%Y-%m"))
         ax.legend(); ax.tick_params(axis="x",rotation=45)
         figures["monthly_activity"]=fig
     targets=table(result,"descriptive.targets","target_prevalence")

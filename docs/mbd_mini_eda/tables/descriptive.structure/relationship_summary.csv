@@ -1,0 +1,5 @@
+﻿left,right,keys,cardinality
+targets,clients,client_id,many_to_one
+transactions,clients,client_id,many_to_one
+geo,clients,client_id,many_to_one
+dialog,clients,client_id,many_to_one

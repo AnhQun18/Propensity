@@ -19,3 +19,4 @@ configs/*.local.json
 # Local build products.
 /build/
 /dist/
+/docs/mbd_mini_eda_local_*/

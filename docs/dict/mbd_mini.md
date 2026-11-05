@@ -95,7 +95,11 @@ Các mã không có bảng quy đổi nghiệp vụ đã xác minh; không tự 
 | Hội thoại | `2021-02-10 09:36:07.022271` → `2022-12-31 20:25:11.730797` |
 | Mốc tháng nhãn `mon` | `2022-02-28` → `2023-01-31`, đủ 12 mốc tháng |
 
-Timestamp của ba bảng detail không có null; timezone chưa được xác nhận. Phạm vi từng nguồn khác nhau; chưa có thống kê đầy đủ về chiều dài lịch sử của từng khách. Timeline chung không bảo đảm mỗi khách được quan sát suốt khoảng đó hoặc có đủ cả ba nguồn. Các ngày ngoài phạm vi của từng nguồn không được xem là những ngày không hoạt động.
+Timestamp của ba bảng detail không có null; timezone chưa được xác nhận. Phạm vi từng nguồn khác nhau.
+Đã bổ sung phân phối chiều dài lịch sử, ngày hoạt động và tháng đầu/cuối của khách
+trong [báo cáo 7 bước](../mbd_mini_eda/report.md); xem [kiểm kê đầu ra](../mbd_mini_eda_audit.md).
+Timeline chung không bảo đảm mỗi khách được quan sát suốt khoảng đó hoặc có đủ cả ba nguồn.
+Các ngày ngoài phạm vi của từng nguồn không được xem là những ngày không hoạt động.
 
 ## 5. Điểm đặc biệt và giới hạn
 

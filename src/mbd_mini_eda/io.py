@@ -5,9 +5,19 @@ from pathlib import Path
 from urllib.parse import unquote
 
 import pandas as pd
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 from .schema import TABLES, TARGET_COLUMNS
+
+
+def nullable_integer_dtype(dtype):
+    """Giữ mã nguyên chính xác khi batch có null hoặc không có pandas metadata."""
+    if pa.types.is_signed_integer(dtype):
+        return pd.Int64Dtype()
+    if pa.types.is_unsigned_integer(dtype):
+        return pd.UInt64Dtype()
+    return None
 
 
 def source_paths(data_root: str | Path) -> dict[str, Path]:
@@ -54,7 +64,7 @@ def iter_batches(path: str | Path, *, columns: Sequence[str] | None = None,
             raise ValueError(f"Thiếu cột {sorted(set(columns) - names)} trong {file}")
         physical = None if columns is None else [c for c in columns if c in current.names]
         for batch in reader.iter_batches(batch_size=batch_size, columns=physical):
-            frame = batch.to_pandas()
+            frame = batch.to_pandas(types_mapper=nullable_integer_dtype)
             for key, value in part.items():
                 if key in frame and not frame[key].eq(value).fillna(False).all():
                     raise ValueError(f"Partition {key} xung đột với nội dung: {file}")

@@ -1,0 +1,4 @@
+﻿source,reference_customers,with_log,without_log,scope
+transactions,100224,98721,1503,full_reference_customers
+geo,100224,72573,27651,full_reference_customers
+dialog,100224,46320,53904,full_reference_customers

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "new-propensity"
-version = "0.2.0"
+version = "0.2.1"
 requires-python = ">=3.10"
 description = "Dự án phân tích dữ liệu và mô hình propensity."
 readme = "README.md"
@@ -23,6 +23,7 @@ include = ["mbd_mini_eda*"]
 
 [project.optional-dependencies]
 plots = ["matplotlib>=3.10"]
+supplement = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 dev = ["build>=1.0"]
 notebook = [
     "ipykernel>=6.0",

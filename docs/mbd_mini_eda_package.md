@@ -1,6 +1,11 @@
 # Package thống kê mô tả MBD-mini
 
 Từ phiên bản 0.2.0, `mbd_mini_eda` thực hiện đúng **7 bước** theo khung đã chốt.
+
+Phiên bản 0.2.1 giữ mã nguyên có null nhất quán giữa các batch và sửa trục tháng
+theo lịch. Các script trong `deliverables/mbd_mini_eda_fixes/` bổ sung thống kê
+toàn bộ cho những đầu ra còn dùng mẫu ở package cơ bản. Xem
+[hướng dẫn chạy đầy đủ](run_complete_other_machine.md).
 Các bước dùng chung một lần quét Parquet và các bảng tổng hợp trên toàn lịch sử.
 Pipeline tạo đặc trưng khách hàng–tháng, cửa sổ 30/84/180 ngày và các module
 `exploration` đã được loại bỏ.

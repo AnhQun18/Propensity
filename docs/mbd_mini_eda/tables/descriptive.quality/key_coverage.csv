@@ -1,0 +1,4 @@
+﻿source,reference_customers,customers_with_valid_time_log,distinct_ids_with_valid_time,customers_without_valid_time_log,coverage,unknown_client_rows,missing_id_rows
+transactions,100224,98721,98721,1503,0.985003591954023,0,0
+geo,100224,72573,72573,27651,0.7241079980842912,0,0
+dialog,100224,46320,46320,53904,0.4621647509578544,0,0

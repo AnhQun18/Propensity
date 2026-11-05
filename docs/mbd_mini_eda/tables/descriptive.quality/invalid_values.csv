@@ -1,0 +1,12 @@
+﻿source,check,n
+transactions,invalid_event_time,0
+transactions,unknown_client_rows,0
+transactions,fold_mismatch_rows,0
+transactions,invalid_amount,0
+transactions,infinite_amount,0
+geo,invalid_event_time,0
+geo,unknown_client_rows,0
+geo,fold_mismatch_rows,0
+dialog,invalid_event_time,0
+dialog,unknown_client_rows,0
+dialog,fold_mismatch_rows,0

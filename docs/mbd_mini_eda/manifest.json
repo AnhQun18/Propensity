@@ -1,0 +1,549 @@
+{
+  "tables": [
+    {
+      "section": "descriptive.customers",
+      "name": "customer_activity",
+      "path": "tables/descriptive.customers/customer_activity.csv",
+      "rows": 20,
+      "columns": [
+        "feature",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ]
+    },
+    {
+      "section": "descriptive.customers",
+      "name": "customer_aggregation_checks",
+      "path": "tables/descriptive.customers/customer_aggregation_checks.csv",
+      "rows": 1,
+      "columns": [
+        "input_customers",
+        "output_customers",
+        "duplicate_keys",
+        "customers_without_log"
+      ]
+    },
+    {
+      "section": "descriptive.customers",
+      "name": "first_last_event_coverage",
+      "path": "tables/descriptive.customers/first_last_event_coverage.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "reference_customers",
+        "with_log",
+        "without_log",
+        "scope"
+      ]
+    },
+    {
+      "section": "descriptive.customers",
+      "name": "first_last_event_month",
+      "path": "tables/descriptive.customers/first_last_event_month.csv",
+      "rows": 121,
+      "columns": [
+        "source",
+        "milestone",
+        "month",
+        "customers",
+        "logged_customers",
+        "reference_customers",
+        "rate_among_logged",
+        "scope"
+      ]
+    },
+    {
+      "section": "descriptive.customers",
+      "name": "modality_coverage",
+      "path": "tables/descriptive.customers/modality_coverage.csv",
+      "rows": 8,
+      "columns": [
+        "trx_geo_dialog",
+        "customers",
+        "population",
+        "rate"
+      ]
+    },
+    {
+      "section": "descriptive.customers",
+      "name": "source_count_distribution",
+      "path": "tables/descriptive.customers/source_count_distribution.csv",
+      "rows": 4,
+      "columns": [
+        "source_count",
+        "customers",
+        "population",
+        "rate"
+      ]
+    },
+    {
+      "section": "descriptive.modalities",
+      "name": "dialog_summary",
+      "path": "tables/descriptive.modalities/dialog_summary.csv",
+      "rows": 2,
+      "columns": [
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ]
+    },
+    {
+      "section": "descriptive.modalities",
+      "name": "embedding_quality",
+      "path": "tables/descriptive.modalities/embedding_quality.csv",
+      "rows": 6,
+      "columns": [
+        "check",
+        "n",
+        "value"
+      ]
+    },
+    {
+      "section": "descriptive.modalities",
+      "name": "geo_summary",
+      "path": "tables/descriptive.modalities/geo_summary.csv",
+      "rows": 3,
+      "columns": [
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ]
+    },
+    {
+      "section": "descriptive.modalities",
+      "name": "location_categories",
+      "path": "tables/descriptive.modalities/location_categories.csv",
+      "rows": 73,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ]
+    },
+    {
+      "section": "descriptive.modalities",
+      "name": "location_categories_full",
+      "path": "tables/descriptive.modalities/location_categories_full.csv",
+      "rows": 752805,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ]
+    },
+    {
+      "section": "descriptive.quality",
+      "name": "duplicates",
+      "path": "tables/descriptive.quality/duplicates.csv",
+      "rows": 7,
+      "columns": [
+        "source",
+        "kind",
+        "duplicate_n",
+        "analyzed_rows",
+        "scope"
+      ]
+    },
+    {
+      "section": "descriptive.quality",
+      "name": "invalid_values",
+      "path": "tables/descriptive.quality/invalid_values.csv",
+      "rows": 11,
+      "columns": [
+        "source",
+        "check",
+        "n"
+      ]
+    },
+    {
+      "section": "descriptive.quality",
+      "name": "key_coverage",
+      "path": "tables/descriptive.quality/key_coverage.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "reference_customers",
+        "customers_with_valid_time_log",
+        "distinct_ids_with_valid_time",
+        "customers_without_valid_time_log",
+        "coverage",
+        "unknown_client_rows",
+        "missing_id_rows"
+      ]
+    },
+    {
+      "section": "descriptive.quality",
+      "name": "missing_values",
+      "path": "tables/descriptive.quality/missing_values.csv",
+      "rows": 36,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "missing_n",
+        "missing_rate"
+      ]
+    },
+    {
+      "section": "descriptive.structure",
+      "name": "column_roles",
+      "path": "tables/descriptive.structure/column_roles.csv",
+      "rows": 36,
+      "columns": [
+        "source",
+        "column",
+        "dtype",
+        "role"
+      ]
+    },
+    {
+      "section": "descriptive.structure",
+      "name": "relationship_summary",
+      "path": "tables/descriptive.structure/relationship_summary.csv",
+      "rows": 4,
+      "columns": [
+        "left",
+        "right",
+        "keys",
+        "cardinality"
+      ]
+    },
+    {
+      "section": "descriptive.structure",
+      "name": "table_inventory",
+      "path": "tables/descriptive.structure/table_inventory.csv",
+      "rows": 5,
+      "columns": [
+        "source",
+        "files",
+        "rows",
+        "row_unit",
+        "logical_columns",
+        "schema_variants"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "customer_positive_history",
+      "path": "tables/descriptive.targets/customer_positive_history.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "customers",
+        "observed_customers",
+        "ever_positive_customers",
+        "rate",
+        "mean_positive_months"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "label_coverage",
+      "path": "tables/descriptive.targets/label_coverage.csv",
+      "rows": 60,
+      "columns": [
+        "mon",
+        "fold",
+        "customer_month_rows",
+        "customers",
+        "targets",
+        "observed_label_cells",
+        "missing_label_cells"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "positive_labels_per_row",
+      "path": "tables/descriptive.targets/positive_labels_per_row.csv",
+      "rows": 5,
+      "columns": [
+        "positive_labels",
+        "rows"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "target_by_month_fold",
+      "path": "tables/descriptive.targets/target_by_month_fold.csv",
+      "rows": 240,
+      "columns": [
+        "mon",
+        "fold",
+        "target",
+        "rows",
+        "customers",
+        "labelled_n",
+        "positive_n",
+        "missing_n",
+        "rate"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "target_cooccurrence",
+      "path": "tables/descriptive.targets/target_cooccurrence.csv",
+      "rows": 6,
+      "columns": [
+        "left",
+        "right",
+        "observed_pairs",
+        "both_positive"
+      ]
+    },
+    {
+      "section": "descriptive.targets",
+      "name": "target_prevalence",
+      "path": "tables/descriptive.targets/target_prevalence.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "rows",
+        "labelled_n",
+        "positive_n",
+        "negative_n",
+        "missing_n",
+        "rate"
+      ]
+    },
+    {
+      "section": "descriptive.temporal",
+      "name": "history_length_summary",
+      "path": "tables/descriptive.temporal/history_length_summary.csv",
+      "rows": 6,
+      "columns": [
+        "source",
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ]
+    },
+    {
+      "section": "descriptive.temporal",
+      "name": "monthly_activity",
+      "path": "tables/descriptive.temporal/monthly_activity.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "month",
+        "events",
+        "customers",
+        "observed_days",
+        "events_per_active_customer"
+      ]
+    },
+    {
+      "section": "descriptive.temporal",
+      "name": "source_time_ranges",
+      "path": "tables/descriptive.temporal/source_time_ranges.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "first_event",
+        "last_event",
+        "scanned_rows",
+        "valid_time_rows"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "amount_by_currency",
+      "path": "tables/descriptive.transactions/amount_by_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "currency_missing",
+        "rows",
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "scope"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "amount_histogram",
+      "path": "tables/descriptive.transactions/amount_histogram.csv",
+      "rows": 40,
+      "columns": [
+        "left",
+        "right",
+        "n",
+        "scope"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "amount_log_histogram",
+      "path": "tables/descriptive.transactions/amount_log_histogram.csv",
+      "rows": 40,
+      "columns": [
+        "left",
+        "right",
+        "n",
+        "scope",
+        "transform"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "amount_summary",
+      "path": "tables/descriptive.transactions/amount_summary.csv",
+      "rows": 1,
+      "columns": [
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "scanned_rows",
+        "sample_rows",
+        "sample_finite_n",
+        "missing_n",
+        "infinite_n",
+        "invalid_n",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "moments_scope",
+        "quantile_scope",
+        "whisker_low",
+        "whisker_high",
+        "quantile_method"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "transaction_categories",
+      "path": "tables/descriptive.transactions/transaction_categories.csv",
+      "rows": 242,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "transaction_categories_full",
+      "path": "tables/descriptive.transactions/transaction_categories_full.csv",
+      "rows": 12829,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ]
+    },
+    {
+      "section": "descriptive.transactions",
+      "name": "transaction_outliers",
+      "path": "tables/descriptive.transactions/transaction_outliers.csv",
+      "rows": 1,
+      "columns": [
+        "lower",
+        "upper",
+        "outlier_n",
+        "analyzed_finite_n",
+        "scope"
+      ]
+    }
+  ],
+  "figures": [
+    "figures/amount_boxplot.png",
+    "figures/amount_histogram.png",
+    "figures/amount_log_histogram.png",
+    "figures/amount_quantiles.png",
+    "figures/customer_event_medians.png",
+    "figures/embedding_dimensions.png",
+    "figures/first_event_month.png",
+    "figures/last_event_month.png",
+    "figures/location_codes.png",
+    "figures/missing_attributes.png",
+    "figures/monthly_activity.png",
+    "figures/monthly_customers.png",
+    "figures/source_count_distribution.png",
+    "figures/source_coverage.png",
+    "figures/source_timeline.png",
+    "figures/target_by_month.png",
+    "figures/target_prevalence.png",
+    "figures/transaction_event_types.png"
+  ],
+  "metadata": "metadata.json",
+  "report": "report.md"
+}

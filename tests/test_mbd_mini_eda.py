@@ -161,6 +161,41 @@ class MBDMiniTests(unittest.TestCase):
             two.update(source.iloc[start:start+7])
         pd.testing.assert_frame_equal(one.frame,two.frame)
 
+    def test_nullable_integer_codes_without_pandas_metadata(self):
+        # Nguồn thật không có metadata pandas: null từng batch không được đổi mã thành float.
+        for path in self.data.rglob("*.parquet"):
+            raw=pq.ParquetFile(path).read().replace_schema_metadata(None)
+            pq.write_table(raw,path)
+        snapshots=[]
+        for size in (1,7):
+            with self.context(replace(self.config,batch_size=size)) as context:
+                categories=engine(context).categories("transactions")
+                currency=categories[categories.column.eq("currency")]
+                self.assertEqual(set(currency[currency.kind.eq("value")].value),{"1","2"})
+                self.assertEqual(currency.distinct_n.unique().tolist(),[2])
+                self.assertEqual(currency.n.sum(),len(self.trx))
+                snapshots.append(categories)
+        pd.testing.assert_frame_equal(*snapshots)
+        directory=self.root/"integer_precision"
+        directory.mkdir()
+        exact=2**53+1
+        pq.write_table(pa.table({"code":pa.array([exact,None,exact],type=pa.int64())}),directory/"part.parquet")
+        frame=pd.concat(iter_batches(directory,batch_size=1),ignore_index=True)
+        self.assertEqual(int(frame.code.iloc[0]),exact)
+        self.assertEqual(str(frame.code.dtype),"Int64")
+
+    def test_monthly_plot_uses_calendar_axis(self):
+        from types import SimpleNamespace
+        from mbd_mini_eda.visualization import descriptive_figures
+        monthly=pd.DataFrame({"source":["dialog","dialog","transactions","transactions"],
+            "month":["2022-02","2022-03","2021-12","2022-01"],"events":[1,2,3,4]})
+        result=SimpleNamespace(sections={"descriptive.temporal":SimpleNamespace(tables={"monthly_activity":monthly})})
+        axis=descriptive_figures(result)["monthly_activity"].axes[0]
+        for line in axis.lines:
+            self.assertTrue(pd.api.types.is_datetime64_any_dtype(line.get_xdata()))
+            self.assertTrue(pd.Index(line.get_xdata()).is_monotonic_increasing)
+        self.assertLess(axis.lines[1].get_xdata()[0],axis.lines[0].get_xdata()[0])
+
     def test_seven_steps_progress_and_embedding_batch_limit(self):
         progress=[]
         analysis=run_analysis(replace(self.config,batch_size=7,dialog_batch_size=1),progress=progress.append)

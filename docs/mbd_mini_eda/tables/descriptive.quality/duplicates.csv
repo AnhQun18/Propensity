@@ -1,0 +1,8 @@
+﻿source,kind,duplicate_n,analyzed_rows,scope
+clients,unique_key,0,100224,full
+targets,unique_key,0,1202688,full
+clients,full_row,0,100224,all_scanned_rows
+targets,full_row,0,1202688,all_scanned_rows
+transactions,full_row,0,38764930,all_scanned_rows
+geo,full_row,0,66295724,all_scanned_rows
+dialog,full_row,0,217205,all_scanned_rows

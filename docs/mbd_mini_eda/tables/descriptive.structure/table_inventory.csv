@@ -1,0 +1,6 @@
+﻿source,files,rows,row_unit,logical_columns,schema_variants
+clients,1000,100224,customer,2,1
+targets,435,1202688,customer-month,9,1
+transactions,400,38764930,transaction event,15,1
+geo,460,66295724,location event,6,1
+dialog,415,217205,dialog event,4,1

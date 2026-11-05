@@ -1,0 +1,2 @@
+﻿finite_n,mean,std,min,max,scanned_rows,sample_rows,sample_finite_n,missing_n,infinite_n,invalid_n,p25,median,p75,p95,p99,moments_scope,quantile_scope,whisker_low,whisker_high,quantile_method
+38764930,1304901.2467444781,480446055.5156194,3.021820702997502e-06,1370187366400.0,38764930,0,0,0,0,0,2453.86865234375,18035.8369140625,94759.544921875,904811.1562499981,5377121.430000074,all_scanned_finite_amounts,all_scanned_finite_amounts,3.021820702997502e-06,233218.046875,exact_continuous_type7_linear

@@ -1,5 +1,9 @@
 # Setup từ GitHub và chạy trên máy đã có dữ liệu
 
+Để chạy **đầy đủ cả phần bổ sung và xuất kết quả cuối**, dùng
+[hướng dẫn quy trình hoàn chỉnh](run_complete_other_machine.md) với Python >=3.11.
+Trang này mô tả riêng package cơ bản; một số phân vị và kiểm tra trùng còn dùng mẫu.
+
 Yêu cầu: Python **3.10 trở lên**, venv và bộ MBD-mini đã giải nén trên máy.
 Lần cài đầu cần truy cập kho package Python để tải các dependency.
 Các bước dưới dùng Windows PowerShell; cuối trang có lệnh tương ứng cho Linux/macOS.

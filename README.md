@@ -3,6 +3,13 @@
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
 Phiên bản 0.2.0 bỏ pipeline đặc trưng khách hàng–tháng và khai phá mở rộng;
 cấu hình mặc định dành cho máy RAM 16 GB, đọc dữ liệu theo batch.
+Phiên bản 0.2.1 sửa mã nguyên có null và trục thời gian. Bộ script bổ sung
+cho phép hoàn tất phân vị, tần suất mã và kiểm tra trùng trên toàn bộ dữ liệu.
+
+**Chạy đủ quy trình trên máy đã có data/venv:** xem
+[hướng dẫn chi tiết](docs/run_complete_other_machine.md) (Python >=3.11).
+Kết quả đã chạy nằm tại [báo cáo 7 bước](docs/mbd_mini_eda/report.md).
+Xem [kiểm kê cuối và giới hạn diễn giải](docs/mbd_mini_eda_audit.md).
 
 ## Setup trên máy khác
 
@@ -23,10 +30,12 @@ trên máy đó, ví dụ `"D:/Datasets/MBD-mini"`, rồi chạy:
 
 ```powershell
 .\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.local.json --plots
+.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.local.json --output-dir build/mbd_mini_eda_base --plots
 ```
 
-Kết quả mặc định ở `docs/mbd_mini_eda/report.md`. Hướng dẫn từng bước, cấu trúc
+Lệnh trên lưu kết quả cơ bản ở `build/mbd_mini_eda_base/report.md`. Để tính bổ sung
+và giữ snapshot kết quả GitHub, dùng [quy trình đầy đủ](docs/run_complete_other_machine.md).
+Hướng dẫn package cơ bản, cấu trúc
 thư mục dữ liệu, Linux/macOS và xử lý lỗi thường gặp nằm tại
 [Setup và chạy trên máy khác](docs/setup_other_machine.md).
 
@@ -61,7 +70,7 @@ Package thống kê mô tả MBD-mini nằm tại
 CLI hỗ trợ xem kế hoạch và chạy phân tích, xuất bảng CSV, biểu đồ PNG và báo cáo:
 
 ```powershell
-.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.json --plots
+.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.json --output-dir build/mbd_mini_eda_base --plots
 ```
 
 Kiểm thử bằng dữ liệu tổng hợp:
