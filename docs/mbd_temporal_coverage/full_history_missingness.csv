@@ -1,0 +1,9 @@
+﻿metric,clients,opportunities_per_client,clients_no_events,clients_absent_strictly_over_50_percent,percent_clients_absent_strictly_over_50_percent,clients_at_least_50_percent_observed
+any_source_active_days_all_initial_clients,100224,354,1156,42320,42.225415070242654,57904
+any_source_active_days_among_clients_with_any_events,99068,354,0,41164,41.551257721968746,57904
+any_source_active_days_among_all_three_source_clients,25695,354,0,4854,18.89083479276124,20841
+source_day_cells_all_initial_clients,100224,1062,1156,95227,95.01416826309068,4997
+sources_available_all_initial_clients,100224,3,1156,22329,22.279094827586206,77895
+any_source_first_last_calendar_span,100224,354,1156,7774,7.756625159642401,92450
+all_three_common_first_last_calendar_span,100224,354,79239,96396,96.18055555555556,3828
+any_source_full_earliest_history_active_days,100224,699,832,62997,62.85620210727969,37227

@@ -3,15 +3,11 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .ipynb_checkpoints/
-# Raw datasets and local downloads; retain the download script.
+# Raw datasets and local downloads.
 /data/*
-!/data/code.py
-/sample_data/*
-!/sample_data/.gitkeep
 
 # Generated data containing individual user records.
 *.parquet
-/docs/fliggy_140721_profile/binary_matrix_sample.csv
 
 # Local credentials and environment configuration.
 .env

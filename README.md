@@ -1,6 +1,6 @@
 # New Propensity
 
-Repository lưu trữ tài liệu, notebook phân tích dữ liệu khám phá (EDA), mã nguồn core và dữ liệu ví dụ cho dự án propensity.
+Repository chứa package thống kê mô tả, khai phá dữ liệu và tài liệu nghiên cứu propensity cho MBD-mini.
 
 ## Cấu trúc thư mục
 
@@ -8,28 +8,36 @@ Repository lưu trữ tài liệu, notebook phân tích dữ liệu khám phá (
 .
 ├── docs/             # Tài liệu dự án
 ├── notebooks/        # Notebook EDA
-├── src/              # Mã nguồn core
-├── sample_data/      # Dữ liệu ví dụ
-├── data/             # Script tải, dữ liệu MBD-mini và eCommerce
+├── src/              # Package mbd_mini_eda và script kiểm chứng MBD-mini
+├── tests/            # Kiểm thử bằng dữ liệu tổng hợp
+├── configs/          # Cấu hình package MBD-mini
+├── data/             # Dữ liệu gốc cục bộ, không đưa lên Git
 ├── pyproject.toml    # Khai báo thông tin dự án và dependency
 └── README.md         # Mô tả repository
 ```
 
-Các thư mục có file `.gitkeep` để Git lưu lại cấu trúc khi chưa có nội dung.
-
 ## Dependency
 
-Khai báo các thư viện cần dùng trong danh sách `dependencies` của `pyproject.toml`.
+Các dependency được khai báo trong `pyproject.toml`. Cài package và phần vẽ biểu đồ:
 
-Script `data/code.py` tải bộ dữ liệu
-[eCommerce behavior data from multi category store](https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store)
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[plots]"
+```
 
 Bộ [MBD-mini](https://huggingface.co/datasets/ai-lab/MBD-mini) đã tải và giải nén
 trước đó nằm riêng tại `data/MBD-mini/`.
 
-[dataset 140721](https://tianchi.aliyun.com/dataset/140721)
+Package thống kê mô tả và khai phá dữ liệu MBD-mini nằm tại
+[`src/mbd_mini_eda/`](src/mbd_mini_eda/). Xem
+[cấu trúc, giao diện và thứ tự triển khai](docs/mbd_mini_eda_package.md).
+CLI hỗ trợ xem kế hoạch và chạy phân tích, xuất bảng CSV, biểu đồ PNG và báo cáo:
 
-- `user_behavior_transfer_plans.csv`
-- `user_profile.csv`
-- `transfer_plan_profile.csv`
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.json --plots
+```
 
+Kiểm thử bằng dữ liệu tổng hợp:
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+```

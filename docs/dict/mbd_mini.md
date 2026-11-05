@@ -17,8 +17,10 @@ một sự kiện, và các bảng `ptls`, nơi mỗi dòng là một chuỗi c�
 - Mỗi nhãn nhận 1 nếu ghi nhận mua sản phẩm tương ứng trong khoảng nhãn,
   bằng 0 nếu không ghi nhận mua sản phẩm đó.
 - Chưa xác định tên nghiệp vụ của bốn sản phẩm, nên giữ nguyên tên nhãn.
-- Cần xác định khoảng nhãn và cutoff tương ứng với `mon` trước khi lấy
-  lịch sử đầu vào.
+- Tháng lịch chứa `mon` là tháng nhãn theo quy ước đã đối chiếu với các bài báo;
+  cutoff là ngày đầu tháng và lịch sử chỉ gồm sự kiện `event_time < cutoff`.
+  Ví dụ `mon=2022-02-28` dùng cutoff `2022-02-01`. Xem
+  [nghiên cứu `mon` và giới hạn về múi giờ](../propensity_feasibility/mon_research.md).
 
 **Đầu ra.** Mô hình trả về 1 trong 4 xác suất `p_target_1`–`p_target_4 ∈ [0, 1]`
 cho mỗi khách hàng tại cutoff. Đây là bài toán nhiều nhãn, để xây dựng dự án này có thể lựa chọn 1 trong 4 hoặc giữ cả 4
@@ -55,7 +57,7 @@ Có **100.224 khách hàng × 12 tháng = 1.202.688 mẫu có nhãn**. Bảng `t
 |---|---|---|
 | `client_id` | string | Khóa khách hàng nối các bảng; dùng định danh/nhóm lịch sử |
 | `fold` | Partition | Nhóm khách hàng để chia dữ liệu; dùng quản lý split |
-| `mon` | string ngày `YYYY-MM-DD` | Mốc tháng trong bảng nhãn; cần xác nhận quan hệ với cutoff |
+| `mon` | string ngày `YYYY-MM-DD` | Ngày cuối tháng nhãn; cutoff ở ngày đầu tháng chứa `mon`, chỉ dùng lịch sử trước cutoff |
 | `target_1`–`target_4` | int32 | Bốn nhãn nhị phân; không đưa vào feature cùng mẫu |
 | `trans_count` | int32 | Trường đếm giao dịch trong `targets`; chưa xác minh khoảng thời gian tính |
 | `diff_trans_date` | int32 | Trường chênh lệch thời gian liên quan giao dịch; chưa xác minh công thức, đơn vị và cutoff |

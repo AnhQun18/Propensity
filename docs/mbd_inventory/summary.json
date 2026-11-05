@@ -1,0 +1,203 @@
+{
+  "checked_at": "2026-11-05T21:32:09.730703+07:00",
+  "scope": "Every Parquet footer and top-level schema; full client_split IDs and target client-month keys",
+  "tables": {
+    "client_split": {
+      "files": 1000,
+      "rows": 100224,
+      "unit": "Khách hàng",
+      "physical_column_count": 1,
+      "logical_column_count": 2,
+      "physical_columns": {
+        "client_id": "string"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "targets": {
+      "files": 435,
+      "rows": 1202688,
+      "unit": "Khách hàng–tháng",
+      "physical_column_count": 8,
+      "logical_column_count": 9,
+      "physical_columns": {
+        "client_id": "string",
+        "mon": "string",
+        "target_1": "int32",
+        "target_2": "int32",
+        "target_3": "int32",
+        "target_4": "int32",
+        "trans_count": "int32",
+        "diff_trans_date": "int32"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "detail/trx": {
+      "files": 400,
+      "rows": 38764930,
+      "unit": "Sự kiện giao dịch",
+      "physical_column_count": 14,
+      "logical_column_count": 15,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "timestamp[ns]",
+        "amount": "float",
+        "event_type": "int32",
+        "event_subtype": "int32",
+        "currency": "int32",
+        "src_type11": "int32",
+        "src_type12": "int32",
+        "dst_type11": "int32",
+        "dst_type12": "int32",
+        "src_type21": "int32",
+        "src_type22": "int32",
+        "src_type31": "int32",
+        "src_type32": "int32"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "detail/geo": {
+      "files": 460,
+      "rows": 66295724,
+      "unit": "Sự kiện vị trí",
+      "physical_column_count": 5,
+      "logical_column_count": 6,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "timestamp[ns]",
+        "geohash_4": "int32",
+        "geohash_5": "int32",
+        "geohash_6": "int32"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "detail/dialog": {
+      "files": 415,
+      "rows": 217205,
+      "unit": "Sự kiện hội thoại",
+      "physical_column_count": 3,
+      "logical_column_count": 4,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "timestamp[ns]",
+        "embedding": "list<element: float>"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "ptls/trx": {
+      "files": 335,
+      "rows": 98721,
+      "unit": "Chuỗi giao dịch của khách",
+      "physical_column_count": 14,
+      "logical_column_count": 15,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "list<element: int64>",
+        "amount": "list<element: float>",
+        "event_type": "list<element: int32>",
+        "event_subtype": "list<element: int32>",
+        "currency": "list<element: int32>",
+        "src_type11": "list<element: int32>",
+        "src_type12": "list<element: int32>",
+        "dst_type11": "list<element: int32>",
+        "dst_type12": "list<element: int32>",
+        "src_type21": "list<element: int32>",
+        "src_type22": "list<element: int32>",
+        "src_type31": "list<element: int32>",
+        "src_type32": "list<element: int32>"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "ptls/geo": {
+      "files": 365,
+      "rows": 72573,
+      "unit": "Chuỗi vị trí của khách",
+      "physical_column_count": 5,
+      "logical_column_count": 6,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "list<element: int64>",
+        "geohash_4": "list<element: int32>",
+        "geohash_5": "list<element: int32>",
+        "geohash_6": "list<element: int32>"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    },
+    "ptls/dialog": {
+      "files": 410,
+      "rows": 46320,
+      "unit": "Chuỗi hội thoại của khách",
+      "physical_column_count": 3,
+      "logical_column_count": 4,
+      "physical_columns": {
+        "client_id": "string",
+        "event_time": "list<element: int64>",
+        "embedding": "list<element: list<element: float>>"
+      },
+      "partition_keys": [
+        "fold"
+      ]
+    }
+  },
+  "parquet_files": 3820,
+  "unique_clients": 100224,
+  "target_unique_clients": 100224,
+  "duplicate_client_ids_in_split": 0,
+  "duplicate_target_client_months": 0,
+  "months": [
+    "2022-02-28",
+    "2022-03-31",
+    "2022-04-30",
+    "2022-05-31",
+    "2022-06-30",
+    "2022-07-31",
+    "2022-08-31",
+    "2022-09-30",
+    "2022-10-31",
+    "2022-11-30",
+    "2022-12-31",
+    "2023-01-31"
+  ],
+  "detail_events": 105277859,
+  "distinct_top_level_column_names": [
+    "amount",
+    "client_id",
+    "currency",
+    "diff_trans_date",
+    "dst_type11",
+    "dst_type12",
+    "embedding",
+    "event_subtype",
+    "event_time",
+    "event_type",
+    "fold",
+    "geohash_4",
+    "geohash_5",
+    "geohash_6",
+    "mon",
+    "src_type11",
+    "src_type12",
+    "src_type21",
+    "src_type22",
+    "src_type31",
+    "src_type32",
+    "target_1",
+    "target_2",
+    "target_3",
+    "target_4",
+    "trans_count"
+  ]
+}

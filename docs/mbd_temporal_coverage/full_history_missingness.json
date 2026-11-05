@@ -1,0 +1,548 @@
+{
+  "date": "2026-11-05",
+  "initial_clients": 100224,
+  "cutoff_exclusive": "2022-12-01 00:00:00",
+  "common_history_start_inclusive": "2021-12-12 00:00:00",
+  "common_history_days": 354,
+  "full_source_history_starts": {
+    "trx": "2021-01-01 00:00:00",
+    "geo": "2021-12-12 00:00:00",
+    "dialog": "2021-02-11 00:00:00"
+  },
+  "full_source_history_days": {
+    "trx": 699,
+    "geo": 354,
+    "dialog": 658
+  },
+  "definitions": {
+    "absent_event_day": "No retained event for an ID on the stored naive calendar date; does not distinguish no activity from missing collection.",
+    "strictly_over_50_percent": "2 * observed_opportunities < total_opportunities; exactly 50% is not included.",
+    "common_day_any_source": "A day is observed if at least one valid event occurs in any of trx/geo/dialog.",
+    "common_source_day_cells": "354 days times 3 sources; a source-day is observed if that source has at least one valid event.",
+    "common_event_envelope": "Inclusive calendar span from first to last event of a client; not continuous coverage.",
+    "sources_missing_over_half": "No events in at least 2 out of 3 sources anywhere in the history.",
+    "strict_event_quality": "Same all-column non-null and finite-value/768-element embedding rule as summary.json."
+  },
+  "row_quality": {
+    "trx": {
+      "files": 400,
+      "all_source_rows_checked": 38764930,
+      "invalid_source_rows": 342181,
+      "raw_rows_in_common_history": 18709547,
+      "valid_rows_in_common_history": 18547593
+    },
+    "geo": {
+      "files": 460,
+      "all_source_rows_checked": 66295724,
+      "invalid_source_rows": 0,
+      "raw_rows_in_common_history": 60704426,
+      "valid_rows_in_common_history": 60704426
+    },
+    "dialog": {
+      "files": 415,
+      "all_source_rows_checked": 217205,
+      "invalid_source_rows": 0,
+      "raw_rows_in_common_history": 113065,
+      "valid_rows_in_common_history": 113065
+    }
+  },
+  "raw_id_time": {
+    "clients_any_source_in_history": 99212,
+    "clients_all_three_sources_in_history": 25734,
+    "any_source_active_days_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 1012,
+      "clients_absent_strictly_over_50_percent": 42208,
+      "percent_clients_absent_strictly_over_50_percent": 42.11366538952746,
+      "clients_at_least_50_percent_observed": 58016,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 85.0,
+        "0.5": 214.0,
+        "0.75": 301.0,
+        "0.9": 338.0,
+        "0.95": 347.0,
+        "1": 354.0
+      }
+    },
+    "any_source_active_days_among_clients_with_any_events": {
+      "clients": 99212,
+      "opportunities_per_client": 354,
+      "clients_no_events": 0,
+      "clients_absent_strictly_over_50_percent": 41196,
+      "percent_clients_absent_strictly_over_50_percent": 41.52320283836632,
+      "clients_at_least_50_percent_observed": 58016,
+      "observed_count_quantiles": {
+        "0": 1.0,
+        "0.25": 89.0,
+        "0.5": 216.0,
+        "0.75": 302.0,
+        "0.9": 338.0,
+        "0.95": 347.0,
+        "1": 354.0
+      }
+    },
+    "any_source_active_days_among_all_three_source_clients": {
+      "clients": 25734,
+      "opportunities_per_client": 354,
+      "clients_no_events": 0,
+      "clients_absent_strictly_over_50_percent": 4847,
+      "percent_clients_absent_strictly_over_50_percent": 18.835004274500662,
+      "clients_at_least_50_percent_observed": 20887,
+      "observed_count_quantiles": {
+        "0": 3.0,
+        "0.25": 206.0,
+        "0.5": 284.0,
+        "0.75": 330.0,
+        "0.9": 346.0,
+        "0.95": 351.0,
+        "1": 354.0
+      }
+    },
+    "per_source_active_days": {
+      "trx": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 3321,
+        "clients_absent_strictly_over_50_percent": 76336,
+        "percent_clients_absent_strictly_over_50_percent": 76.16538952745849,
+        "clients_at_least_50_percent_observed": 23888,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 16.0,
+          "0.5": 67.0,
+          "0.75": 170.0,
+          "0.9": 257.0,
+          "0.95": 293.0,
+          "1": 354.0
+        }
+      },
+      "geo": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 28225,
+        "clients_absent_strictly_over_50_percent": 60764,
+        "percent_clients_absent_strictly_over_50_percent": 60.62819284802043,
+        "clients_at_least_50_percent_observed": 39460,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 114.0,
+          "0.75": 253.0,
+          "0.9": 320.0,
+          "0.95": 339.0,
+          "1": 354.0
+        }
+      },
+      "dialog": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 66183,
+        "clients_absent_strictly_over_50_percent": 100224,
+        "percent_clients_absent_strictly_over_50_percent": 100.0,
+        "clients_at_least_50_percent_observed": 0,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 1.0,
+          "0.9": 3.0,
+          "0.95": 6.0,
+          "1": 58.0
+        }
+      }
+    },
+    "source_day_cells_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 1062,
+      "clients_no_events": 1012,
+      "clients_absent_strictly_over_50_percent": 95184,
+      "percent_clients_absent_strictly_over_50_percent": 94.97126436781609,
+      "clients_at_least_50_percent_observed": 5040,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 87.0,
+        "0.5": 232.0,
+        "0.75": 352.0,
+        "0.9": 464.0,
+        "0.95": 531.0,
+        "1": 709.0
+      }
+    },
+    "sources_available_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 3,
+      "clients_no_events": 1012,
+      "clients_absent_strictly_over_50_percent": 22227,
+      "percent_clients_absent_strictly_over_50_percent": 22.177322796934863,
+      "clients_at_least_50_percent_observed": 77997,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 2.0,
+        "0.5": 2.0,
+        "0.75": 3.0,
+        "0.9": 3.0,
+        "0.95": 3.0,
+        "1": 3.0
+      }
+    },
+    "any_source_first_last_calendar_span": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 1012,
+      "clients_absent_strictly_over_50_percent": 7625,
+      "percent_clients_absent_strictly_over_50_percent": 7.607958173690932,
+      "clients_at_least_50_percent_observed": 92599,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 338.0,
+        "0.5": 351.0,
+        "0.75": 353.0,
+        "0.9": 354.0,
+        "0.95": 354.0,
+        "1": 354.0
+      }
+    },
+    "all_three_common_first_last_calendar_span": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 79210,
+      "clients_absent_strictly_over_50_percent": 96392,
+      "percent_clients_absent_strictly_over_50_percent": 96.17656449553002,
+      "clients_at_least_50_percent_observed": 3832,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 0.0,
+        "0.5": 0.0,
+        "0.75": 0.0,
+        "0.9": 38.0,
+        "0.95": 141.0,
+        "1": 352.0
+      }
+    },
+    "source_specific_full_history_active_days": {
+      "trx": {
+        "clients": 100224,
+        "opportunities_per_client": 699,
+        "clients_no_events": 2428,
+        "clients_absent_strictly_over_50_percent": 77496,
+        "percent_clients_absent_strictly_over_50_percent": 77.3227969348659,
+        "clients_at_least_50_percent_observed": 22728,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 32.0,
+          "0.5": 131.0,
+          "0.75": 326.0,
+          "0.9": 494.0,
+          "0.95": 569.0,
+          "1": 699.0
+        }
+      },
+      "geo": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 28225,
+        "clients_absent_strictly_over_50_percent": 60764,
+        "percent_clients_absent_strictly_over_50_percent": 60.62819284802043,
+        "clients_at_least_50_percent_observed": 39460,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 114.0,
+          "0.75": 253.0,
+          "0.9": 320.0,
+          "0.95": 339.0,
+          "1": 354.0
+        }
+      },
+      "dialog": {
+        "clients": 100224,
+        "opportunities_per_client": 658,
+        "clients_no_events": 55055,
+        "clients_absent_strictly_over_50_percent": 100224,
+        "percent_clients_absent_strictly_over_50_percent": 100.0,
+        "clients_at_least_50_percent_observed": 0,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 2.0,
+          "0.9": 6.0,
+          "0.95": 9.0,
+          "1": 91.0
+        }
+      }
+    },
+    "any_source_full_earliest_history_active_days": {
+      "clients": 100224,
+      "opportunities_per_client": 699,
+      "clients_no_events": 699,
+      "clients_absent_strictly_over_50_percent": 62820,
+      "percent_clients_absent_strictly_over_50_percent": 62.679597701149426,
+      "clients_at_least_50_percent_observed": 37404,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 131.0,
+        "0.5": 293.0,
+        "0.75": 422.0,
+        "0.9": 550.0,
+        "0.95": 606.0,
+        "1": 699.0
+      }
+    }
+  },
+  "strict_event_quality": {
+    "clients_any_source_in_history": 99068,
+    "clients_all_three_sources_in_history": 25695,
+    "any_source_active_days_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 1156,
+      "clients_absent_strictly_over_50_percent": 42320,
+      "percent_clients_absent_strictly_over_50_percent": 42.225415070242654,
+      "clients_at_least_50_percent_observed": 57904,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 84.0,
+        "0.5": 213.0,
+        "0.75": 301.0,
+        "0.9": 338.0,
+        "0.95": 347.0,
+        "1": 354.0
+      }
+    },
+    "any_source_active_days_among_clients_with_any_events": {
+      "clients": 99068,
+      "opportunities_per_client": 354,
+      "clients_no_events": 0,
+      "clients_absent_strictly_over_50_percent": 41164,
+      "percent_clients_absent_strictly_over_50_percent": 41.551257721968746,
+      "clients_at_least_50_percent_observed": 57904,
+      "observed_count_quantiles": {
+        "0": 1.0,
+        "0.25": 89.0,
+        "0.5": 216.0,
+        "0.75": 302.0,
+        "0.9": 338.0,
+        "0.95": 347.0,
+        "1": 354.0
+      }
+    },
+    "any_source_active_days_among_all_three_source_clients": {
+      "clients": 25695,
+      "opportunities_per_client": 354,
+      "clients_no_events": 0,
+      "clients_absent_strictly_over_50_percent": 4854,
+      "percent_clients_absent_strictly_over_50_percent": 18.89083479276124,
+      "clients_at_least_50_percent_observed": 20841,
+      "observed_count_quantiles": {
+        "0": 3.0,
+        "0.25": 206.0,
+        "0.5": 283.0,
+        "0.75": 329.0,
+        "0.9": 346.0,
+        "0.95": 350.0,
+        "1": 354.0
+      }
+    },
+    "per_source_active_days": {
+      "trx": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 3606,
+        "clients_absent_strictly_over_50_percent": 76514,
+        "percent_clients_absent_strictly_over_50_percent": 76.34299169859514,
+        "clients_at_least_50_percent_observed": 23710,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 16.0,
+          "0.5": 66.0,
+          "0.75": 169.0,
+          "0.9": 256.0,
+          "0.95": 292.0,
+          "1": 354.0
+        }
+      },
+      "geo": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 28225,
+        "clients_absent_strictly_over_50_percent": 60764,
+        "percent_clients_absent_strictly_over_50_percent": 60.62819284802043,
+        "clients_at_least_50_percent_observed": 39460,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 114.0,
+          "0.75": 253.0,
+          "0.9": 320.0,
+          "0.95": 339.0,
+          "1": 354.0
+        }
+      },
+      "dialog": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 66183,
+        "clients_absent_strictly_over_50_percent": 100224,
+        "percent_clients_absent_strictly_over_50_percent": 100.0,
+        "clients_at_least_50_percent_observed": 0,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 1.0,
+          "0.9": 3.0,
+          "0.95": 6.0,
+          "1": 58.0
+        }
+      }
+    },
+    "source_day_cells_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 1062,
+      "clients_no_events": 1156,
+      "clients_absent_strictly_over_50_percent": 95227,
+      "percent_clients_absent_strictly_over_50_percent": 95.01416826309068,
+      "clients_at_least_50_percent_observed": 4997,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 86.0,
+        "0.5": 232.0,
+        "0.75": 352.0,
+        "0.9": 463.0,
+        "0.95": 530.0,
+        "1": 708.0
+      }
+    },
+    "sources_available_all_initial_clients": {
+      "clients": 100224,
+      "opportunities_per_client": 3,
+      "clients_no_events": 1156,
+      "clients_absent_strictly_over_50_percent": 22329,
+      "percent_clients_absent_strictly_over_50_percent": 22.279094827586206,
+      "clients_at_least_50_percent_observed": 77895,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 2.0,
+        "0.5": 2.0,
+        "0.75": 3.0,
+        "0.9": 3.0,
+        "0.95": 3.0,
+        "1": 3.0
+      }
+    },
+    "any_source_first_last_calendar_span": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 1156,
+      "clients_absent_strictly_over_50_percent": 7774,
+      "percent_clients_absent_strictly_over_50_percent": 7.756625159642401,
+      "clients_at_least_50_percent_observed": 92450,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 338.0,
+        "0.5": 351.0,
+        "0.75": 353.0,
+        "0.9": 354.0,
+        "0.95": 354.0,
+        "1": 354.0
+      }
+    },
+    "all_three_common_first_last_calendar_span": {
+      "clients": 100224,
+      "opportunities_per_client": 354,
+      "clients_no_events": 79239,
+      "clients_absent_strictly_over_50_percent": 96396,
+      "percent_clients_absent_strictly_over_50_percent": 96.18055555555556,
+      "clients_at_least_50_percent_observed": 3828,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 0.0,
+        "0.5": 0.0,
+        "0.75": 0.0,
+        "0.9": 38.0,
+        "0.95": 141.0,
+        "1": 352.0
+      }
+    },
+    "source_specific_full_history_active_days": {
+      "trx": {
+        "clients": 100224,
+        "opportunities_per_client": 699,
+        "clients_no_events": 2715,
+        "clients_absent_strictly_over_50_percent": 77682,
+        "percent_clients_absent_strictly_over_50_percent": 77.50838122605363,
+        "clients_at_least_50_percent_observed": 22542,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 32.0,
+          "0.5": 130.0,
+          "0.75": 324.0,
+          "0.9": 492.0,
+          "0.95": 567.0,
+          "1": 699.0
+        }
+      },
+      "geo": {
+        "clients": 100224,
+        "opportunities_per_client": 354,
+        "clients_no_events": 28225,
+        "clients_absent_strictly_over_50_percent": 60764,
+        "percent_clients_absent_strictly_over_50_percent": 60.62819284802043,
+        "clients_at_least_50_percent_observed": 39460,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 114.0,
+          "0.75": 253.0,
+          "0.9": 320.0,
+          "0.95": 339.0,
+          "1": 354.0
+        }
+      },
+      "dialog": {
+        "clients": 100224,
+        "opportunities_per_client": 658,
+        "clients_no_events": 55055,
+        "clients_absent_strictly_over_50_percent": 100224,
+        "percent_clients_absent_strictly_over_50_percent": 100.0,
+        "clients_at_least_50_percent_observed": 0,
+        "observed_count_quantiles": {
+          "0": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 2.0,
+          "0.9": 6.0,
+          "0.95": 9.0,
+          "1": 91.0
+        }
+      }
+    },
+    "any_source_full_earliest_history_active_days": {
+      "clients": 100224,
+      "opportunities_per_client": 699,
+      "clients_no_events": 832,
+      "clients_absent_strictly_over_50_percent": 62997,
+      "percent_clients_absent_strictly_over_50_percent": 62.85620210727969,
+      "clients_at_least_50_percent_observed": 37227,
+      "observed_count_quantiles": {
+        "0": 0.0,
+        "0.25": 130.0,
+        "0.5": 292.0,
+        "0.75": 421.0,
+        "0.9": 548.0,
+        "0.95": 605.0,
+        "1": 699.0
+      }
+    }
+  },
+  "transaction_attribute_missingness_in_common_history": {
+    "clients_with_raw_transactions": 96903,
+    "clients_over_half_recorded_transactions_fail_attribute_quality": 323,
+    "percent_of_all_initial_clients": 0.3222780970625798,
+    "percent_of_clients_with_raw_transactions": 0.33332301373538487
+  },
+  "elapsed_seconds": 50.96463120000044
+}

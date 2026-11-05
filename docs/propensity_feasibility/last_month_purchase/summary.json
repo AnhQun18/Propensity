@@ -1,0 +1,69 @@
+{
+  "checked_on": "2026-11-05",
+  "source": "data/MBD-mini/targets",
+  "scope": "All clients in the latest label month; no event availability or history filters",
+  "cutoff": "2023-01-01 00:00:00",
+  "label_end_exclusive": "2023-02-01 00:00:00",
+  "mon_values": [
+    "2023-01-31"
+  ],
+  "label_month": "2023-01",
+  "clients": 100224,
+  "duplicate_clients": 0,
+  "null_labels": {
+    "target_1": 0,
+    "target_2": 0,
+    "target_3": 0,
+    "target_4": 0
+  },
+  "metrics": [
+    {
+      "target": "target_1",
+      "positive_clients": 159,
+      "negative_clients": 100065,
+      "total_clients": 100224,
+      "purchase_rate": 0.0015864463601532566,
+      "purchase_rate_pct": 0.15864463601532566
+    },
+    {
+      "target": "target_2",
+      "positive_clients": 25,
+      "negative_clients": 100199,
+      "total_clients": 100224,
+      "purchase_rate": 0.000249441251596424,
+      "purchase_rate_pct": 0.0249441251596424
+    },
+    {
+      "target": "target_3",
+      "positive_clients": 215,
+      "negative_clients": 100009,
+      "total_clients": 100224,
+      "purchase_rate": 0.0021451947637292465,
+      "purchase_rate_pct": 0.21451947637292465
+    },
+    {
+      "target": "target_4",
+      "positive_clients": 293,
+      "negative_clients": 99931,
+      "total_clients": 100224,
+      "purchase_rate": 0.0029234514687100895,
+      "purchase_rate_pct": 0.29234514687100893
+    },
+    {
+      "target": "any_product",
+      "positive_clients": 675,
+      "negative_clients": 99549,
+      "total_clients": 100224,
+      "purchase_rate": 0.006734913793103448,
+      "purchase_rate_pct": 0.6734913793103448
+    }
+  ],
+  "clients_by_product_count": {
+    "0": 99549,
+    "1": 659,
+    "2": 15,
+    "3": 1
+  },
+  "earlier_label_rows": 1102464,
+  "alignment": "Month containing mon is label month; history event_time must be strictly before first day of that month. Source timestamp timezone is unconfirmed."
+}

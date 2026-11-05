@@ -1,0 +1,282 @@
+{
+  "definitions": {
+    "presence": "ID occurs in detail over ALL available history, no attribute filtering",
+    "after_mon": "event_time > mon at 00:00:00; same-day later events included",
+    "delta": "floor((mon - full-history last_trx_time) / 1 day); NOT safe training recency",
+    "event_denominator": "all detail/trx rows; computed independently per mon, not summed over months"
+  },
+  "clients": 100224,
+  "target_rows": 1202688,
+  "duplicate_client_months": 0,
+  "months_per_client_counts": {
+    "12": 100224
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "clients": 20328,
+      "trx_absent_percent": 1.4561196379378198,
+      "geo_absent_percent": 26.88410074773711,
+      "dialog_absent_percent": 53.7534435261708
+    },
+    {
+      "fold": 1,
+      "clients": 19902,
+      "trx_absent_percent": 1.5274846749070445,
+      "geo_absent_percent": 27.600241181790775,
+      "dialog_absent_percent": 54.01969651291327
+    },
+    {
+      "fold": 2,
+      "clients": 19917,
+      "trx_absent_percent": 1.3305216649093738,
+      "geo_absent_percent": 27.72003815835718,
+      "dialog_absent_percent": 53.72295024351057
+    },
+    {
+      "fold": 3,
+      "clients": 20017,
+      "trx_absent_percent": 1.5986411550182347,
+      "geo_absent_percent": 28.16106309636809,
+      "dialog_absent_percent": 54.22890543038418
+    },
+    {
+      "fold": 4,
+      "clients": 20060,
+      "trx_absent_percent": 1.585244267198405,
+      "geo_absent_percent": 27.59222333000997,
+      "dialog_absent_percent": 53.19541375872383
+    }
+  ],
+  "transaction_rows": 38764930,
+  "monthly": [
+    {
+      "mon": "2022-02-28",
+      "clients_any_trx_after_mon": 96616,
+      "percent_all_clients_any_after_mon": 96.4000638569604,
+      "transactions_after_mon": 16582219,
+      "percent_transactions_after_mon": 42.776341915231114,
+      "delta_min_median_max_days": [
+        -307.0,
+        -304.0,
+        422.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 385,
+      "full_history_last_trx_more_than_365_days_before_mon": 66
+    },
+    {
+      "mon": "2022-03-31",
+      "clients_any_trx_after_mon": 95625,
+      "percent_all_clients_any_after_mon": 95.4112787356322,
+      "transactions_after_mon": 14954200,
+      "percent_transactions_after_mon": 38.57662067234482,
+      "delta_min_median_max_days": [
+        -276.0,
+        -273.0,
+        453.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 471,
+      "full_history_last_trx_more_than_365_days_before_mon": 106
+    },
+    {
+      "mon": "2022-04-30",
+      "clients_any_trx_after_mon": 94540,
+      "percent_all_clients_any_after_mon": 94.32870370370371,
+      "transactions_after_mon": 13413981,
+      "percent_transactions_after_mon": 34.603392808912595,
+      "delta_min_median_max_days": [
+        -246.0,
+        -243.0,
+        483.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 555,
+      "full_history_last_trx_more_than_365_days_before_mon": 152
+    },
+    {
+      "mon": "2022-05-31",
+      "clients_any_trx_after_mon": 93463,
+      "percent_all_clients_any_after_mon": 93.2541107918263,
+      "transactions_after_mon": 11848620,
+      "percent_transactions_after_mon": 30.565307353837607,
+      "delta_min_median_max_days": [
+        -215.0,
+        -212.0,
+        514.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 662,
+      "full_history_last_trx_more_than_365_days_before_mon": 198
+    },
+    {
+      "mon": "2022-06-30",
+      "clients_any_trx_after_mon": 92252,
+      "percent_all_clients_any_after_mon": 92.04581736909323,
+      "transactions_after_mon": 10229164,
+      "percent_transactions_after_mon": 26.387675664576204,
+      "delta_min_median_max_days": [
+        -185.0,
+        -182.0,
+        544.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 825,
+      "full_history_last_trx_more_than_365_days_before_mon": 246
+    },
+    {
+      "mon": "2022-07-31",
+      "clients_any_trx_after_mon": 90467,
+      "percent_all_clients_any_after_mon": 90.26480683269476,
+      "transactions_after_mon": 8576934,
+      "percent_transactions_after_mon": 22.12549848535777,
+      "delta_min_median_max_days": [
+        -154.0,
+        -151.0,
+        575.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 1352,
+      "full_history_last_trx_more_than_365_days_before_mon": 302
+    },
+    {
+      "mon": "2022-08-31",
+      "clients_any_trx_after_mon": 88774,
+      "percent_all_clients_any_after_mon": 88.57559067688378,
+      "transactions_after_mon": 6954549,
+      "percent_transactions_after_mon": 17.94031099759499,
+      "delta_min_median_max_days": [
+        -123.0,
+        -120.0,
+        606.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 2206,
+      "full_history_last_trx_more_than_365_days_before_mon": 380
+    },
+    {
+      "mon": "2022-09-30",
+      "clients_any_trx_after_mon": 86705,
+      "percent_all_clients_any_after_mon": 86.51121487867177,
+      "transactions_after_mon": 5298194,
+      "percent_transactions_after_mon": 13.667492756984212,
+      "delta_min_median_max_days": [
+        -93.0,
+        -90.0,
+        636.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 3160,
+      "full_history_last_trx_more_than_365_days_before_mon": 466
+    },
+    {
+      "mon": "2022-10-31",
+      "clients_any_trx_after_mon": 83716,
+      "percent_all_clients_any_after_mon": 83.52889527458493,
+      "transactions_after_mon": 3529474,
+      "percent_transactions_after_mon": 9.104812004045924,
+      "delta_min_median_max_days": [
+        -62.0,
+        -59.0,
+        667.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 4272,
+      "full_history_last_trx_more_than_365_days_before_mon": 550
+    },
+    {
+      "mon": "2022-11-30",
+      "clients_any_trx_after_mon": 78753,
+      "percent_all_clients_any_after_mon": 78.57698754789271,
+      "transactions_after_mon": 1833909,
+      "percent_transactions_after_mon": 4.7308456380548085,
+      "delta_min_median_max_days": [
+        -32.0,
+        -29.0,
+        697.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 5339,
+      "full_history_last_trx_more_than_365_days_before_mon": 649
+    },
+    {
+      "mon": "2022-12-31",
+      "clients_any_trx_after_mon": 27538,
+      "percent_all_clients_any_after_mon": 27.4764527458493,
+      "transactions_after_mon": 49510,
+      "percent_transactions_after_mon": 0.12771853322061977,
+      "delta_min_median_max_days": [
+        -1.0,
+        2.0,
+        728.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 6610,
+      "full_history_last_trx_more_than_365_days_before_mon": 814
+    },
+    {
+      "mon": "2023-01-31",
+      "clients_any_trx_after_mon": 0,
+      "percent_all_clients_any_after_mon": 0.0,
+      "transactions_after_mon": 0,
+      "percent_transactions_after_mon": 0.0,
+      "delta_min_median_max_days": [
+        30.0,
+        33.0,
+        759.0
+      ],
+      "full_history_last_trx_more_than_180_days_before_mon": 8414,
+      "full_history_last_trx_more_than_365_days_before_mon": 1326
+    }
+  ],
+  "delta_quantiles_days": {
+    "0": -307.0,
+    "0.01": -307.0,
+    "0.05": -301.0,
+    "0.25": -213.0,
+    "0.5": -113.0,
+    "0.75": -14.0,
+    "0.95": 111.0,
+    "0.99": 292.0,
+    "1": 759.0
+  },
+  "delta_extremes": {
+    "min": {
+      "client_months": 27538,
+      "unique_clients": 27538
+    },
+    "max": {
+      "client_months": 1,
+      "unique_clients": 1
+    },
+    "gt180": {
+      "client_months": 34251,
+      "unique_clients": 8414
+    },
+    "gt365": {
+      "client_months": 5255,
+      "unique_clients": 1326
+    },
+    "lt_minus180": {
+      "client_months": 395711,
+      "unique_clients": 89023
+    }
+  },
+  "positive_counts": {
+    "target_1": 5362,
+    "target_2": 577,
+    "target_3": 4530,
+    "target_4": 3060
+  },
+  "positive_percent": {
+    "target_1": 0.44583466368667524,
+    "target_2": 0.04797586739037888,
+    "target_3": 0.37665628991060024,
+    "target_4": 0.2544300766283525
+  },
+  "positive_label_count_distribution": {
+    "0": 1189834,
+    "1": 12207,
+    "2": 620,
+    "3": 26,
+    "4": 1
+  },
+  "pair_overlap_same_client_month": {
+    "target_1 & target_2": 49,
+    "target_1 & target_3": 263,
+    "target_1 & target_4": 205,
+    "target_2 & target_3": 32,
+    "target_2 & target_4": 24,
+    "target_3 & target_4": 131
+  }
+}

@@ -1,19 +1,15 @@
 """Read-only feasibility audit; writes aggregate results under docs/propensity_feasibility.
 
-Run with the project Python and one argument: mbd or ecommerce.
+Run with the project Python and one argument: mbd.
 No model is trained, no identifiers are exported, and source data is unchanged.
 """
 from pathlib import Path
 import argparse
 import json
 import time
-from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
-import pandas as pd
-import pyarrow as pa
 import pyarrow.compute as pc
-import pyarrow.csv as csv
 import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -82,72 +78,13 @@ def mbd():
             'limitation': 'Event contents, event duplicates, per-user history and detail/ptls equivalence are not fully audited.'}
 
 
-def ecommerce():
-    all_users, buyers, history_users, future_users, future_buyers = set(), set(), set(), set(), set()
-    counts, dates = Counter(), Counter()
-    per_file, rows, missing_category, nulls = {}, 0, 0, Counter()
-    low, high = None, None
-    start = '2019-11-03 00:00:00 UTC'
-    cutoff = '2019-11-24 00:00:00 UTC'
-    end = '2019-12-01 00:00:00 UTC'
-    columns = ['event_time', 'event_type', 'user_id', 'category_code']
-    for path in sorted((ROOT / 'data' / 'ecommerce').glob('*.csv')):
-        file_rows = 0
-        reader = csv.open_csv(path, read_options=csv.ReadOptions(block_size=32 * 1024 * 1024),
-                              convert_options=csv.ConvertOptions(
-                                  include_columns=columns,
-                                  column_types={c: (pa.int64() if c == 'user_id' else pa.string()) for c in columns},
-                                  strings_can_be_null=True))
-        for batch in reader:
-            t = pa.Table.from_batches([batch])
-            rows += len(t)
-            file_rows += len(t)
-            for c in columns:
-                nulls[c] += t[c].null_count
-            missing_category += t['category_code'].null_count
-            mn, mx = pc.min(t['event_time']).as_py(), pc.max(t['event_time']).as_py()
-            low, high = min(low or mn, mn), max(high or mx, mx)
-            for v in pc.value_counts(t['event_type']).to_pylist():
-                counts[v['values']] += v['counts']
-            for v in pc.value_counts(pc.utf8_slice_codeunits(t['event_time'], 0, 10)).to_pylist():
-                dates[v['values']] += v['counts']
-            all_users.update(pc.unique(t['user_id']).to_pylist())
-            buy = pc.equal(t['event_type'], 'purchase')
-            buyers.update(pc.unique(pc.filter(t['user_id'], buy)).to_pylist())
-            hist = pc.and_(pc.greater_equal(t['event_time'], start), pc.less(t['event_time'], cutoff))
-            future = pc.and_(pc.greater_equal(t['event_time'], cutoff), pc.less(t['event_time'], end))
-            history_users.update(pc.unique(pc.filter(t['user_id'], hist)).to_pylist())
-            future_users.update(pc.unique(pc.filter(t['user_id'], future)).to_pylist())
-            future_buyers.update(pc.unique(pc.filter(t['user_id'], pc.and_(future, buy))).to_pylist())
-        per_file[path.name] = {'rows': file_rows, 'bytes': path.stat().st_size}
-        print(path.name, file_rows, 'rows; total users', len(all_users), flush=True)
-    assert sum(counts.values()) == rows == sum(dates.values())
-    assert nulls['event_time'] == nulls['event_type'] == nulls['user_id'] == 0
-    pd.DataFrame(sorted(dates.items()), columns=['date_utc', 'events']).to_csv(OUT / 'ecommerce_daily.csv', index=False)
-    positive = len(history_users & future_buyers)
-    return {'scope': 'all rows, four selected columns, both local CSV files',
-            'files': per_file, 'rows': rows, 'users': len(all_users),
-            'users_with_purchase': len(buyers), 'event_counts': dict(counts),
-            'min_time_utc': low, 'max_time_utc': high, 'distinct_calendar_days': len(dates),
-            'null_counts_selected_columns': dict(nulls),
-            'missing_category_code_rows': missing_category,
-            'window': {'history_start_utc': start, 'cutoff_utc': cutoff, 'label_end_exclusive_utc': end,
-                       'history_days': 21, 'label_days': 7, 'eligible_users': len(history_users),
-                       'positive_purchase_users': positive, 'positive_purchase_rate': positive / len(history_users),
-                       'future_active_users_in_cohort': len(history_users & future_users)},
-            'limitations': ['Purchase event is not verified net revenue or a unique order.',
-                            'No full-row deduplication, session or product audit.',
-                            'Users without a future purchase log receive label 0; observability is not guaranteed.',
-                            'One feasibility window, not a trained-model evaluation.']}
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('dataset', choices=['mbd', 'ecommerce'])
+    parser.add_argument('dataset', choices=['mbd'])
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     tick = time.time()
-    result = mbd() if args.dataset == 'mbd' else ecommerce()
+    result = mbd()
     result['elapsed_seconds'] = time.time() - tick
     (OUT / f'{args.dataset}_summary.json').write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')
     print(json.dumps(result, indent=2, ensure_ascii=False), flush=True)

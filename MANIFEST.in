@@ -1,4 +1,5 @@
 include README.md DATASETS.md
-include docs/eda_package.md
-recursive-include configs eda_*.json
+include docs/mbd_mini_eda_package.md
+include docs/propensity_feasibility/mon_research.md
+include configs/mbd_mini_eda.json
 recursive-include tests *.py
