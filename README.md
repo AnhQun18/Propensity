@@ -2,6 +2,32 @@
 
 Repository chứa package thống kê mô tả, khai phá dữ liệu và tài liệu nghiên cứu propensity cho MBD-mini.
 
+## Setup trên máy khác
+
+Yêu cầu Python 3.10 trở lên và dữ liệu MBD-mini đã giải nén. Tải toàn bộ repo
+bằng **Code → Download ZIP** rồi giải nén, hoặc clone nhánh `main`:
+
+```powershell
+git clone --branch main https://github.com/AnhQun18/Propensity.git
+cd Propensity
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install ".[plots]"
+Copy-Item configs/mbd_mini_eda.json configs/mbd_mini_eda.local.json
+```
+
+Nếu đã có venv trong thư mục dự án, bỏ qua lệnh tạo venv. Trong file
+`configs/mbd_mini_eda.local.json`, đổi `data_root` thành đường dẫn dữ liệu
+trên máy đó, ví dụ `"D:/Datasets/MBD-mini"`, rồi chạy:
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.local.json --plots
+```
+
+Kết quả mặc định ở `docs/mbd_mini_eda/report.md`. Hướng dẫn từng bước, cấu trúc
+thư mục dữ liệu, Linux/macOS và xử lý lỗi thường gặp nằm tại
+[Setup và chạy trên máy khác](docs/setup_other_machine.md).
+
 ## Cấu trúc thư mục
 
 ```text
@@ -21,7 +47,7 @@ Repository chứa package thống kê mô tả, khai phá dữ liệu và tài l
 Các dependency được khai báo trong `pyproject.toml`. Cài package và phần vẽ biểu đồ:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -e ".[plots]"
+.\.venv\Scripts\python.exe -m pip install ".[plots]"
 ```
 
 Bộ [MBD-mini](https://huggingface.co/datasets/ai-lab/MBD-mini) đã tải và giải nén

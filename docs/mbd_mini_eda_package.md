@@ -6,6 +6,8 @@ dùng các kết quả EDA trước đó, không sửa dữ liệu nguồn và k
 
 ## Cài và chạy
 
+Với máy khác đã có dữ liệu, xem [hướng dẫn setup từ GitHub](setup_other_machine.md).
+
 Chạy trong thư mục dự án:
 
 ```powershell

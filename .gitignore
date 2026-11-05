@@ -14,6 +14,7 @@ __pycache__/
 .env.*
 !.env.example
 kaggle.json
+configs/*.local.json
 
 # Local build products.
 /build/
