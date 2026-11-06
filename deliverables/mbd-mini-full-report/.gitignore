@@ -1,0 +1,11 @@
+graphics/
+render/
+canva_preview/
+graphics_only.pdf
+html_text_manifest.json
+html_text_pages.json
+disclosure_audit.json
+canva_text.txt
+canva_pages.json
+canva_preview_pages.json
+public_manifest_verification.json

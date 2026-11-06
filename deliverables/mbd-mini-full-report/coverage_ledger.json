@@ -1,0 +1,1674 @@
+{
+  "commit": "3e4b95d79d172d2ef525ff3d26e2528bce290e8e",
+  "tables": [
+    {
+      "key": "descriptive.customers/customer_activity",
+      "section": "descriptive.customers",
+      "name": "customer_activity",
+      "path": "tables/descriptive.customers/customer_activity.csv",
+      "rows": 20,
+      "columns": [
+        "feature",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ],
+      "pages": [
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "61929b6faa732ea6dc2fb3a23917672f2c76ba19bd347bd484b72e8109b2f5a9",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/customer_activity.csv"
+    },
+    {
+      "key": "descriptive.customers/customer_aggregation_checks",
+      "section": "descriptive.customers",
+      "name": "customer_aggregation_checks",
+      "path": "tables/descriptive.customers/customer_aggregation_checks.csv",
+      "rows": 1,
+      "columns": [
+        "input_customers",
+        "output_customers",
+        "duplicate_keys",
+        "customers_without_log"
+      ],
+      "pages": [
+        78
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "33a06a5aad9fd72d711efdca7d8139f5b974ff689419d32ccf9665614bd93b89",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/customer_aggregation_checks.csv"
+    },
+    {
+      "key": "descriptive.customers/first_last_event_coverage",
+      "section": "descriptive.customers",
+      "name": "first_last_event_coverage",
+      "path": "tables/descriptive.customers/first_last_event_coverage.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "reference_customers",
+        "with_log",
+        "without_log",
+        "scope"
+      ],
+      "pages": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "representation": "Toàn bộ số khách theo mốc; tỷ lệ từ mẫu số + CSV",
+      "sha256": "6ce16fc09df28c7a9fa54a44c3ed4c52cefeb963fbb8518710f0c47f76b7f7bb",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/first_last_event_coverage.csv"
+    },
+    {
+      "key": "descriptive.customers/first_last_event_month",
+      "section": "descriptive.customers",
+      "name": "first_last_event_month",
+      "path": "tables/descriptive.customers/first_last_event_month.csv",
+      "rows": 121,
+      "columns": [
+        "source",
+        "milestone",
+        "month",
+        "customers",
+        "logged_customers",
+        "reference_customers",
+        "rate_among_logged",
+        "scope"
+      ],
+      "pages": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "representation": "Toàn bộ số khách theo mốc; tỷ lệ từ mẫu số + CSV",
+      "sha256": "584ce4213eb658be267fbb8c6bed72380d14ae1eff23b66aa242f83fe7bcb506",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/first_last_event_month.csv"
+    },
+    {
+      "key": "descriptive.customers/modality_coverage",
+      "section": "descriptive.customers",
+      "name": "modality_coverage",
+      "path": "tables/descriptive.customers/modality_coverage.csv",
+      "rows": 8,
+      "columns": [
+        "trx_geo_dialog",
+        "customers",
+        "population",
+        "rate"
+      ],
+      "pages": [
+        10
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "82d0a249fdaecc2a1873164d64c2ded0ba587711328c2399365abbe7442ac9b2",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/modality_coverage.csv"
+    },
+    {
+      "key": "descriptive.customers/source_count_distribution",
+      "section": "descriptive.customers",
+      "name": "source_count_distribution",
+      "path": "tables/descriptive.customers/source_count_distribution.csv",
+      "rows": 4,
+      "columns": [
+        "source_count",
+        "customers",
+        "population",
+        "rate"
+      ],
+      "pages": [
+        116
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "f2a37999bc22c47d0e3cd1645bac5020f0c8eb6b9071c46f06004907985ad3f7",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.customers/source_count_distribution.csv"
+    },
+    {
+      "key": "descriptive.modalities/dialog_summary",
+      "section": "descriptive.modalities",
+      "name": "dialog_summary",
+      "path": "tables/descriptive.modalities/dialog_summary.csv",
+      "rows": 2,
+      "columns": [
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ],
+      "pages": [
+        41
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "ad2284656eabd68bca27c706015608af221b9ab87c5f9f879c21c056e1c0a741",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.modalities/dialog_summary.csv"
+    },
+    {
+      "key": "descriptive.modalities/embedding_quality",
+      "section": "descriptive.modalities",
+      "name": "embedding_quality",
+      "path": "tables/descriptive.modalities/embedding_quality.csv",
+      "rows": 6,
+      "columns": [
+        "check",
+        "n",
+        "value"
+      ],
+      "pages": [
+        35,
+        86
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "7c21a7c7d4438afb4ca32abb6c224c07941a811c771105a719a56f24ad068ab4",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.modalities/embedding_quality.csv"
+    },
+    {
+      "key": "descriptive.modalities/geo_summary",
+      "section": "descriptive.modalities",
+      "name": "geo_summary",
+      "path": "tables/descriptive.modalities/geo_summary.csv",
+      "rows": 3,
+      "columns": [
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ],
+      "pages": [
+        40
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "e77292a79c33780ef4b961419b8ec2a394edb9339b609d1250e0e986a50f373c",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.modalities/geo_summary.csv"
+    },
+    {
+      "key": "descriptive.modalities/location_categories",
+      "section": "descriptive.modalities",
+      "name": "location_categories",
+      "path": "tables/descriptive.modalities/location_categories.csv",
+      "rows": 73,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ],
+      "pages": [
+        55,
+        56,
+        57
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "aa4b35391f3c299da36917662288ec81647c94d62309638019a1f529affe62cc",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.modalities/location_categories.csv"
+    },
+    {
+      "key": "descriptive.modalities/location_categories_full",
+      "section": "descriptive.modalities",
+      "name": "location_categories_full",
+      "path": "tables/descriptive.modalities/location_categories_full.csv",
+      "rows": 752805,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ],
+      "pages": [
+        55,
+        56,
+        57
+      ],
+      "representation": "Tất cả cột + top 5 mỗi cột; toàn bộ mã trong CSV",
+      "sha256": "7a66c7f6ef87c7ee94ccb336c0a18eac4e600afcb946b25190731081caf062c5",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.modalities/location_categories_full.csv"
+    },
+    {
+      "key": "descriptive.quality/duplicates",
+      "section": "descriptive.quality",
+      "name": "duplicates",
+      "path": "tables/descriptive.quality/duplicates.csv",
+      "rows": 13,
+      "columns": [
+        "source",
+        "kind",
+        "duplicate_n",
+        "duplicate_groups",
+        "analyzed_rows",
+        "scope"
+      ],
+      "pages": [
+        8,
+        81
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "28bce5da7abb5ea7d24bebb5230b19880fd2d507a18d59c14d4ecb000b54f0c5",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.quality/duplicates.csv"
+    },
+    {
+      "key": "descriptive.quality/invalid_values",
+      "section": "descriptive.quality",
+      "name": "invalid_values",
+      "path": "tables/descriptive.quality/invalid_values.csv",
+      "rows": 11,
+      "columns": [
+        "source",
+        "check",
+        "n"
+      ],
+      "pages": [
+        77
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "6b831387debec5487b86cae05a4ddb419ad96d3acd562ec89de028ee52e41385",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.quality/invalid_values.csv"
+    },
+    {
+      "key": "descriptive.quality/key_coverage",
+      "section": "descriptive.quality",
+      "name": "key_coverage",
+      "path": "tables/descriptive.quality/key_coverage.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "reference_customers",
+        "customers_with_valid_time_log",
+        "distinct_ids_with_valid_time",
+        "customers_without_valid_time_log",
+        "coverage",
+        "unknown_client_rows",
+        "missing_id_rows"
+      ],
+      "pages": [
+        80
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "5cfc5ad91db3c00a97af8927259f81aecbaf4c07582c20a14693315de7b5c729",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.quality/key_coverage.csv"
+    },
+    {
+      "key": "descriptive.quality/missing_values",
+      "section": "descriptive.quality",
+      "name": "missing_values",
+      "path": "tables/descriptive.quality/missing_values.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "missing_n",
+        "missing_rate"
+      ],
+      "pages": [
+        6,
+        69,
+        70,
+        71,
+        72
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "706daf9c2abbb45edfb44f1eb61aab2a2fb1aa8d6dbd06a3fa3259bd3b97ef26",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.quality/missing_values.csv"
+    },
+    {
+      "key": "descriptive.structure/column_roles",
+      "section": "descriptive.structure",
+      "name": "column_roles",
+      "path": "tables/descriptive.structure/column_roles.csv",
+      "rows": 36,
+      "columns": [
+        "source",
+        "column",
+        "dtype",
+        "role"
+      ],
+      "pages": [
+        69,
+        70,
+        71,
+        72
+      ],
+      "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
+      "sha256": "dbde04c6ff05e94f59409f182f37de64f22d44699c3c2d0531013d81a618d62b",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.structure/column_roles.csv"
+    },
+    {
+      "key": "descriptive.structure/relationship_summary",
+      "section": "descriptive.structure",
+      "name": "relationship_summary",
+      "path": "tables/descriptive.structure/relationship_summary.csv",
+      "rows": 4,
+      "columns": [
+        "left",
+        "right",
+        "keys",
+        "cardinality"
+      ],
+      "pages": [
+        79
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "1707d162a9adb55f8d445ce415dfe9498648373efb78975e67d0e4e7ce86501a",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.structure/relationship_summary.csv"
+    },
+    {
+      "key": "descriptive.structure/table_inventory",
+      "section": "descriptive.structure",
+      "name": "table_inventory",
+      "path": "tables/descriptive.structure/table_inventory.csv",
+      "rows": 5,
+      "columns": [
+        "source",
+        "files",
+        "rows",
+        "row_unit",
+        "logical_columns",
+        "schema_variants"
+      ],
+      "pages": [
+        115
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "62edd94e78dd76238730b752450da9afdf729a87c24d283edd911cc60ada5256",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.structure/table_inventory.csv"
+    },
+    {
+      "key": "descriptive.targets/customer_positive_history",
+      "section": "descriptive.targets",
+      "name": "customer_positive_history",
+      "path": "tables/descriptive.targets/customer_positive_history.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "customers",
+        "observed_customers",
+        "ever_positive_customers",
+        "rate",
+        "mean_positive_months"
+      ],
+      "pages": [
+        59
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "ffa65829cecf061fd17acce2ed022c2e9bdd89cc6fa365293b19eb9524747d07",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/customer_positive_history.csv"
+    },
+    {
+      "key": "descriptive.targets/label_coverage",
+      "section": "descriptive.targets",
+      "name": "label_coverage",
+      "path": "tables/descriptive.targets/label_coverage.csv",
+      "rows": 60,
+      "columns": [
+        "mon",
+        "fold",
+        "customer_month_rows",
+        "customers",
+        "targets",
+        "observed_label_cells",
+        "missing_label_cells"
+      ],
+      "pages": [
+        62,
+        63,
+        64,
+        65
+      ],
+      "representation": "Toàn bộ nhóm và số đếm; cột suy ra + CSV",
+      "sha256": "441ff821af614369da9d8284cae3df901a9ffba0c93c0b351fd8a03069507e3a",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/label_coverage.csv"
+    },
+    {
+      "key": "descriptive.targets/positive_labels_per_row",
+      "section": "descriptive.targets",
+      "name": "positive_labels_per_row",
+      "path": "tables/descriptive.targets/positive_labels_per_row.csv",
+      "rows": 5,
+      "columns": [
+        "positive_labels",
+        "rows"
+      ],
+      "pages": [
+        61
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "23289f7a94990aba86667f532e0ef7417277b32fdc2b3583efa0ed53ff69e373",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/positive_labels_per_row.csv"
+    },
+    {
+      "key": "descriptive.targets/target_by_month_fold",
+      "section": "descriptive.targets",
+      "name": "target_by_month_fold",
+      "path": "tables/descriptive.targets/target_by_month_fold.csv",
+      "rows": 240,
+      "columns": [
+        "mon",
+        "fold",
+        "target",
+        "rows",
+        "customers",
+        "labelled_n",
+        "positive_n",
+        "missing_n",
+        "rate"
+      ],
+      "pages": [
+        62,
+        63,
+        64,
+        65
+      ],
+      "representation": "Toàn bộ nhóm và số đếm; cột suy ra + CSV",
+      "sha256": "b0e80a7b7dfe47afb2e8be73607226b36371fecf253255f7ce63c670d2585682",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/target_by_month_fold.csv"
+    },
+    {
+      "key": "descriptive.targets/target_cooccurrence",
+      "section": "descriptive.targets",
+      "name": "target_cooccurrence",
+      "path": "tables/descriptive.targets/target_cooccurrence.csv",
+      "rows": 6,
+      "columns": [
+        "left",
+        "right",
+        "observed_pairs",
+        "both_positive"
+      ],
+      "pages": [
+        60
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "8bccca5f534b915f45c66945c81b2aab21d334b89f666c708f73f0c2216bf310",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/target_cooccurrence.csv"
+    },
+    {
+      "key": "descriptive.targets/target_prevalence",
+      "section": "descriptive.targets",
+      "name": "target_prevalence",
+      "path": "tables/descriptive.targets/target_prevalence.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "rows",
+        "labelled_n",
+        "positive_n",
+        "negative_n",
+        "missing_n",
+        "rate"
+      ],
+      "pages": [
+        58
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "f1b662d35c90bc9df3a4748841623002452b302fbfe5a1133ae3a51d45907128",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.targets/target_prevalence.csv"
+    },
+    {
+      "key": "descriptive.temporal/history_length_summary",
+      "section": "descriptive.temporal",
+      "name": "history_length_summary",
+      "path": "tables/descriptive.temporal/history_length_summary.csv",
+      "rows": 6,
+      "columns": [
+        "source",
+        "metric",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ],
+      "pages": [
+        38,
+        39
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "503f17f27d4da03ae3be8f628dba6e981d7bdb7d7e13b119666c8fb64760ccfb",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.temporal/history_length_summary.csv"
+    },
+    {
+      "key": "descriptive.temporal/monthly_activity",
+      "section": "descriptive.temporal",
+      "name": "monthly_activity",
+      "path": "tables/descriptive.temporal/monthly_activity.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "month",
+        "events",
+        "customers",
+        "observed_days",
+        "events_per_active_customer"
+      ],
+      "pages": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "a1cd3e8791bbf49984c3ba04b75184e25ee8e97af342bf8f2cc319cc93b25b07",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.temporal/monthly_activity.csv"
+    },
+    {
+      "key": "descriptive.temporal/source_time_ranges",
+      "section": "descriptive.temporal",
+      "name": "source_time_ranges",
+      "path": "tables/descriptive.temporal/source_time_ranges.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "first_event",
+        "last_event",
+        "scanned_rows",
+        "valid_time_rows"
+      ],
+      "pages": [
+        117
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "23e5b2ea41839e287e690ed7b0f1337274ffaa9e113eebe25dc81ae5127a7e3d",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.temporal/source_time_ranges.csv"
+    },
+    {
+      "key": "descriptive.transactions/amount_by_currency",
+      "section": "descriptive.transactions",
+      "name": "amount_by_currency",
+      "path": "tables/descriptive.transactions/amount_by_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "currency_missing",
+        "rows",
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "scope"
+      ],
+      "pages": [
+        103,
+        104
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "38694d8a297d1e962e1dd4c2ad50d06c666d350ca1a6c08d71b5f47dd766355e",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/amount_by_currency.csv"
+    },
+    {
+      "key": "descriptive.transactions/amount_histogram",
+      "section": "descriptive.transactions",
+      "name": "amount_histogram",
+      "path": "tables/descriptive.transactions/amount_histogram.csv",
+      "rows": 15,
+      "columns": [
+        "bin",
+        "n",
+        "left",
+        "right",
+        "scope"
+      ],
+      "pages": [
+        19,
+        109
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "ce3beb77d4f328c4aaf090d5c3e21c294a196ac479285bfef55cf6808aa84d6d",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/amount_histogram.csv"
+    },
+    {
+      "key": "descriptive.transactions/amount_summary",
+      "section": "descriptive.transactions",
+      "name": "amount_summary",
+      "path": "tables/descriptive.transactions/amount_summary.csv",
+      "rows": 1,
+      "columns": [
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "scanned_rows",
+        "sample_rows",
+        "sample_finite_n",
+        "missing_n",
+        "infinite_n",
+        "invalid_n",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "moments_scope",
+        "quantile_scope",
+        "whisker_low",
+        "whisker_high",
+        "quantile_method"
+      ],
+      "pages": [
+        106,
+        107
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "82add100babe11d29c99e2c49ff974b9b28c470803feb31c38d2cbd691fb39a1",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/amount_summary.csv"
+    },
+    {
+      "key": "descriptive.transactions/transaction_categories",
+      "section": "descriptive.transactions",
+      "name": "transaction_categories",
+      "path": "tables/descriptive.transactions/transaction_categories.csv",
+      "rows": 242,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ],
+      "pages": [
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
+      "sha256": "58f603851700b7d46d64d7432023d4406ec2823bf9953944647f5b95c35f5119",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/transaction_categories.csv"
+    },
+    {
+      "key": "descriptive.transactions/transaction_categories_full",
+      "section": "descriptive.transactions",
+      "name": "transaction_categories_full",
+      "path": "tables/descriptive.transactions/transaction_categories_full.csv",
+      "rows": 12829,
+      "columns": [
+        "source",
+        "column",
+        "kind",
+        "value",
+        "n",
+        "distinct_n",
+        "rows",
+        "rate",
+        "frequency_scope"
+      ],
+      "pages": [
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "representation": "Tất cả cột + top 5 mỗi cột; toàn bộ mã trong CSV",
+      "sha256": "fa86611de4532cf69e367ffc264fbc73d9bf16ca882ae6e00197e6576f55b526",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/transaction_categories_full.csv"
+    },
+    {
+      "key": "descriptive.transactions/transaction_outliers",
+      "section": "descriptive.transactions",
+      "name": "transaction_outliers",
+      "path": "tables/descriptive.transactions/transaction_outliers.csv",
+      "rows": 1,
+      "columns": [
+        "lower",
+        "upper",
+        "outlier_n",
+        "analyzed_finite_n",
+        "scope"
+      ],
+      "pages": [
+        108
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "40cbf333c62bf413cc325824a762629531330924e02d6e028c0218f0a2ca306e",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/descriptive.transactions/transaction_outliers.csv"
+    },
+    {
+      "key": "review/amount_by_currency",
+      "section": "review",
+      "name": "amount_by_currency",
+      "path": "tables/review/amount_by_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "rows",
+        "finite_n",
+        "mean",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99"
+      ],
+      "pages": [
+        103,
+        104
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "1f601b905500e2664891eb70b227c520a5bfb0cb71c395653cbc7c265c8e8fd9",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/amount_by_currency.csv"
+    },
+    {
+      "key": "review/amount_full",
+      "section": "review",
+      "name": "amount_full",
+      "path": "tables/review/amount_full.csv",
+      "rows": 1,
+      "columns": [
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99"
+      ],
+      "pages": [
+        19,
+        105
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "39c06ca4bf8fd8df4439c88a5838377a6a1ff6b0309fdf5a043d5758699587f3",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/amount_full.csv"
+    },
+    {
+      "key": "review/amount_outliers_currency",
+      "section": "review",
+      "name": "amount_outliers_currency",
+      "path": "tables/review/amount_outliers_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "finite_n",
+        "lower_fence",
+        "upper_fence",
+        "outlier_n",
+        "nonpositive_n",
+        "max"
+      ],
+      "pages": [
+        26,
+        112
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "4250021a58ccb8aa0c9870d6223dd55b98bab8c7332359930278c37e26975146",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/amount_outliers_currency.csv"
+    },
+    {
+      "key": "review/amount_raw_bins",
+      "section": "review",
+      "name": "amount_raw_bins",
+      "path": "tables/review/amount_raw_bins.csv",
+      "rows": 15,
+      "columns": [
+        "bin",
+        "n",
+        "left",
+        "right"
+      ],
+      "pages": [
+        19,
+        109
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "33cadffed2e0e7a8dbb8e65c72520b1a3b4037874d94f1905bdab36a819df33d",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/amount_raw_bins.csv"
+    },
+    {
+      "key": "review/amount_zoom",
+      "section": "review",
+      "name": "amount_zoom",
+      "path": "tables/review/amount_zoom.csv",
+      "rows": 30,
+      "columns": [
+        "bin",
+        "n",
+        "left",
+        "right"
+      ],
+      "pages": [
+        20,
+        110,
+        111
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "e5967238f797f8e51fb9a93f607b62c69803b9008edac9449d607cb3e028536b",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/amount_zoom.csv"
+    },
+    {
+      "key": "review/behavior_combinations",
+      "section": "review",
+      "name": "behavior_combinations",
+      "path": "tables/review/behavior_combinations.csv",
+      "rows": 8,
+      "columns": [
+        "trx",
+        "geo",
+        "dialog",
+        "customers",
+        "population",
+        "percent"
+      ],
+      "pages": [
+        10
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "df4faad719974e05613994534336da73556d5dff1d6e190754752af7aed7be9d",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/behavior_combinations.csv"
+    },
+    {
+      "key": "review/behavior_rates",
+      "section": "review",
+      "name": "behavior_rates",
+      "path": "tables/review/behavior_rates.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "population",
+        "with_log",
+        "without_log",
+        "coverage_percent"
+      ],
+      "pages": [
+        10
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "ae71237b0786bd1614c26ee50958bdd589b8c69e8d2cd8aa7b891b7acff955fb",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/behavior_rates.csv"
+    },
+    {
+      "key": "review/customer_count_outliers",
+      "section": "review",
+      "name": "customer_count_outliers",
+      "path": "tables/review/customer_count_outliers.csv",
+      "rows": 4,
+      "columns": [
+        "source",
+        "rows",
+        "q1",
+        "median",
+        "q3",
+        "lower_fence",
+        "upper_fence",
+        "outlier_n",
+        "above_p99_n",
+        "max"
+      ],
+      "pages": [
+        25,
+        113
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "8b5cf9954d0403e568c0641a32ed76ecb885933f816eb1ce672531df3146a956",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/customer_count_outliers.csv"
+    },
+    {
+      "key": "review/daily_behavior",
+      "section": "review",
+      "name": "daily_behavior",
+      "path": "tables/review/daily_behavior.csv",
+      "rows": 2193,
+      "columns": [
+        "source",
+        "day",
+        "events"
+      ],
+      "pages": [
+        18
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "e61081a8c4f9278ce50599ce35a6c9cd17153573e39e77a63f1f5fee53e9336c",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/daily_behavior.csv"
+    },
+    {
+      "key": "review/daily_count_outliers",
+      "section": "review",
+      "name": "daily_count_outliers",
+      "path": "tables/review/daily_count_outliers.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "observed_days",
+        "q1",
+        "q3",
+        "upper_fence",
+        "outlier_days",
+        "max_day",
+        "max_events"
+      ],
+      "pages": [
+        25,
+        114
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "07ac889b25b01cae10434fc9f66ebb1e23402949d8ad15367dd814d3b88424d7",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/daily_count_outliers.csv"
+    },
+    {
+      "key": "review/duplicates",
+      "section": "review",
+      "name": "duplicates",
+      "path": "tables/review/duplicates.csv",
+      "rows": 13,
+      "columns": [
+        "source",
+        "kind",
+        "duplicate_n",
+        "duplicate_groups",
+        "analyzed_rows",
+        "scope"
+      ],
+      "pages": [
+        8,
+        81
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "bbbebb97bc9d17ce6d5787f3ff62841595f10d8750f0895f9d9b0ae3a01403e3",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/duplicates.csv"
+    },
+    {
+      "key": "review/embedding_element_quality",
+      "section": "review",
+      "name": "embedding_element_quality",
+      "path": "tables/review/embedding_element_quality.csv",
+      "rows": 2,
+      "columns": [
+        "source",
+        "rows",
+        "null_vectors",
+        "non_768_vectors",
+        "null_scalar_elements",
+        "nonfinite_scalar_elements"
+      ],
+      "pages": [
+        9,
+        85
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "2dad78c6be7bbaecfa703e5823e38e29c84dd636611460abdfef3d4adfcf6b7d",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/embedding_element_quality.csv"
+    },
+    {
+      "key": "review/events_per_customer",
+      "section": "review",
+      "name": "events_per_customer",
+      "path": "tables/review/events_per_customer.csv",
+      "rows": 8,
+      "columns": [
+        "source",
+        "population",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ],
+      "pages": [
+        17,
+        36,
+        37
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "ec21d288ac647751da4dbc5fd0add2e4c328b2d5b2f811c25ea807c4804a0128",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/events_per_customer.csv"
+    },
+    {
+      "key": "review/group_monthly_coverage",
+      "section": "review",
+      "name": "group_monthly_coverage",
+      "path": "tables/review/group_monthly_coverage.csv",
+      "rows": 175,
+      "columns": [
+        "activity_group",
+        "month",
+        "population",
+        "min_total",
+        "max_total",
+        "coverage_percent"
+      ],
+      "pages": [
+        28,
+        29,
+        30
+      ],
+      "representation": "Toàn bộ 175 ô + quy mô và biên nhóm",
+      "sha256": "5a0f452ceae9330a0eef7a31dc92aa9e3593d209ef26921b450db1aec0d85c83",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/group_monthly_coverage.csv"
+    },
+    {
+      "key": "review/missing_values",
+      "section": "review",
+      "name": "missing_values",
+      "path": "tables/review/missing_values.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "missing_n",
+        "missing_rate"
+      ],
+      "pages": [
+        6,
+        69,
+        70,
+        71,
+        72
+      ],
+      "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
+      "sha256": "38c659280f09add3bfe4b3a3a17287201b3056d8c018032c75087dbae9d3bfc0",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/missing_values.csv"
+    },
+    {
+      "key": "review/monthly_coverage",
+      "section": "review",
+      "name": "monthly_coverage",
+      "path": "tables/review/monthly_coverage.csv",
+      "rows": 75,
+      "columns": [
+        "source",
+        "month",
+        "events",
+        "customers_with_log",
+        "population",
+        "unknown_customers",
+        "coverage_percent"
+      ],
+      "pages": [
+        11
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "62b1c58e1da0a7a3eb114d9998a52ea5dadb6a6e6a5ac1a1e14aeeae817c4b6b",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/monthly_coverage.csv"
+    },
+    {
+      "key": "review/null_by_event_type",
+      "section": "review",
+      "name": "null_by_event_type",
+      "path": "tables/review/null_by_event_type.csv",
+      "rows": 55,
+      "columns": [
+        "event_type",
+        "rows",
+        "null_currency",
+        "null_src11",
+        "null_dst11",
+        "null_src21",
+        "null_src31"
+      ],
+      "pages": [
+        73,
+        74,
+        75,
+        76
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "50c82cec8af600a9fb55e6d3ab288c1f22b3af2e49af5d7dc8fbfe7808f0fa65",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/null_by_event_type.csv"
+    },
+    {
+      "key": "review/null_pairs",
+      "section": "review",
+      "name": "null_pairs",
+      "path": "tables/review/null_pairs.csv",
+      "rows": 4,
+      "columns": [
+        "pair",
+        "both_null",
+        "only_one_null",
+        "rows"
+      ],
+      "pages": [
+        7
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "bedea358cd0e6a3a51ea817a194c0818307adc3614e5c053262e48b20a9b00ca",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/null_pairs.csv"
+    },
+    {
+      "key": "review/null_target_context",
+      "section": "review",
+      "name": "null_target_context",
+      "path": "tables/review/null_target_context.csv",
+      "rows": 3,
+      "columns": [
+        "trans_count_group",
+        "rows",
+        "missing_diff",
+        "min_trans_count",
+        "max_trans_count"
+      ],
+      "pages": [
+        7
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "c8da9bfb9f8b3faf857ba48949a02878deece4b7d065b87f6f21bbd70e4ec3e2",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/null_target_context.csv"
+    },
+    {
+      "key": "review/purposeful_coverage",
+      "section": "review",
+      "name": "purposeful_coverage",
+      "path": "tables/review/purposeful_coverage.csv",
+      "rows": 1000,
+      "columns": [
+        "group",
+        "display_id",
+        "month",
+        "events",
+        "full_history_events"
+      ],
+      "pages": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "representation": "Tóm tắt / biểu diễn trực tiếp",
+      "sha256": "e4512c195b870c68fc7a7f5cfc137166ad17fd892bff6aaa0bbc7ffb8cdd033c",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/purposeful_coverage.csv"
+    },
+    {
+      "key": "review/sample_inventory",
+      "section": "review",
+      "name": "sample_inventory",
+      "path": "tables/review/sample_inventory.csv",
+      "rows": 8,
+      "columns": [
+        "source",
+        "rows",
+        "path"
+      ],
+      "pages": [
+        23,
+        101
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "fad9fc45f5bd5c4ac01dd5804945dbe6e9f7db8b9ffd66393ee8ba526ef28e3f",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sample_inventory.csv"
+    },
+    {
+      "key": "review/sampling_labels",
+      "section": "review",
+      "name": "sampling_labels",
+      "path": "tables/review/sampling_labels.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "population_positive_n",
+        "population_percent",
+        "sample_positive_n",
+        "sample_percent"
+      ],
+      "pages": [
+        24,
+        102
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "4c9cb6a4a0513046e5463cf162fb9b4674bca6a6007eba3d18d7413ddc62c118",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sampling_labels.csv"
+    },
+    {
+      "key": "review/sampling_strata",
+      "section": "review",
+      "name": "sampling_strata",
+      "path": "tables/review/sampling_strata.csv",
+      "rows": 178,
+      "columns": [
+        "stratum",
+        "population_n",
+        "sample_n",
+        "expected_n",
+        "population_rate",
+        "sample_rate",
+        "difference_pp"
+      ],
+      "pages": [
+        23,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "83042e6a17c5e727b5ea5db645deecb97798a4fc2f2ba25a13366212173e2944",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sampling_strata.csv"
+    },
+    {
+      "key": "review/sampling_validation",
+      "section": "review",
+      "name": "sampling_validation",
+      "path": "tables/review/sampling_validation.csv",
+      "rows": 24,
+      "columns": [
+        "source",
+        "metric",
+        "population_value",
+        "sample_value"
+      ],
+      "pages": [
+        24,
+        87,
+        88
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "360c95fd3162a0a70798871aa1dd2faa9d462aca83e3a5593a891a9abf8d5c52",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sampling_validation.csv"
+    },
+    {
+      "key": "review/sequence_quality",
+      "section": "review",
+      "name": "sequence_quality",
+      "path": "tables/review/sequence_quality.csv",
+      "rows": 19,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "elements",
+        "null_elements",
+        "length_mismatch_rows"
+      ],
+      "pages": [
+        82,
+        83
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "1f8a99d6b0de6048d4e6c39db2529dd2938d11de60024f5b387bd9620fba9957",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sequence_quality.csv"
+    },
+    {
+      "key": "review/sequence_reconciliation",
+      "section": "review",
+      "name": "sequence_reconciliation",
+      "path": "tables/review/sequence_reconciliation.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "detail_events",
+        "ptls_events",
+        "max_detail_events",
+        "max_sequence_events",
+        "customers_shorter_sequence",
+        "customers_longer_sequence",
+        "customer_presence_mismatch"
+      ],
+      "pages": [
+        9,
+        84
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "1d12dd05247712705dcf45d758942b9ae1de5a6ac78686da5c1ddec9d165b513",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/sequence_reconciliation.csv"
+    },
+    {
+      "key": "review/source_schema",
+      "section": "review",
+      "name": "source_schema",
+      "path": "tables/review/source_schema.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "path",
+        "rows",
+        "column",
+        "dtype",
+        "grain"
+      ],
+      "pages": [
+        3,
+        4,
+        5,
+        69,
+        70,
+        71,
+        72
+      ],
+      "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
+      "sha256": "056b6a55d114b3d1912dde191ca2b1d149c14ce89b2f578dc078b18ea2d41d8a",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/source_schema.csv"
+    },
+    {
+      "key": "review/target_monthly",
+      "section": "review",
+      "name": "target_monthly",
+      "path": "tables/review/target_monthly.csv",
+      "rows": 48,
+      "columns": [
+        "mon",
+        "target",
+        "positive_n",
+        "labelled_n",
+        "positive_percent"
+      ],
+      "pages": [
+        21,
+        22,
+        66,
+        67,
+        68
+      ],
+      "representation": "Bảng đầy đủ",
+      "sha256": "f481ffe6e8c6fc1e4292136439b7cd8439cc8dff46514cce1e0e3cee0ae17be1",
+      "url": "https://raw.githubusercontent.com/AnhQun18/Propensity/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/tables/review/target_monthly.csv"
+    }
+  ],
+  "figures": [
+    {
+      "path": "figures/amount_boxplot.png",
+      "pages": [
+        106,
+        107
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_boxplot.png"
+    },
+    {
+      "path": "figures/amount_histogram.png",
+      "pages": [
+        19,
+        109
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_histogram.png"
+    },
+    {
+      "path": "figures/amount_quantiles.png",
+      "pages": [
+        19,
+        105
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_quantiles.png"
+    },
+    {
+      "path": "figures/amount_zoom_linear.png",
+      "pages": [
+        20,
+        110,
+        111
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_zoom_linear.png"
+    },
+    {
+      "path": "figures/behavior_monthly_matrix.png",
+      "pages": [
+        11
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/behavior_monthly_matrix.png"
+    },
+    {
+      "path": "figures/behavior_rates_matrix.png",
+      "pages": [
+        10
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/behavior_rates_matrix.png"
+    },
+    {
+      "path": "figures/coverage_group_1.png",
+      "pages": [
+        12
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_group_1.png"
+    },
+    {
+      "path": "figures/coverage_group_2.png",
+      "pages": [
+        13
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_group_2.png"
+    },
+    {
+      "path": "figures/coverage_group_3.png",
+      "pages": [
+        14
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_group_3.png"
+    },
+    {
+      "path": "figures/coverage_group_4.png",
+      "pages": [
+        15
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_group_4.png"
+    },
+    {
+      "path": "figures/coverage_group_5.png",
+      "pages": [
+        16
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_group_5.png"
+    },
+    {
+      "path": "figures/coverage_population_groups.png",
+      "pages": [
+        28,
+        29,
+        30
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_population_groups.png"
+    },
+    {
+      "path": "figures/customer_event_medians.png",
+      "pages": [
+        17,
+        36,
+        37
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/customer_event_medians.png"
+    },
+    {
+      "path": "figures/daily_behavior_linear.png",
+      "pages": [
+        18
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/daily_behavior_linear.png"
+    },
+    {
+      "path": "figures/embedding_dimensions.png",
+      "pages": [
+        35,
+        86
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/embedding_dimensions.png"
+    },
+    {
+      "path": "figures/first_event_month.png",
+      "pages": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/first_event_month.png"
+    },
+    {
+      "path": "figures/last_event_month.png",
+      "pages": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/last_event_month.png"
+    },
+    {
+      "path": "figures/location_codes.png",
+      "pages": [
+        55,
+        56,
+        57
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/location_codes.png"
+    },
+    {
+      "path": "figures/missing_attributes.png",
+      "pages": [
+        6,
+        69,
+        70,
+        71,
+        72
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/missing_attributes.png"
+    },
+    {
+      "path": "figures/monthly_activity.png",
+      "pages": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/monthly_activity.png"
+    },
+    {
+      "path": "figures/monthly_customers.png",
+      "pages": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/monthly_customers.png"
+    },
+    {
+      "path": "figures/source_timeline.png",
+      "pages": [
+        117
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/source_timeline.png"
+    },
+    {
+      "path": "figures/target_by_month.png",
+      "pages": [
+        21,
+        22,
+        66,
+        67,
+        68
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/target_by_month.png"
+    },
+    {
+      "path": "figures/transaction_event_types.png",
+      "pages": [
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "representation": "Revised chart, matrix or source table",
+      "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/transaction_event_types.png"
+    }
+  ]
+}
