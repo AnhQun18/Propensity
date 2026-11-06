@@ -72,8 +72,9 @@ class ExportFixTests(unittest.TestCase):
         self.assertAlmostEqual(summary['mean'],raw.mean())
         self.assertAlmostEqual(summary['std'],raw.std(ddof=1))
         self.assertEqual(summary.quantile_scope,complete.FULL)
-        for name in ('amount_histogram','amount_log_histogram'):
-            self.assertEqual(fix.read_table(self.output,'descriptive.transactions',name).n.sum(),len(raw))
+        self.assertEqual(fix.read_table(self.output,'descriptive.transactions','amount_histogram').n.sum(),len(raw))
+        self.assertEqual(fix.read_table(self.output,'descriptive.transactions','amount_zoom_histogram').n.sum(),
+                         raw.between(raw.min(),raw.quantile(.99)).sum())
         grouped=fix.read_table(self.output,'descriptive.transactions','amount_by_currency')
         self.assertEqual(grouped.rows.sum(),len(self.fixture.trx))
 
@@ -99,7 +100,7 @@ class ExportFixTests(unittest.TestCase):
             frame=pd.read_csv(self.output/item['path'])
             self.assertEqual(len(frame),item['rows'])
             self.assertNotIn('client_id',frame)
-        self.assertIn('figures/amount_log_histogram.png',manifest['figures'])
+        self.assertIn('figures/amount_zoom_histogram.png',manifest['figures'])
         self.assertIn('figures/first_event_month.png',manifest['figures'])
         metadata=json.loads((self.output/'metadata.json').read_text(encoding='utf-8'))
         self.assertEqual(metadata['raw_supplements']['status'],'completed')
@@ -160,7 +161,7 @@ class ExportFixTests(unittest.TestCase):
                 result=complete.full_amounts(db,{'transactions':{'rows':len(values)}})
                 summary=result['descriptive.transactions','amount_summary'].iloc[0]
                 self.assertEqual(summary.finite_n,0 if not values else 3)
-                self.assertEqual(result['descriptive.transactions','amount_log_histogram'].n.sum(),summary.finite_n)
+                self.assertEqual(result['descriptive.transactions','amount_histogram'].n.sum(),summary.finite_n)
                 self.assertIn('currency',result['descriptive.transactions','amount_by_currency'])
 
 

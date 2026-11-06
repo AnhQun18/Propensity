@@ -1,0 +1,9 @@
+﻿source,rows,path
+clients,1000,clients.parquet
+targets,12000,targets.parquet
+trx,358682,trx.parquet
+geo,666411,geo.parquet
+dialog,2091,dialog.parquet
+ptls_trx,989,ptls_trx.parquet
+ptls_geo,724,ptls_geo.parquet
+ptls_dialog,460,ptls_dialog.parquet

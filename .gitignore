@@ -20,3 +20,22 @@ configs/*.local.json
 /build/
 /dist/
 /docs/mbd_mini_eda_local_*/
+/outputs/behavior_coverage/
+
+# Persistent scan caches and local reports.
+/outputs/
+/.codex-remote-attachments/
+*.duckdb
+*.duckdb.wal
+*.sqlite
+*.npz
+
+# The explicitly requested, anonymized public MBD-mini sample is versioned.
+!/sampledata/mbd_mini/*.parquet
+
+# Reproducible preview/build artefacts.
+/deliverables/propensity-pitch/*preview*.png
+/deliverables/propensity-pitch/qa-*.png
+/deliverables/propensity-pitch/v2-*.png
+/deliverables/propensity-pitch/contact-sheet*.jpg
+/deliverables/propensity-pitch/*.zip

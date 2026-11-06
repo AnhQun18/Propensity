@@ -3,6 +3,10 @@ include docs/mbd_mini_eda_package.md
 include docs/setup_other_machine.md
 include docs/run_complete_other_machine.md
 include docs/performance_16gb.md
+include docs/mbd_eda_review.md
+include docs/behavior_coverage_matrix.md
+include src/review_mbd_eda.py src/mbd_eda_review_report.py src/validate_mbd_review.py
+include src/plot_behavior_coverage.py src/behavior_coverage_viewer.html
 include docs/propensity_feasibility/mon_research.md
 include configs/mbd_mini_eda.json
 recursive-include tests *.py

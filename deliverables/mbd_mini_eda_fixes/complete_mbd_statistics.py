@@ -208,10 +208,11 @@ def full_amounts(db, descriptions):
                    moments_scope=FULL, quantile_scope=FULL, whisker_low=whisker_low, whisker_high=whisker_high,
                    quantile_method="exact_continuous_type7_linear")
     hist = make_histogram(db, low, high)
-    log_expression = "sign(v)*log10(1+abs(v))"
-    a, b = db.execute(f"SELECT min({log_expression}),max({log_expression}) FROM finite_amounts").fetchone()
-    log_hist = make_histogram(db, a, b, transform=log_expression)
-    log_hist["transform"] = "signed_log10_1p_abs"
+    # Equal-width raw-value zoom retains a readable central distribution.
+    # The full histogram still accounts for every finite observation.
+    zoom_hist = hist.copy()
+    if q[-1] is not None:
+        zoom_hist = make_histogram_range(db, low, q[-1])
     log("Amount theo mã currency, gồm cả nhóm currency bị thiếu")
     grouped = db.execute("""SELECT CAST(currency AS VARCHAR) currency,count(*) rows,
         count(*) FILTER(WHERE isfinite(v)) finite_n,
@@ -225,16 +226,28 @@ def full_amounts(db, descriptions):
         rows.append(dict(currency=currency, currency_missing=currency is None, rows=int(total), finite_n=int(finite),
                          mean=avg, std=stdev, min=minimum, max=maximum,
                          **dict(zip(("p25", "median", "p75", "p95", "p99"), quantiles)), scope=FULL))
-    if int(hist.n.sum()) != n or int(log_hist.n.sum()) != n:
+    if int(hist.n.sum()) != n:
         raise ValueError("Histogram không cộng đủ số amount hữu hạn")
     return {("descriptive.transactions", "amount_summary"): pd.DataFrame([summary]),
             ("descriptive.transactions", "transaction_outliers"): pd.DataFrame([dict(lower=lower, upper=upper,
                 outlier_n=int(outliers), analyzed_finite_n=int(n), scope=FULL)]),
             ("descriptive.transactions", "amount_histogram"): hist,
-            ("descriptive.transactions", "amount_log_histogram"): log_hist,
+            ("descriptive.transactions", "amount_zoom_histogram"): zoom_hist,
             ("descriptive.transactions", "amount_by_currency"): pd.DataFrame(rows, columns=[
                 "currency", "currency_missing", "rows", "finite_n", "mean", "std", "min", "max",
                 "p25", "median", "p75", "p95", "p99", "scope"])}
+
+
+def make_histogram_range(db, minimum, maximum, bins=40):
+    """Linear raw-value histogram on an explicit subset, without tail folding."""
+    low,high=float(minimum),float(maximum)
+    if low==high:
+        high=low+max(abs(low)*.01,.5)
+    edges=np.linspace(low,high,bins+1)
+    counts=dict(db.execute(f"""SELECT least({bins-1},floor((v-?)/?*{bins})::INTEGER) bucket,count(*) n
+        FROM finite_amounts WHERE v>=? AND v<=? GROUP BY bucket""",[low,high-low,minimum,maximum]).fetchall())
+    return pd.DataFrame([dict(left=edges[i],right=edges[i+1],n=int(counts.get(i,0)),
+                              scope='all_finite_amounts_within_min_to_p99') for i in range(bins)])
 
 
 def customer_dates(db, descriptions):

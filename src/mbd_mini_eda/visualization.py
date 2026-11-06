@@ -23,6 +23,39 @@ def bars(frame,x,y,title):
     ax.tick_params(axis="x",rotation=45)
     return fig
 
+
+def rate_matrix(frame, labels, values, title):
+    """Numeric matrix for rates; cells retain exact denominators in source CSV."""
+    fig,ax=figure(title)
+    ax.axis('off')
+    cells=[[f'{float(row[c])*100:.4f}%' for c in values] for _,row in frame.iterrows()]
+    matrix=ax.table(cellText=cells,rowLabels=frame[labels].astype(str),colLabels=values,loc='center',cellLoc='center')
+    matrix.auto_set_font_size(False);matrix.set_fontsize(11);matrix.scale(1,1.8)
+    return fig
+
+
+def target_monthly_figure(rates):
+    """Aggregate numerator/denominator, then zoom each target's linear Y axis."""
+    from matplotlib.figure import Figure
+    from matplotlib import dates
+    from matplotlib.ticker import FuncFormatter
+    data=rates.groupby(['mon','target'],as_index=False)[['positive_n','labelled_n']].sum()
+    fig=Figure(figsize=(12,8),layout='constrained');axes=fig.subplots(2,2)
+    for color,(target,part),ax in zip(COLORS,data.groupby('target'),axes.flat):
+        y=part.positive_n/part.labelled_n.replace(0,np.nan)*100
+        ax.plot(pd.to_datetime(part.mon),y,marker='o',label=target,color=color)
+        pooled=part.positive_n.sum()/part.labelled_n.sum()*100 if part.labelled_n.sum() else np.nan
+        ax.axhline(pooled,color='#888888',linestyle='--',label='Pooled period')
+        valid=y.dropna()
+        if not valid.empty:
+            pad=max(float(valid.max()-valid.min())*.15,abs(float(valid.mean()))*.05,.0001)
+            ax.set_ylim(max(0,float(valid.min())-pad),float(valid.max())+pad)
+        ax.set_title(target+' (individual linear Y zoom)')
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda v,_:f'{v:.3f}%'))
+        ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m'))
+        ax.tick_params(axis='x',rotation=35);ax.legend(fontsize=8);ax.grid(alpha=.2)
+    return fig
+
 def descriptive_figures(result):
     figures={}
     missing=table(result,"descriptive.quality","missing_values")
@@ -83,18 +116,13 @@ def descriptive_figures(result):
         figures["monthly_activity"]=fig
     targets=table(result,"descriptive.targets","target_prevalence")
     if not targets.empty:
-        figures["target_prevalence"]=bars(targets,"target","rate","Positive label fraction (observed labels)")
+        figures["target_prevalence"]=rate_matrix(targets,"target",["rate"],"Positive labels / observed labels")
     rates=table(result,"descriptive.targets","target_by_month_fold")
     if not rates.empty:
-        data=rates.groupby(["mon","target"],as_index=False)[["positive_n","labelled_n"]].sum()
-        fig,ax=figure("Positive labels by month","Label marker mon","Positive / observed")
-        for color,(target,part) in zip(COLORS,data.groupby("target")):
-            ax.plot(part.mon,part.positive_n/part.labelled_n.replace(0,np.nan),label=target,color=color)
-        ax.legend(); ax.tick_params(axis="x",rotation=45)
-        figures["target_by_month"]=fig
+        figures["target_by_month"]=target_monthly_figure(rates)
     coverage=table(result,"descriptive.customers","modality_coverage")
     if not coverage.empty:
-        figures["source_coverage"]=bars(coverage,"trx_geo_dialog","customers","Source combination (trx, geo, dialog)")
+        figures["source_coverage"]=rate_matrix(coverage,"trx_geo_dialog",["rate"],"Source combination: fraction of customers")
     activity=table(result,"descriptive.customers","customer_activity")
     if not activity.empty:
         part=activity[activity.feature.isin(["trx_event_count","geo_event_count","dialog_event_count"])].copy()

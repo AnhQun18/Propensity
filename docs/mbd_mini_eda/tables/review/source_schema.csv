@@ -1,0 +1,62 @@
+﻿source,path,rows,column,dtype,grain
+clients,client_split,100224,client_id,string,customer
+clients,client_split,100224,fold,hive partition integer,customer
+targets,targets,1202688,client_id,string,customer_month
+targets,targets,1202688,mon,string,customer_month
+targets,targets,1202688,target_1,int32,customer_month
+targets,targets,1202688,target_2,int32,customer_month
+targets,targets,1202688,target_3,int32,customer_month
+targets,targets,1202688,target_4,int32,customer_month
+targets,targets,1202688,trans_count,int32,customer_month
+targets,targets,1202688,diff_trans_date,int32,customer_month
+targets,targets,1202688,fold,hive partition integer,customer_month
+trx,detail/trx,38764930,client_id,string,event
+trx,detail/trx,38764930,event_time,timestamp[ns],event
+trx,detail/trx,38764930,amount,float,event
+trx,detail/trx,38764930,event_type,int32,event
+trx,detail/trx,38764930,event_subtype,int32,event
+trx,detail/trx,38764930,currency,int32,event
+trx,detail/trx,38764930,src_type11,int32,event
+trx,detail/trx,38764930,src_type12,int32,event
+trx,detail/trx,38764930,dst_type11,int32,event
+trx,detail/trx,38764930,dst_type12,int32,event
+trx,detail/trx,38764930,src_type21,int32,event
+trx,detail/trx,38764930,src_type22,int32,event
+trx,detail/trx,38764930,src_type31,int32,event
+trx,detail/trx,38764930,src_type32,int32,event
+trx,detail/trx,38764930,fold,hive partition integer,event
+geo,detail/geo,66295724,client_id,string,event
+geo,detail/geo,66295724,event_time,timestamp[ns],event
+geo,detail/geo,66295724,geohash_4,int32,event
+geo,detail/geo,66295724,geohash_5,int32,event
+geo,detail/geo,66295724,geohash_6,int32,event
+geo,detail/geo,66295724,fold,hive partition integer,event
+dialog,detail/dialog,217205,client_id,string,event
+dialog,detail/dialog,217205,event_time,timestamp[ns],event
+dialog,detail/dialog,217205,embedding,list<element: float>,event
+dialog,detail/dialog,217205,fold,hive partition integer,event
+ptls_trx,ptls/trx,98721,client_id,string,customer_sequence
+ptls_trx,ptls/trx,98721,event_time,list<element: int64>,customer_sequence
+ptls_trx,ptls/trx,98721,amount,list<element: float>,customer_sequence
+ptls_trx,ptls/trx,98721,event_type,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,event_subtype,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,currency,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type11,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type12,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,dst_type11,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,dst_type12,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type21,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type22,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type31,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,src_type32,list<element: int32>,customer_sequence
+ptls_trx,ptls/trx,98721,fold,hive partition integer,customer_sequence
+ptls_geo,ptls/geo,72573,client_id,string,customer_sequence
+ptls_geo,ptls/geo,72573,event_time,list<element: int64>,customer_sequence
+ptls_geo,ptls/geo,72573,geohash_4,list<element: int32>,customer_sequence
+ptls_geo,ptls/geo,72573,geohash_5,list<element: int32>,customer_sequence
+ptls_geo,ptls/geo,72573,geohash_6,list<element: int32>,customer_sequence
+ptls_geo,ptls/geo,72573,fold,hive partition integer,customer_sequence
+ptls_dialog,ptls/dialog,46320,client_id,string,customer_sequence
+ptls_dialog,ptls/dialog,46320,event_time,list<element: int64>,customer_sequence
+ptls_dialog,ptls/dialog,46320,embedding,list<element: list<element: float>>,customer_sequence
+ptls_dialog,ptls/dialog,46320,fold,hive partition integer,customer_sequence

@@ -289,7 +289,6 @@ def refresh_figures(root):
             fig, ax = figure("Amount quantiles: "+str(r.quantile_scope), "Stored amount", "Quantile")
             names = ["p25", "median", "p75", "p95", "p99"]
             ax.scatter([r[n] for n in names], names)
-            ax.set_xscale("symlog", linthresh=1)
             save_figure(root, "amount_quantiles", fig)
             if pd.notna(r.get("whisker_low")) and pd.notna(r.get("whisker_high")):
                 fig, ax = figure("Amount boxplot: "+str(r.quantile_scope)+" (outlier points omitted)", "Stored amount")
@@ -297,10 +296,10 @@ def refresh_figures(root):
                              whishi=r.whisker_high, fliers=[])], orientation="horizontal", showfliers=False)
                 ax.set_yticks([])
                 save_figure(root, "amount_boxplot", fig)
-    for name in ("amount_histogram", "amount_log_histogram"):
+    for name in ("amount_histogram", "amount_zoom_histogram"):
         frame = read_table(root, "descriptive.transactions", name)
         if not frame.empty:
-            xlabel = "signed log10(1+abs(amount))" if "log" in name else "Stored amount"
+            xlabel = "Stored amount (linear raw values)"
             fig, ax = figure(name+": "+str(frame.scope.iloc[0]), xlabel, "Events")
             ax.bar(frame.left, frame.n, width=frame.right-frame.left, align="edge")
             save_figure(root, name, fig)
@@ -349,7 +348,7 @@ def findings(root, metadata):
         notes["descriptive.transactions"].append("Các mã currency chưa được diễn giải hoặc quy đổi; xem amount_by_currency nếu đã chạy bổ sung raw.")
     hist = read_table(root, "descriptive.transactions", "amount_histogram")
     if not hist.empty and hist.n.sum():
-        notes["descriptive.transactions"].append(f"Cột đầu histogram tuyến tính chứa {int(hist.n.iloc[0]):,}/{int(hist.n.sum()):,} quan sát ({hist.n.iloc[0]/hist.n.sum():.6%}); xem thêm histogram log nếu có.")
+        notes["descriptive.transactions"].append(f"Cột đầu histogram toàn miền chứa {int(hist.n.iloc[0]):,}/{int(hist.n.sum()):,} quan sát ({hist.n.iloc[0]/hist.n.sum():.6%}); xem thêm histogram zoom tuyến tính đến P99.")
     for section, name in (("descriptive.transactions", "transaction_categories"), ("descriptive.modalities", "location_categories")):
         frame = read_table(root, section, name)
         if not frame.empty and "frequency_scope" in frame:

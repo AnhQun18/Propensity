@@ -1,0 +1,4 @@
+﻿trans_count_group,rows,missing_diff,min_trans_count,max_trans_count
+one,50460,0,1,1
+two_or_more,1031442,0,2,1000
+zero,120786,120786,0,0

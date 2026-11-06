@@ -1,5 +1,9 @@
 # Chạy đủ 7 bước trên máy đã có dữ liệu
 
+Bản rà soát 12 yêu cầu hiện tại dùng [quy trình có cache](mbd_eda_review.md):
+`python -u -X utf8 src/review_mbd_eda.py`. Quy trình dưới đây vẫn dành cho
+package 7 bước và bổ sung export; không cần chạy lại nếu chỉ tái lập bản rà soát.
+
 Quy trình gồm package cơ bản và script bổ sung: sửa biểu đồ, tần suất mọi mã,
 phân vị amount toàn bộ, tháng đầu/cuối theo khách và trùng nguyên dòng toàn bộ.
 Raw chỉ được đọc; không tạo feature khách hàng–tháng, không huấn luyện mô hình.
@@ -155,7 +159,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Bổ sung thất bại; chưa có kết quả 
 Script đối chiếu schema, số dòng, khóa và tổng nhãn, rồi đọc raw để tính:
 
 - Tần suất đầy đủ mọi mã; sửa lỗi tách `11`/`11.0` theo schema nguyên.
-- Phân vị amount chính xác trên tất cả giá trị hữu hạn; histogram tuyến tính/log,
+- Phân vị amount chính xác trên tất cả giá trị hữu hạn; histogram toàn miền và zoom tuyến tính đến P99,
   boxplot và thống kê theo currency.
 - Tháng có sự kiện đầu/cuối theo khách và độ phủ; số nguồn có log, độ phủ nhãn.
 - Trùng nguyên dòng toàn bộ xuyên shard/batch; kiểm tra khóa khách/khách–tháng riêng.
@@ -207,7 +211,8 @@ docs/mbd_mini_eda_local_<ngày_giờ>/
 Các bảng đầy đủ nằm cạnh bảng top 20: `transaction_categories_full.csv`,
 `location_categories_full.csv`.
 
-Histogram log dùng `sign(amount)*log10(1+abs(amount))`. Chưa có từ điển mã thì
+Histogram dùng giá trị amount gốc; bản zoom chỉ hiển thị từ min tới P99,
+các giá trị ngoài zoom vẫn nằm trong histogram toàn miền. Chưa có từ điển mã thì
 không suy diễn đơn vị/quy đổi currency. Khoảng cách sự kiện ở customer_activity
 là phân phối **khoảng cách trung bình mỗi khách**, không phải mọi khoảng cách
 liên tiếp của từng sự kiện. Export không có client_id từng khách; build có thể

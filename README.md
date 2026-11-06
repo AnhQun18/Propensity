@@ -1,6 +1,22 @@
 # New Propensity
 
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
+
+Bản rà soát mới hoàn thành **12 yêu cầu EDA**: giữ toàn bộ lịch sử, null theo nguồn,
+duplicate toàn bộ, nhóm độ phủ có chủ đích, biểu đồ tuyến tính, nhãn zoom Y và outlier.
+Đọc [báo cáo hiện tại](docs/mbd_mini_eda/report.md),
+[danh mục bảng/biến](docs/mbd_mini_eda/data_catalog.md),
+[mẫu phân tầng 1.000 khách](sampledata/README.md).
+
+```powershell
+.\.venv\Scripts\python.exe -u -X utf8 src/review_mbd_eda.py
+```
+
+Lệnh này dùng raw ở `data/MBD-mini`, tạo lại báo cáo và sampledata; giữ kết quả
+quét trong `outputs/mbd_review_cache/review.duckdb` và ma trận từng nguồn trong
+`source_month_counts.npz`. Chạy lại tái dùng các phép kiểm tra đã hoàn tất.
+Cache cũ `outputs/behavior_coverage/matrix.npz` vẫn được giữ và đối chiếu từng ô.
+Chi tiết cài đặt, cơ chế tái dùng cache và dọn file: [hướng dẫn rà soát](docs/mbd_eda_review.md).
 Phiên bản 0.2.0 bỏ pipeline đặc trưng khách hàng–tháng và khai phá mở rộng;
 cấu hình mặc định dành cho máy RAM 16 GB, đọc dữ liệu theo batch.
 Phiên bản 0.2.1 sửa mã nguyên có null và trục thời gian. Bộ script bổ sung
@@ -77,4 +93,12 @@ Kiểm thử bằng dữ liệu tổng hợp:
 
 ```powershell
 .\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+```
+
+Ma trận độ phủ hành vi khách hàng × tháng (gộp `trx`, `geo`, `dialog`), có cache,
+ảnh raster và HTML xem chi tiết theo trang:
+[cách tính và tối ưu](docs/behavior_coverage_matrix.md).
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 src/plot_behavior_coverage.py --active-days
 ```

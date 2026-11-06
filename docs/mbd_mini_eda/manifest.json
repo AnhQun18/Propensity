@@ -180,11 +180,12 @@
       "section": "descriptive.quality",
       "name": "duplicates",
       "path": "tables/descriptive.quality/duplicates.csv",
-      "rows": 7,
+      "rows": 13,
       "columns": [
         "source",
         "kind",
         "duplicate_n",
+        "duplicate_groups",
         "analyzed_rows",
         "scope"
       ]
@@ -220,7 +221,7 @@
       "section": "descriptive.quality",
       "name": "missing_values",
       "path": "tables/descriptive.quality/missing_values.csv",
-      "rows": 36,
+      "rows": 61,
       "columns": [
         "source",
         "column",
@@ -426,25 +427,13 @@
       "section": "descriptive.transactions",
       "name": "amount_histogram",
       "path": "tables/descriptive.transactions/amount_histogram.csv",
-      "rows": 40,
+      "rows": 15,
       "columns": [
+        "bin",
+        "n",
         "left",
         "right",
-        "n",
         "scope"
-      ]
-    },
-    {
-      "section": "descriptive.transactions",
-      "name": "amount_log_histogram",
-      "path": "tables/descriptive.transactions/amount_log_histogram.csv",
-      "rows": 40,
-      "columns": [
-        "left",
-        "right",
-        "n",
-        "scope",
-        "transform"
       ]
     },
     {
@@ -522,14 +511,425 @@
         "analyzed_finite_n",
         "scope"
       ]
+    },
+    {
+      "section": "review",
+      "name": "amount_by_currency",
+      "path": "tables/review/amount_by_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "rows",
+        "finite_n",
+        "mean",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "amount_full",
+      "path": "tables/review/amount_full.csv",
+      "rows": 1,
+      "columns": [
+        "finite_n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "amount_outliers_currency",
+      "path": "tables/review/amount_outliers_currency.csv",
+      "rows": 14,
+      "columns": [
+        "currency",
+        "finite_n",
+        "lower_fence",
+        "upper_fence",
+        "outlier_n",
+        "nonpositive_n",
+        "max"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "amount_raw_bins",
+      "path": "tables/review/amount_raw_bins.csv",
+      "rows": 15,
+      "columns": [
+        "bin",
+        "n",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "amount_zoom",
+      "path": "tables/review/amount_zoom.csv",
+      "rows": 30,
+      "columns": [
+        "bin",
+        "n",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "behavior_combinations",
+      "path": "tables/review/behavior_combinations.csv",
+      "rows": 8,
+      "columns": [
+        "trx",
+        "geo",
+        "dialog",
+        "customers",
+        "population",
+        "percent"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "behavior_rates",
+      "path": "tables/review/behavior_rates.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "population",
+        "with_log",
+        "without_log",
+        "coverage_percent"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "customer_count_outliers",
+      "path": "tables/review/customer_count_outliers.csv",
+      "rows": 4,
+      "columns": [
+        "source",
+        "rows",
+        "q1",
+        "median",
+        "q3",
+        "lower_fence",
+        "upper_fence",
+        "outlier_n",
+        "above_p99_n",
+        "max"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "daily_behavior",
+      "path": "tables/review/daily_behavior.csv",
+      "rows": 2193,
+      "columns": [
+        "source",
+        "day",
+        "events"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "daily_count_outliers",
+      "path": "tables/review/daily_count_outliers.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "observed_days",
+        "q1",
+        "q3",
+        "upper_fence",
+        "outlier_days",
+        "max_day",
+        "max_events"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "duplicates",
+      "path": "tables/review/duplicates.csv",
+      "rows": 13,
+      "columns": [
+        "source",
+        "kind",
+        "duplicate_n",
+        "duplicate_groups",
+        "analyzed_rows",
+        "scope"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "embedding_element_quality",
+      "path": "tables/review/embedding_element_quality.csv",
+      "rows": 2,
+      "columns": [
+        "source",
+        "rows",
+        "null_vectors",
+        "non_768_vectors",
+        "null_scalar_elements",
+        "nonfinite_scalar_elements"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "events_per_customer",
+      "path": "tables/review/events_per_customer.csv",
+      "rows": 8,
+      "columns": [
+        "source",
+        "population",
+        "rows",
+        "finite_n",
+        "missing_n",
+        "infinite_n",
+        "mean",
+        "std",
+        "min",
+        "p25",
+        "median",
+        "p75",
+        "p95",
+        "p99",
+        "max"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "group_monthly_coverage",
+      "path": "tables/review/group_monthly_coverage.csv",
+      "rows": 175,
+      "columns": [
+        "activity_group",
+        "month",
+        "population",
+        "min_total",
+        "max_total",
+        "coverage_percent"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "missing_values",
+      "path": "tables/review/missing_values.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "missing_n",
+        "missing_rate"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "monthly_coverage",
+      "path": "tables/review/monthly_coverage.csv",
+      "rows": 75,
+      "columns": [
+        "source",
+        "month",
+        "events",
+        "customers_with_log",
+        "population",
+        "unknown_customers",
+        "coverage_percent"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "null_by_event_type",
+      "path": "tables/review/null_by_event_type.csv",
+      "rows": 55,
+      "columns": [
+        "event_type",
+        "rows",
+        "null_currency",
+        "null_src11",
+        "null_dst11",
+        "null_src21",
+        "null_src31"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "null_pairs",
+      "path": "tables/review/null_pairs.csv",
+      "rows": 4,
+      "columns": [
+        "pair",
+        "both_null",
+        "only_one_null",
+        "rows"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "null_target_context",
+      "path": "tables/review/null_target_context.csv",
+      "rows": 3,
+      "columns": [
+        "trans_count_group",
+        "rows",
+        "missing_diff",
+        "min_trans_count",
+        "max_trans_count"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "purposeful_coverage",
+      "path": "tables/review/purposeful_coverage.csv",
+      "rows": 1000,
+      "columns": [
+        "group",
+        "display_id",
+        "month",
+        "events",
+        "full_history_events"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sample_inventory",
+      "path": "tables/review/sample_inventory.csv",
+      "rows": 8,
+      "columns": [
+        "source",
+        "rows",
+        "path"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sampling_labels",
+      "path": "tables/review/sampling_labels.csv",
+      "rows": 4,
+      "columns": [
+        "target",
+        "population_positive_n",
+        "population_percent",
+        "sample_positive_n",
+        "sample_percent"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sampling_strata",
+      "path": "tables/review/sampling_strata.csv",
+      "rows": 178,
+      "columns": [
+        "stratum",
+        "population_n",
+        "sample_n",
+        "expected_n",
+        "population_rate",
+        "sample_rate",
+        "difference_pp"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sampling_validation",
+      "path": "tables/review/sampling_validation.csv",
+      "rows": 24,
+      "columns": [
+        "source",
+        "metric",
+        "population_value",
+        "sample_value"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sequence_quality",
+      "path": "tables/review/sequence_quality.csv",
+      "rows": 19,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "elements",
+        "null_elements",
+        "length_mismatch_rows"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "sequence_reconciliation",
+      "path": "tables/review/sequence_reconciliation.csv",
+      "rows": 3,
+      "columns": [
+        "source",
+        "detail_events",
+        "ptls_events",
+        "max_detail_events",
+        "max_sequence_events",
+        "customers_shorter_sequence",
+        "customers_longer_sequence",
+        "customer_presence_mismatch"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "source_schema",
+      "path": "tables/review/source_schema.csv",
+      "rows": 61,
+      "columns": [
+        "source",
+        "path",
+        "rows",
+        "column",
+        "dtype",
+        "grain"
+      ]
+    },
+    {
+      "section": "review",
+      "name": "target_monthly",
+      "path": "tables/review/target_monthly.csv",
+      "rows": 48,
+      "columns": [
+        "mon",
+        "target",
+        "positive_n",
+        "labelled_n",
+        "positive_percent"
+      ]
     }
   ],
   "figures": [
     "figures/amount_boxplot.png",
     "figures/amount_histogram.png",
-    "figures/amount_log_histogram.png",
     "figures/amount_quantiles.png",
+    "figures/amount_zoom_linear.png",
+    "figures/behavior_monthly_matrix.png",
+    "figures/behavior_rates_matrix.png",
+    "figures/coverage_group_1.png",
+    "figures/coverage_group_2.png",
+    "figures/coverage_group_3.png",
+    "figures/coverage_group_4.png",
+    "figures/coverage_group_5.png",
+    "figures/coverage_population_groups.png",
     "figures/customer_event_medians.png",
+    "figures/daily_behavior_linear.png",
     "figures/embedding_dimensions.png",
     "figures/first_event_month.png",
     "figures/last_event_month.png",
@@ -537,13 +937,11 @@
     "figures/missing_attributes.png",
     "figures/monthly_activity.png",
     "figures/monthly_customers.png",
-    "figures/source_count_distribution.png",
-    "figures/source_coverage.png",
     "figures/source_timeline.png",
     "figures/target_by_month.png",
-    "figures/target_prevalence.png",
     "figures/transaction_event_types.png"
   ],
+  "report": "report.md",
   "metadata": "metadata.json",
-  "report": "report.md"
+  "catalog": "data_catalog.md"
 }

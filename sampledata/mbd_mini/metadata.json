@@ -1,0 +1,56 @@
+{
+  "seed": 42,
+  "sample_customers": 1000,
+  "source_fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "method": "proportional_stratified_without_replacement_Hamilton",
+  "strata": [
+    "fold",
+    "full_history_source_mask",
+    "full_history_activity_band"
+  ],
+  "scope": "full_history_linked_customer_sample_for_EDA_only",
+  "tables": [
+    {
+      "source": "clients",
+      "rows": 1000,
+      "path": "clients.parquet"
+    },
+    {
+      "source": "targets",
+      "rows": 12000,
+      "path": "targets.parquet"
+    },
+    {
+      "source": "trx",
+      "rows": 358682,
+      "path": "trx.parquet"
+    },
+    {
+      "source": "geo",
+      "rows": 666411,
+      "path": "geo.parquet"
+    },
+    {
+      "source": "dialog",
+      "rows": 2091,
+      "path": "dialog.parquet"
+    },
+    {
+      "source": "ptls_trx",
+      "rows": 989,
+      "path": "ptls_trx.parquet"
+    },
+    {
+      "source": "ptls_geo",
+      "rows": 724,
+      "path": "ptls_geo.parquet"
+    },
+    {
+      "source": "ptls_dialog",
+      "rows": 460,
+      "path": "ptls_dialog.parquet"
+    }
+  ],
+  "null_policy": "source raw fields retained; customer_month.parquet distinguishes unknown early geo/dialog",
+  "leakage_note": "Full-history strata are for EDA; recreate selection using only pre-cutoff data for modelling."
+}

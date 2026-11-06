@@ -1,0 +1,38 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ma trận độ phủ hành vi</title>
+<style>:root{font-family:Segoe UI,Arial,sans-serif;color:#173d38;background:#f6f4ec}body{max-width:1500px;margin:30px auto;padding:0 24px}h1{font-size:30px;margin-bottom:8px}p{line-height:1.6;color:#526963}.controls{display:flex;gap:18px;flex-wrap:wrap;align-items:end;background:#fffcf6;padding:20px;border-radius:20px}label{display:grid;gap:7px;font-size:14px}select,input,button{padding:9px;border:1px solid #b6c8bb;border-radius:8px;font:inherit;background:#fffdf7;color:#173d38}button{cursor:pointer}canvas{width:100%;display:block;background:#fffcf6;border-radius:16px;margin-top:16px}#hint{min-height:30px;font-size:14px}#scale{font-size:14px;margin:16px 0}.swatch{display:inline-block;width:140px;height:12px;background:linear-gradient(to right,#f6f4ec,#a7cbb5,#206b5e);margin:0 12px}#back{display:none}a{color:#206b5e}</style>
+<h1>Ma trận độ phủ hành vi · khách hàng × tháng</h1><p>Gộp giao dịch, vị trí và hội thoại. Tổng quan gom nhóm hàng; nhấn một ô để mở nhóm khách đó ở chế độ chi tiết.</p>
+<div class="controls"><label>Chế độ<select id="view"><option value="overview">Tổng quan (nhóm khách)</option><option value="detail">Chi tiết (mỗi hàng một khách)</option></select></label><label>Màu theo<select id="metric"><option value="presence">Có log bất kỳ nguồn nào</option><option value="count">Tổng số sự kiện</option><option value="sources">Số nguồn có log (0–3)</option><option value="days">Tỷ lệ ngày có log trong tháng</option></select></label><label>Số hàng hiển thị<input id="limit" type="number" min="20" max="2000" value="600" step="20"></label><button id="prev">← Trước</button><button id="next">Tiếp →</button><button id="back">Về tổng quan</button></div><div id="scale"></div><canvas id="matrix" aria-label="Ma trận độ phủ hành vi"></canvas><p id="hint"></p><p>Hàng được xếp theo số tháng có log, rồi tổng sự kiện (hoặc thứ tự ID nếu chạy <code>--row-order id</code>). Hạng là vị trí sau sắp xếp, không phải client ID. Các tháng biên có thể chỉ có một phần dữ liệu. Không có log không đồng nghĩa thất thoát thu thập.</p>
+<script>window.addEventListener('error',e=>{document.getElementById('hint').textContent='Lỗi viewer: '+e.message;});</script>
+<script>
+const D=__MATRIX_DATA__;
+function bytes(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+const C=new Uint32Array(bytes(D.counts).buffer), M=bytes(D.masks), A=bytes(D.days), O=new Uint32Array(bytes(D.order).buffer), cols=D.months.length;
+const bits=[0,1,1,2,1,2,2,3], $=id=>document.getElementById(id), cv=$('matrix'),ctx=cv.getContext('2d');
+const monthDays=D.months.map(m=>{const [y,n]=m.split('-').map(Number);return new Date(y,n,0).getDate();});
+if(!A.length)$('metric').querySelector('[value=days]').disabled=true;
+let offset=0, edges=[],values=[], cellW=0,cellH=0, plotLeft=95, plotTop=75, plotBottom=40, rows=0, maximum=1;
+const format=n=>n.toLocaleString('vi-VN',{maximumFractionDigits:3});
+function metricValue(rank,col,metric){let k=O[rank]*cols+col;return metric==='presence'?+(C[k]>0):metric==='sources'?bits[M[k]]:metric==='days'?A[k]/monthDays[col]:C[k];}
+function render(){
+ const metric=$('metric').value, overview=$('view').value==='overview', limit=Math.max(20,Math.min(2000,Number($('limit').value)||600));
+ $('limit').value=limit;offset=Math.max(0,Math.min(offset,Math.max(0,D.rows-1)));
+ rows=Math.min(limit,overview?D.rows:D.rows-offset);edges=Array.from({length:rows+1},(_,i)=>overview?Math.floor(i*D.rows/rows):offset+i);
+ values=new Float64Array(rows*cols);maximum=metric==='sources'?3:1;
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){let sum=0;for(let rank=edges[r];rank<edges[r+1];rank++)sum+=metricValue(rank,c,metric);let v=sum/(edges[r+1]-edges[r]);values[r*cols+c]=v;if(metric==='count')maximum=Math.max(maximum,v);}
+ const width=1400,height=overview?850:Math.max(600,Math.min(1400,rows*18+plotTop+plotBottom)),ratio=window.devicePixelRatio||1;
+ cv.width=width*ratio;cv.height=height*ratio;cv.style.aspectRatio=width+'/'+height;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#fffcf6';ctx.fillRect(0,0,width,height);cellW=(width-plotLeft-25)/cols;cellH=(height-plotTop-plotBottom)/rows;
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){let v=values[r*cols+c],t=v/maximum;ctx.fillStyle=`rgb(${Math.round(246-214*t)},${Math.round(244-137*t)},${Math.round(236-142*t)})`;ctx.fillRect(plotLeft+c*cellW,plotTop+r*cellH,cellW+.1,cellH+.1);}
+ ctx.fillStyle='#173d38';ctx.font='14px Segoe UI';ctx.textAlign='left';
+ for(let c=0;c<cols;c++){ctx.save();ctx.translate(plotLeft+c*cellW+cellW*.65,plotTop-12);ctx.rotate(-.65);ctx.fillText(D.months[c],0,0);ctx.restore();}
+ ctx.textAlign='right';let step=Math.max(1,Math.ceil(rows/12));for(let r=0;r<rows;r+=step)ctx.fillText(format(edges[r]+1),plotLeft-10,plotTop+r*cellH+11);
+ ctx.textAlign='left';ctx.fillText('Hạng khách',5,25);
+ $('scale').innerHTML=(overview?`${format(D.rows)} khách · mỗi hàng gom ${Math.floor(D.rows/rows)}–${Math.ceil(D.rows/rows)} khách`:`Hạng ${format(offset+1)}–${format(offset+rows)} · mỗi hàng một khách`)+ ' · 0 <span class="swatch"></span> '+(metric==='presence'?'100%':metric==='sources'?'3 nguồn':metric==='days'?'100% ngày lịch':`${format(maximum)} sự kiện (màu tuyến tính)`)+(overview&&metric==='count'?' · trung bình sự kiện / khách trong nhóm':'');
+ $('prev').disabled=overview||offset===0;$('next').disabled=overview||offset+rows>=D.rows;$('back').style.display=overview?'none':'inline-block';
+ $('hint').textContent='Di chuột để xem giá trị; ở tổng quan, nhấn để xem chính xác các hàng trong nhóm.';
+}
+function cell(e){let box=cv.getBoundingClientRect(),x=(e.clientX-box.left)*1400/box.width,y=(e.clientY-box.top)*(cv.height/(window.devicePixelRatio||1))/box.height;let c=Math.floor((x-plotLeft)/cellW),r=Math.floor((y-plotTop)/cellH);return r>=0&&r<rows&&c>=0&&c<cols?{r,c}:null;}
+cv.addEventListener('mousemove',e=>{const p=cell(e);if(!p)return;let {r,c}=p,v=values[r*cols+c],metric=$('metric').value;let label=metric==='presence'||metric==='days'?format(v*100)+'%':format(v);$('hint').textContent=`${D.months[c]} · hạng ${format(edges[r]+1)}–${format(edges[r+1])}: ${label}`;});
+cv.addEventListener('click',e=>{const p=cell(e);if(!p||$('view').value!=='overview')return;offset=edges[p.r];$('view').value='detail';$('limit').value=Math.min(200,Math.max(20,edges[p.r+1]-edges[p.r]));render();});
+for(const id of ['metric','limit','view'])$(id).addEventListener('change',()=>{offset=0;render();});
+$('prev').onclick=()=>{offset=Math.max(0,offset-rows);render();};$('next').onclick=()=>{offset+=rows;render();};$('back').onclick=()=>{$('view').value='overview';$('limit').value=600;offset=0;render();};render();
+</script></html>
