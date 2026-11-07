@@ -39,8 +39,4 @@ import pandas as pd
 trx = pd.read_parquet("sampledata/mbd_mini/trx.parquet", dtype_backend="pyarrow")
 ```
 
-Nguồn dữ liệu: [ai-lab/MBD-mini](https://huggingface.co/datasets/ai-lab/MBD-mini),
-giấy phép **CC BY 4.0** theo README đi kèm bộ dữ liệu. ID và thuộc tính nguồn
-được nhà phát hành ẩn danh. Các thay đổi ở mẫu này: chọn khách theo tầng,
-giữ các dòng liên quan, bổ sung bảng lưới tháng và cờ thiếu nguồn; bảng detail
-và ptls giữ nguyên giá trị nguồn. Không có bản đồ ánh xạ ID sang danh tính thật.
+Nguồn dữ liệu: [ai-lab/MBD-mini](https://huggingface.co/datasets/ai-lab/MBD-mini)
