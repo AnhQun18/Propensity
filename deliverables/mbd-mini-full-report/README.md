@@ -6,7 +6,7 @@ Bản báo cáo 123 trang, cập nhật ngày 07/11/2026: đã bỏ các biểu 
 - `MBD_mini_Bao_cao_day_du_Canva.html`: bản nhập Canva; chữ có thể sửa, nền đồ họa giữ bố cục của PDF.
 - `coverage_ledger.csv` và `.json`: đối chiếu 61 bảng, số dòng, tên biến, trang phân tích, cách biểu diễn và đường dẫn nguồn; JSON có SHA-256 của từng CSV và đối chiếu 24 hình.
 - `canva_content_verification.json`: kết quả đối chiếu chữ và giá trị số sau nhập Canva.
-- `build_summary.json`: danh sách tên 123 trang và trạng thái đã bỏ biểu đồ phân phối Amount.
+- `build_summary.json`: file trung gian được tạo lại khi chạy `build_complete.py`, không lưu trên Git; chứa tên 123 trang và trạng thái đã bỏ biểu đồ phân phối Amount.
 
 ## Nội dung
 

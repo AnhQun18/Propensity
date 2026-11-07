@@ -39,3 +39,6 @@ configs/*.local.json
 /deliverables/propensity-pitch/v2-*.png
 /deliverables/propensity-pitch/contact-sheet*.jpg
 /deliverables/propensity-pitch/*.zip
+
+# Local report exports; published copies live in deliverables/.
+/output/
