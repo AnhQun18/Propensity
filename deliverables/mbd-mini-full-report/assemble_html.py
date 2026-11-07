@@ -33,7 +33,7 @@ audit={'pages':len(pages),'tables':len(ledger['tables']),'figures':len(ledger['f
  'local_machine_paths':len(re.findall(r'[A-Z]:[\\/]|Users[\\/]admin',alltext)),
  'html_bytes':out.stat().st_size,'pdf_bytes':PDF.stat().st_size}
 with pdfplumber.open(PDF) as doc:
-    assert len(doc.pages)==125
+    assert len(doc.pages)==summary['pages']
     assert all(len(p.chars)>80 for p in doc.pages)
     assert all(-.5<=ch['x0']<=ch['x1']<=float(p.width)+.5 for p in doc.pages for ch in p.chars)
     # Every source filename and exported variable is discoverable in the catalogue.
@@ -43,6 +43,6 @@ with pdfplumber.open(PDF) as doc:
         assert compact(item['key']) in compact(catalog),item['key']
         assert all(compact(c) in compact(catalog) for c in item['columns']),item['key']
     assert audit['raw_64hex_ids']==audit['local_machine_paths']==0
-    audit['verification']='125 pages nonempty; horizontal bounds; 61 table names/all columns in catalogue; public aggregate data only'
+    audit['verification']=f"{summary['pages']} pages nonempty; horizontal bounds; 61 table names/all columns in catalogue; public aggregate data only"
 (WORK/'disclosure_audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(audit,ensure_ascii=False))

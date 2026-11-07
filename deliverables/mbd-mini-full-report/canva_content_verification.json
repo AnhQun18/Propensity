@@ -1,10 +1,11 @@
 {
-  "pages": 125,
-  "expected_text_blocks": 10416,
+  "pages": 123,
+  "expected_text_blocks": 10257,
   "unmatched_text_blocks": 0,
   "missing_numeric_occurrences": 0,
   "extra_numeric_occurrences": 0,
   "source_tables": 61,
   "source_figures": 24,
-  "public_manifest_matches": true
+  "amount_distribution_charts": "removed",
+  "verified_canva_design_id": "DAHaM0g7cqg"
 }

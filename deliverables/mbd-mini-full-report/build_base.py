@@ -79,7 +79,7 @@ def page(title,part='PHÂN TÍCH DỮ LIỆU'):
     C.setStrokeColor(LINE);C.setLineWidth(.7);C.line(M,H-37,W-M,H-37)
     para(title,H-53,size=22,leading=27,color=NAVY,bold=True)
     C.setStrokeColor(LINE);C.line(M,24,W-M,24)
-    text(M,12,'Báo cáo toàn lịch sử | 06/11/2026',8,'Arial',GREY)
+    text(M,12,'Báo cáo toàn lịch sử | 07/11/2026',8,'Arial',GREY)
     text(W-M,12,f'{PAGE:02d}',8,'Arial',GREY,'right')
     return H-98
 
@@ -330,25 +330,6 @@ for i,s in enumerate(['trx','geo','dialog']):
     line_chart(M,H-240-i*129,CW,142,p.events.to_numpy(),[(j,days.iloc[j].strftime('%m/%Y')) for j in label_idx],
                {'trx':'Giao dịch: số log/ngày','geo':'Vị trí: số log/ngày','dialog':'Hội thoại: số log/ngày'}[s],PALETTE[i])
 source('review/daily_behavior.csv. Ba trục Y tuyến tính riêng. Ngoài mốc đầu/cuối nguồn để null. Các ngày biên có thể chỉ có một phần dữ liệu.')
-
-# 19. Amount original scale
-y=page('Phân phối Amount theo giá trị gốc','04  ĐẶC ĐIỂM HÀNH VI')
-a=read('amount_full').iloc[0]
-y=table(['Trung bình','Trung vị','P95','P99','Min','Max'],[[f(a['mean'],2),f(a['median'],2),f(a.p95,2),f(a.p99,2),'3,02182 x 10^-6',f(a['max'])]],y,[119,119,119,119,125,CW-601],font=10.1)
-h=read('amount_raw_bins');labels=['<0','0-1k','1-5k','5-10k','10-25k','25-50k','50-100k','100-250k','250-500k','0,5-1tr','1-5tr','5-10tr','10-100tr','100tr-1tỷ','>=1tỷ']
-bar_chart(M,116,CW,284,h.n.tolist(),labels,'Số lượng giao dịch theo bin Amount gốc')
-note('Các bin có độ rộng không bằng nhau, chiều cao biểu diễn số lượng và không biểu diễn mật độ. k = nghìn, tr = triệu. Không quy đổi currency và không gắn đơn vị VND.',103)
-source('review/amount_raw_bins.csv và amount_full.csv. Tổng số Amount hữu hạn: 38.764.930. Giữ toàn bộ đuôi phân phối, không biến đổi log.')
-
-# 20. Zoom amount
-y=page('Phân phối Amount trong khoảng từ 0 đến P99','04  ĐẶC ĐIỂM HÀNH VI')
-zoom=read('amount_zoom');included=int(zoom.n.sum());excluded=int(a.finite_n-included)
-y=para(f'Hình tập trung vào {f(included)} giao dịch có Amount không vượt P99 = {f(a.p99,2)}. '
-       f'{f(excluded)} giao dịch còn lại vẫn nằm trong bảng và biểu đồ toàn miền.',y)-17
-labels=[f(v/1e6,1) if i%3==0 else '' for i,v in enumerate(zoom.left)]
-bar_chart(M,105,CW,338,zoom.n.tolist(),labels,'30 bin đều theo giá trị Amount gốc; nhãn trục X theo triệu')
-note('Cả trục X và Y đều tuyến tính. Zoom là lựa chọn hiển thị, không phải bước loại quan sát. Các thống kê pooled mô tả số lưu trong file và cần đối chiếu theo từng mã currency trước khi diễn giải nghiệp vụ.',92)
-source('review/amount_zoom.csv. 99% quan sát đầu không đại diện cho toàn bộ đuôi phải; hình toàn miền nằm ở trang trước.')
 
 # 21-22. Targets, readable panels
 rates=read('target_monthly')

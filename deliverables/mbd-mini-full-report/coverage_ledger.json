@@ -24,11 +24,11 @@
         "max"
       ],
       "pages": [
+        29,
+        30,
         31,
         32,
-        33,
-        34,
-        35
+        33
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "61929b6faa732ea6dc2fb3a23917672f2c76ba19bd347bd484b72e8109b2f5a9",
@@ -47,7 +47,7 @@
         "customers_without_log"
       ],
       "pages": [
-        78
+        76
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "33a06a5aad9fd72d711efdca7d8139f5b974ff689419d32ccf9665614bd93b89",
@@ -67,10 +67,10 @@
         "scope"
       ],
       "pages": [
+        44,
+        45,
         46,
-        47,
-        48,
-        49
+        47
       ],
       "representation": "Toàn bộ số khách theo mốc; tỷ lệ từ mẫu số + CSV",
       "sha256": "6ce16fc09df28c7a9fa54a44c3ed4c52cefeb963fbb8518710f0c47f76b7f7bb",
@@ -93,10 +93,10 @@
         "scope"
       ],
       "pages": [
+        44,
+        45,
         46,
-        47,
-        48,
-        49
+        47
       ],
       "representation": "Toàn bộ số khách theo mốc; tỷ lệ từ mẫu số + CSV",
       "sha256": "584ce4213eb658be267fbb8c6bed72380d14ae1eff23b66aa242f83fe7bcb506",
@@ -134,7 +134,7 @@
         "rate"
       ],
       "pages": [
-        116
+        114
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "f2a37999bc22c47d0e3cd1645bac5020f0c8eb6b9071c46f06004907985ad3f7",
@@ -163,7 +163,7 @@
         "max"
       ],
       "pages": [
-        41
+        39
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "ad2284656eabd68bca27c706015608af221b9ab87c5f9f879c21c056e1c0a741",
@@ -181,8 +181,8 @@
         "value"
       ],
       "pages": [
-        35,
-        86
+        33,
+        84
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "7c21a7c7d4438afb4ca32abb6c224c07941a811c771105a719a56f24ad068ab4",
@@ -211,7 +211,7 @@
         "max"
       ],
       "pages": [
-        40
+        38
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "e77292a79c33780ef4b961419b8ec2a394edb9339b609d1250e0e986a50f373c",
@@ -235,9 +235,9 @@
         "frequency_scope"
       ],
       "pages": [
-        55,
-        56,
-        57
+        53,
+        54,
+        55
       ],
       "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
       "sha256": "aa4b35391f3c299da36917662288ec81647c94d62309638019a1f529affe62cc",
@@ -261,9 +261,9 @@
         "frequency_scope"
       ],
       "pages": [
-        55,
-        56,
-        57
+        53,
+        54,
+        55
       ],
       "representation": "Tất cả cột + top 5 mỗi cột; toàn bộ mã trong CSV",
       "sha256": "7a66c7f6ef87c7ee94ccb336c0a18eac4e600afcb946b25190731081caf062c5",
@@ -285,7 +285,7 @@
       ],
       "pages": [
         8,
-        81
+        79
       ],
       "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
       "sha256": "28bce5da7abb5ea7d24bebb5230b19880fd2d507a18d59c14d4ecb000b54f0c5",
@@ -303,7 +303,7 @@
         "n"
       ],
       "pages": [
-        77
+        75
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "6b831387debec5487b86cae05a4ddb419ad96d3acd562ec89de028ee52e41385",
@@ -326,7 +326,7 @@
         "missing_id_rows"
       ],
       "pages": [
-        80
+        78
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "5cfc5ad91db3c00a97af8927259f81aecbaf4c07582c20a14693315de7b5c729",
@@ -347,10 +347,10 @@
       ],
       "pages": [
         6,
+        67,
+        68,
         69,
-        70,
-        71,
-        72
+        70
       ],
       "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
       "sha256": "706daf9c2abbb45edfb44f1eb61aab2a2fb1aa8d6dbd06a3fa3259bd3b97ef26",
@@ -369,10 +369,10 @@
         "role"
       ],
       "pages": [
+        67,
+        68,
         69,
-        70,
-        71,
-        72
+        70
       ],
       "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
       "sha256": "dbde04c6ff05e94f59409f182f37de64f22d44699c3c2d0531013d81a618d62b",
@@ -391,7 +391,7 @@
         "cardinality"
       ],
       "pages": [
-        79
+        77
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "1707d162a9adb55f8d445ce415dfe9498648373efb78975e67d0e4e7ce86501a",
@@ -412,7 +412,7 @@
         "schema_variants"
       ],
       "pages": [
-        115
+        113
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "62edd94e78dd76238730b752450da9afdf729a87c24d283edd911cc60ada5256",
@@ -433,7 +433,7 @@
         "mean_positive_months"
       ],
       "pages": [
-        59
+        57
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "ffa65829cecf061fd17acce2ed022c2e9bdd89cc6fa365293b19eb9524747d07",
@@ -455,10 +455,10 @@
         "missing_label_cells"
       ],
       "pages": [
+        60,
+        61,
         62,
-        63,
-        64,
-        65
+        63
       ],
       "representation": "Toàn bộ nhóm và số đếm; cột suy ra + CSV",
       "sha256": "441ff821af614369da9d8284cae3df901a9ffba0c93c0b351fd8a03069507e3a",
@@ -475,7 +475,7 @@
         "rows"
       ],
       "pages": [
-        61
+        59
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "23289f7a94990aba86667f532e0ef7417277b32fdc2b3583efa0ed53ff69e373",
@@ -499,10 +499,10 @@
         "rate"
       ],
       "pages": [
+        60,
+        61,
         62,
-        63,
-        64,
-        65
+        63
       ],
       "representation": "Toàn bộ nhóm và số đếm; cột suy ra + CSV",
       "sha256": "b0e80a7b7dfe47afb2e8be73607226b36371fecf253255f7ce63c670d2585682",
@@ -521,7 +521,7 @@
         "both_positive"
       ],
       "pages": [
-        60
+        58
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "8bccca5f534b915f45c66945c81b2aab21d334b89f666c708f73f0c2216bf310",
@@ -543,7 +543,7 @@
         "rate"
       ],
       "pages": [
-        58
+        56
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "f1b662d35c90bc9df3a4748841623002452b302fbfe5a1133ae3a51d45907128",
@@ -573,8 +573,8 @@
         "max"
       ],
       "pages": [
-        38,
-        39
+        36,
+        37
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "503f17f27d4da03ae3be8f628dba6e981d7bdb7d7e13b119666c8fb64760ccfb",
@@ -595,10 +595,10 @@
         "events_per_active_customer"
       ],
       "pages": [
+        40,
+        41,
         42,
-        43,
-        44,
-        45
+        43
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "a1cd3e8791bbf49984c3ba04b75184e25ee8e97af342bf8f2cc319cc93b25b07",
@@ -618,7 +618,7 @@
         "valid_time_rows"
       ],
       "pages": [
-        117
+        115
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "23e5b2ea41839e287e690ed7b0f1337274ffaa9e113eebe25dc81ae5127a7e3d",
@@ -647,8 +647,8 @@
         "scope"
       ],
       "pages": [
-        103,
-        104
+        101,
+        102
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "38694d8a297d1e962e1dd4c2ad50d06c666d350ca1a6c08d71b5f47dd766355e",
@@ -668,8 +668,7 @@
         "scope"
       ],
       "pages": [
-        19,
-        109
+        107
       ],
       "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
       "sha256": "ce3beb77d4f328c4aaf090d5c3e21c294a196ac479285bfef55cf6808aa84d6d",
@@ -705,8 +704,8 @@
         "quantile_method"
       ],
       "pages": [
-        106,
-        107
+        104,
+        105
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "82add100babe11d29c99e2c49ff974b9b28c470803feb31c38d2cbd691fb39a1",
@@ -730,11 +729,11 @@
         "frequency_scope"
       ],
       "pages": [
+        48,
+        49,
         50,
         51,
-        52,
-        53,
-        54
+        52
       ],
       "representation": "Cùng chủ đề/biểu diễn; tệp gốc đầy đủ liên kết",
       "sha256": "58f603851700b7d46d64d7432023d4406ec2823bf9953944647f5b95c35f5119",
@@ -758,11 +757,11 @@
         "frequency_scope"
       ],
       "pages": [
+        48,
+        49,
         50,
         51,
-        52,
-        53,
-        54
+        52
       ],
       "representation": "Tất cả cột + top 5 mỗi cột; toàn bộ mã trong CSV",
       "sha256": "fa86611de4532cf69e367ffc264fbc73d9bf16ca882ae6e00197e6576f55b526",
@@ -782,7 +781,7 @@
         "scope"
       ],
       "pages": [
-        108
+        106
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "40cbf333c62bf413cc325824a762629531330924e02d6e028c0218f0a2ca306e",
@@ -808,8 +807,8 @@
         "p99"
       ],
       "pages": [
-        103,
-        104
+        101,
+        102
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "1f601b905500e2664891eb70b227c520a5bfb0cb71c395653cbc7c265c8e8fd9",
@@ -834,8 +833,7 @@
         "p99"
       ],
       "pages": [
-        19,
-        105
+        103
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "39c06ca4bf8fd8df4439c88a5838377a6a1ff6b0309fdf5a043d5758699587f3",
@@ -857,8 +855,8 @@
         "max"
       ],
       "pages": [
-        26,
-        112
+        24,
+        110
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "4250021a58ccb8aa0c9870d6223dd55b98bab8c7332359930278c37e26975146",
@@ -877,8 +875,7 @@
         "right"
       ],
       "pages": [
-        19,
-        109
+        107
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "33cadffed2e0e7a8dbb8e65c72520b1a3b4037874d94f1905bdab36a819df33d",
@@ -897,9 +894,8 @@
         "right"
       ],
       "pages": [
-        20,
-        110,
-        111
+        108,
+        109
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "e5967238f797f8e51fb9a93f607b62c69803b9008edac9449d607cb3e028536b",
@@ -965,8 +961,8 @@
         "max"
       ],
       "pages": [
-        25,
-        113
+        23,
+        111
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "8b5cf9954d0403e568c0641a32ed76ecb885933f816eb1ce672531df3146a956",
@@ -1007,8 +1003,8 @@
         "max_events"
       ],
       "pages": [
-        25,
-        114
+        23,
+        112
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "07ac889b25b01cae10434fc9f66ebb1e23402949d8ad15367dd814d3b88424d7",
@@ -1030,7 +1026,7 @@
       ],
       "pages": [
         8,
-        81
+        79
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "bbbebb97bc9d17ce6d5787f3ff62841595f10d8750f0895f9d9b0ae3a01403e3",
@@ -1052,7 +1048,7 @@
       ],
       "pages": [
         9,
-        85
+        83
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "2dad78c6be7bbaecfa703e5823e38e29c84dd636611460abdfef3d4adfcf6b7d",
@@ -1083,8 +1079,8 @@
       ],
       "pages": [
         17,
-        36,
-        37
+        34,
+        35
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "ec21d288ac647751da4dbc5fd0add2e4c328b2d5b2f811c25ea807c4804a0128",
@@ -1105,9 +1101,9 @@
         "coverage_percent"
       ],
       "pages": [
-        28,
-        29,
-        30
+        26,
+        27,
+        28
       ],
       "representation": "Toàn bộ 175 ô + quy mô và biên nhóm",
       "sha256": "5a0f452ceae9330a0eef7a31dc92aa9e3593d209ef26921b450db1aec0d85c83",
@@ -1128,10 +1124,10 @@
       ],
       "pages": [
         6,
+        67,
+        68,
         69,
-        70,
-        71,
-        72
+        70
       ],
       "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
       "sha256": "38c659280f09add3bfe4b3a3a17287201b3056d8c018032c75087dbae9d3bfc0",
@@ -1175,10 +1171,10 @@
         "null_src31"
       ],
       "pages": [
+        71,
+        72,
         73,
-        74,
-        75,
-        76
+        74
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "50c82cec8af600a9fb55e6d3ab288c1f22b3af2e49af5d7dc8fbfe7808f0fa65",
@@ -1259,8 +1255,8 @@
         "path"
       ],
       "pages": [
-        23,
-        101
+        21,
+        99
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "fad9fc45f5bd5c4ac01dd5804945dbe6e9f7db8b9ffd66393ee8ba526ef28e3f",
@@ -1280,8 +1276,8 @@
         "sample_percent"
       ],
       "pages": [
-        24,
-        102
+        22,
+        100
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "4c9cb6a4a0513046e5463cf162fb9b4674bca6a6007eba3d18d7413ddc62c118",
@@ -1303,7 +1299,9 @@
         "difference_pp"
       ],
       "pages": [
-        23,
+        21,
+        87,
+        88,
         89,
         90,
         91,
@@ -1314,9 +1312,7 @@
         96,
         97,
         98,
-        99,
-        100,
-        101
+        99
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "83042e6a17c5e727b5ea5db645deecb97798a4fc2f2ba25a13366212173e2944",
@@ -1335,9 +1331,9 @@
         "sample_value"
       ],
       "pages": [
-        24,
-        87,
-        88
+        22,
+        85,
+        86
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "360c95fd3162a0a70798871aa1dd2faa9d462aca83e3a5593a891a9abf8d5c52",
@@ -1358,8 +1354,8 @@
         "length_mismatch_rows"
       ],
       "pages": [
-        82,
-        83
+        80,
+        81
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "1f8a99d6b0de6048d4e6c39db2529dd2938d11de60024f5b387bd9620fba9957",
@@ -1383,7 +1379,7 @@
       ],
       "pages": [
         9,
-        84
+        82
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "1d12dd05247712705dcf45d758942b9ae1de5a6ac78686da5c1ddec9d165b513",
@@ -1407,10 +1403,10 @@
         3,
         4,
         5,
+        67,
+        68,
         69,
-        70,
-        71,
-        72
+        70
       ],
       "representation": "61 cột đầy đủ; vai trò giải thích theo nhóm",
       "sha256": "056b6a55d114b3d1912dde191ca2b1d149c14ce89b2f578dc078b18ea2d41d8a",
@@ -1430,11 +1426,11 @@
         "positive_percent"
       ],
       "pages": [
-        21,
-        22,
-        66,
-        67,
-        68
+        19,
+        20,
+        64,
+        65,
+        66
       ],
       "representation": "Bảng đầy đủ",
       "sha256": "f481ffe6e8c6fc1e4292136439b7cd8439cc8dff46514cce1e0e3cee0ae17be1",
@@ -1445,8 +1441,8 @@
     {
       "path": "figures/amount_boxplot.png",
       "pages": [
-        106,
-        107
+        104,
+        105
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_boxplot.png"
@@ -1454,17 +1450,15 @@
     {
       "path": "figures/amount_histogram.png",
       "pages": [
-        19,
-        109
+        107
       ],
-      "representation": "Revised chart, matrix or source table",
+      "representation": "Chart removed; source table retained",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_histogram.png"
     },
     {
       "path": "figures/amount_quantiles.png",
       "pages": [
-        19,
-        105
+        103
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_quantiles.png"
@@ -1472,11 +1466,10 @@
     {
       "path": "figures/amount_zoom_linear.png",
       "pages": [
-        20,
-        110,
-        111
+        108,
+        109
       ],
-      "representation": "Revised chart, matrix or source table",
+      "representation": "Chart removed; source table retained",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/amount_zoom_linear.png"
     },
     {
@@ -1538,9 +1531,9 @@
     {
       "path": "figures/coverage_population_groups.png",
       "pages": [
-        28,
-        29,
-        30
+        26,
+        27,
+        28
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/coverage_population_groups.png"
@@ -1549,8 +1542,8 @@
       "path": "figures/customer_event_medians.png",
       "pages": [
         17,
-        36,
-        37
+        34,
+        35
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/customer_event_medians.png"
@@ -1566,8 +1559,8 @@
     {
       "path": "figures/embedding_dimensions.png",
       "pages": [
-        35,
-        86
+        33,
+        84
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/embedding_dimensions.png"
@@ -1575,10 +1568,10 @@
     {
       "path": "figures/first_event_month.png",
       "pages": [
+        44,
+        45,
         46,
-        47,
-        48,
-        49
+        47
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/first_event_month.png"
@@ -1586,10 +1579,10 @@
     {
       "path": "figures/last_event_month.png",
       "pages": [
+        44,
+        45,
         46,
-        47,
-        48,
-        49
+        47
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/last_event_month.png"
@@ -1597,9 +1590,9 @@
     {
       "path": "figures/location_codes.png",
       "pages": [
-        55,
-        56,
-        57
+        53,
+        54,
+        55
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/location_codes.png"
@@ -1608,10 +1601,10 @@
       "path": "figures/missing_attributes.png",
       "pages": [
         6,
+        67,
+        68,
         69,
-        70,
-        71,
-        72
+        70
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/missing_attributes.png"
@@ -1619,10 +1612,10 @@
     {
       "path": "figures/monthly_activity.png",
       "pages": [
+        40,
+        41,
         42,
-        43,
-        44,
-        45
+        43
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/monthly_activity.png"
@@ -1630,10 +1623,10 @@
     {
       "path": "figures/monthly_customers.png",
       "pages": [
+        40,
+        41,
         42,
-        43,
-        44,
-        45
+        43
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/monthly_customers.png"
@@ -1641,7 +1634,7 @@
     {
       "path": "figures/source_timeline.png",
       "pages": [
-        117
+        115
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/source_timeline.png"
@@ -1649,11 +1642,11 @@
     {
       "path": "figures/target_by_month.png",
       "pages": [
-        21,
-        22,
-        66,
-        67,
-        68
+        19,
+        20,
+        64,
+        65,
+        66
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/target_by_month.png"
@@ -1661,11 +1654,11 @@
     {
       "path": "figures/transaction_event_types.png",
       "pages": [
+        48,
+        49,
         50,
         51,
-        52,
-        53,
-        54
+        52
       ],
       "representation": "Revised chart, matrix or source table",
       "url": "https://github.com/AnhQun18/Propensity/blob/3e4b95d79d172d2ef525ff3d26e2528bce290e8e/docs/mbd_mini_eda/figures/transaction_event_types.png"

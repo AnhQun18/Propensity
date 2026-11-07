@@ -1,6 +1,6 @@
 {
   "pdf": "MBD_mini_Bao_cao_day_du.pdf",
-  "pages": 125,
+  "pages": 123,
   "page_titles": [
     "Báo cáo phân tích dữ liệu MBD-mini",
     "Tổng quan kết quả phân tích",
@@ -20,8 +20,6 @@
     "Nhóm khách không ghi nhận log trong cả ba nguồn",
     "Số sự kiện phát sinh trên mỗi khách hàng",
     "Nhịp hành vi theo ngày trên toàn lịch sử",
-    "Phân phối Amount theo giá trị gốc",
-    "Phân phối Amount trong khoảng từ 0 đến P99",
     "Biến động tỷ lệ nhãn dương: target_1, target_2",
     "Biến động tỷ lệ nhãn dương: target_3, target_4",
     "Thiết kế mẫu theo phân phối hoạt động",
@@ -131,5 +129,9 @@
   "source_commit": "3e4b95d79d172d2ef525ff3d26e2528bce290e8e",
   "tables": 61,
   "figures": 24,
-  "catalog_start": 120
+  "catalog_start": 118,
+  "amount_distribution": {
+    "status": "removed_by_user_request",
+    "reason": "currency codes not mapped and monetary unit not verified"
+  }
 }

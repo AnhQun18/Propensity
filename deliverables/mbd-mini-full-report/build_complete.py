@@ -71,17 +71,16 @@ existing={
  'review/embedding_element_quality':[9], 'review/behavior_rates':[10],
  'review/behavior_combinations':[10], 'review/monthly_coverage':[11],
  'review/purposeful_coverage':list(range(12,17)), 'review/events_per_customer':[17],
- 'review/daily_behavior':[18], 'review/amount_full':[19], 'review/amount_raw_bins':[19],
- 'review/amount_zoom':[20], 'review/target_monthly':[21,22], 'review/sample_inventory':[23],
+ 'review/daily_behavior':[18], 'review/target_monthly':[21,22], 'review/sample_inventory':[23],
  'review/sampling_strata':[23], 'review/sampling_validation':[24], 'review/sampling_labels':[24],
  'review/customer_count_outliers':[25], 'review/daily_count_outliers':[25],
  'review/amount_outliers_currency':[26]}
-for k,p in existing.items():mark([k],p,'Tóm tắt / biểu diễn trực tiếp')
+for k,p in existing.items():mark([k],[n if n<19 else n-2 for n in p],'Tóm tắt / biểu diễn trực tiếp')
 
 y=page('Hướng dẫn tra cứu báo cáo đầy đủ','PHẠM VI VÀ PHƯƠNG PHÁP')
 for title,body in [
- ('Phần chính · trang 1–26','Các kết luận, ma trận minh họa có chủ đích và biểu đồ được vẽ lại từ dữ liệu toàn lịch sử. Biểu đồ dùng trục tuyến tính; Amount giữ giá trị gốc và có vùng zoom riêng.'),
- ('Phụ lục phân tích · từ trang 28','Bổ sung toàn bộ chủ đề trong 61 bảng và 24 hình của manifest: độ phủ dân số, phân phối theo khách, thời gian, tần suất mã, nhãn, chất lượng dữ liệu, mẫu và ngoại lai.'),
+ ('Phần chính · trang 1–24','Các kết luận, ma trận minh họa có chủ đích và biểu đồ được vẽ lại từ dữ liệu toàn lịch sử. Đã bỏ các biểu đồ phân phối Amount theo yêu cầu; các thống kê số gốc được giữ trong phụ lục để tra cứu, chưa diễn giải thành giá trị tiền đã quy đổi.'),
+ ('Phụ lục phân tích · từ trang 26','Bổ sung toàn bộ chủ đề trong 61 bảng và 24 hình của manifest: độ phủ dân số, phân phối theo khách, thời gian, tần suất mã, nhãn, chất lượng dữ liệu, mẫu và ngoại lai.'),
  ('Dữ liệu chi tiết và tính đầy đủ','Các bảng dài được trình bày bằng ma trận, thống kê hoặc nhóm mã nổi bật. Mỗi bảng đều có liên kết CSV đầy đủ và trang đối chiếu. Báo cáo không in tuần tự 752.805 dòng tần suất vị trí hoặc 12.829 dòng tần suất giao dịch.'),
  ('Quy ước diễn giải','Số liệu trình bày được làm tròn; CSV giữ độ chính xác đã xuất. null ở thuộc tính, null do thiếu quan sát và ô không áp dụng trong bảng thống kê có ý nghĩa khác nhau. Mỗi phần ghi rõ mẫu số và đơn vị.')]:
     y=section_title(title,y);y=para(body,y,size=11,leading=16)-18
@@ -185,7 +184,7 @@ pages_table('Nhãn theo tháng và fold · toàn bộ 60 nhóm',['Tháng','Fold'
 k='review/target_monthly';d=load(k)
 pages_table('Nhãn theo tháng · số đếm và tỷ lệ',['Tháng','Nhãn','Dương','Có nhãn','Tỷ lệ dương'],
  [[str(r.mon)[:7],r.target,f(r.positive_n),f(r.labelled_n),pct(r.positive_percent,6)] for r in d.itertuples()],[k],
- 'Bảng số bổ sung hai trang biểu đồ zoom Y (trang 21–22). Mẫu số từng tháng và từng target là 100.224 khách; không thay tỷ lệ thấp bằng 0.',widths=[120,130,160,170,CW-580])
+ 'Bảng số bổ sung hai trang biểu đồ zoom Y (trang 19–20). Mẫu số từng tháng và từng target là 100.224 khách; không thay tỷ lệ thấp bằng 0.',widths=[120,130,160,170,CW-580])
 
 # Complete column dictionary + missingness in one view.
 k='review/source_schema';d=load(k);miss=load('review/missing_values')
@@ -260,7 +259,7 @@ for k,title in [('review/amount_full','Amount toàn kỳ · đầy đủ thống
 for k,title in [('review/amount_raw_bins','Bảng bin Amount · toàn miền giá trị'),('review/amount_zoom','Bảng bin Amount · vùng 0 đến P99')]:
     d=load(k);pages_table(title,['Bin','Biên trái','Biên phải','Số Amount','% toàn bộ Amount'],
       [[f(r.bin),fmt(r.left),fmt(r.right),f(r.n),pct(r.n/38764930*100,6)] for r in d.itertuples()],[k],
-      'Biên −∞ và +∞ là đầu mở vô hạn, không phải Amount null. Biểu đồ trang 19–20 dùng các bin này và trục tuyến tính. Vùng zoom chỉ trình bày đến P99, không loại giao dịch ngoài vùng khỏi phân tích toàn kỳ.',widths=[55,190,190,160,CW-595])
+      'Biên −∞ và +∞ là đầu mở vô hạn, không phải Amount null. Đây là bảng bin của phiên bản trước, giữ để đối chiếu nguồn. Các biểu đồ phân phối Amount đã được bỏ khỏi báo cáo; bảng số gốc được giữ để tra cứu, không có bước quy đổi tiền tệ.',widths=[55,190,190,160,CW-595])
 for k,title in [('review/amount_outliers_currency','Ngoại lai Amount · hai hàng rào theo currency'),
  ('review/customer_count_outliers','Ngoại lai theo khách · phân vị và hàng rào'),('review/daily_count_outliers','Ngoại lai theo ngày · đầy đủ thống kê')]:
     d=load(k);pages_table(title,list(d.columns),[[fmt(v) for v in r] for r in d.itertuples(index=False,name=None)],[k],
@@ -310,10 +309,12 @@ figrows=[];figledger=[]
 for fig in MANIFEST['figures']:
     name=Path(fig).stem;keys=figure_keys[name];p=sorted({n for k in keys for n in LEDGER[k]['pages']})
     if name.startswith('coverage_group_'):p=[11+int(name.rsplit('_',1)[1])]
-    figrows.append([name,ranges(p),'Biểu đồ tuyến tính / ma trận / bảng tương ứng; hình gốc có liên kết'])
-    figledger.append({'path':fig,'pages':p,'representation':'Revised chart, matrix or source table','url':PUBLIC+fig})
+    removed=name in {'amount_histogram','amount_zoom_linear'}
+    representation='Đã bỏ biểu đồ; chỉ giữ bảng nguồn tại trang '+ranges(p) if removed else 'Biểu đồ tuyến tính / ma trận / bảng tương ứng; hình gốc có liên kết'
+    figrows.append([name,'Đã bỏ' if removed else ranges(p),representation])
+    figledger.append({'path':fig,'pages':p,'representation':'Chart removed; source table retained' if removed else 'Revised chart, matrix or source table','url':PUBLIC+fig})
 pages_table('Đối chiếu đủ 24 hình đã thực hiện',['Hình nguồn','Trang phân tích','Hình thức trong bản đầy đủ'],figrows,[],
- 'Báo cáo dùng dạng trình bày phù hợp yêu cầu mới; không nhất thiết lặp lại hình PNG gốc. Nhấp vào dòng để mở hình gốc. Các biểu đồ mới không dùng hàm log.',widths=[245,150,CW-395],font=9,links=[x['url'] for x in figledger])
+ 'Báo cáo dùng dạng trình bày phù hợp yêu cầu mới; không nhất thiết lặp lại hình PNG gốc. Nhấp vào dòng để mở hình gốc. Các biểu đồ mới không dùng hàm log. Các biểu đồ phân phối Amount đã được bỏ theo yêu cầu; danh mục giữ thông tin bảng nguồn để đối chiếu.',widths=[245,150,CW-395],font=9,links=[x['url'] for x in figledger])
 
 # Full table catalogue, with every exported field name and stable hyperlink.
 catalog_start=PAGE+1
@@ -339,5 +340,5 @@ for key,v in LEDGER.items():
     path=DOC/v['path'];audit.append({'key':key,**v,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'url':RAW+v['path']})
 (BUILD/'coverage_ledger.json').write_text(json.dumps({'commit':COMMIT,'tables':audit,'figures':figledger},ensure_ascii=False,indent=2),encoding='utf-8')
 pd.DataFrame([{'table':x['key'],'rows':x['rows'],'pages':ranges(x['pages']),'representation':x['representation'],'url':x['url'],'columns':', '.join(x['columns'])} for x in audit]).to_csv(BUILD/'coverage_ledger.csv',index=False,encoding='utf-8-sig')
-(BUILD/'build_summary.json').write_text(json.dumps({'pdf':str(OUTPUT),'pages':PAGE,'page_titles':PAGES,'source_commit':COMMIT,'tables':len(audit),'figures':len(figledger),'catalog_start':catalog_start},ensure_ascii=False,indent=2),encoding='utf-8')
+(BUILD/'build_summary.json').write_text(json.dumps({'pdf':str(OUTPUT),'pages':PAGE,'page_titles':PAGES,'source_commit':COMMIT,'tables':len(audit),'figures':len(figledger),'catalog_start':catalog_start,'amount_distribution':{'status':'removed_by_user_request','reason':'currency codes not mapped and monetary unit not verified'}},ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps({'pdf':str(OUTPUT),'pages':PAGE,'tables':len(audit),'figures':len(figledger)},ensure_ascii=False))
