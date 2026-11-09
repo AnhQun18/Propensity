@@ -1,0 +1,81 @@
+{
+  "checked_at": "2026-11-09T05:38:37.052733+00:00",
+  "source_fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "rank_scope": "All available history, UTC, descriptive EDA only; not a training cohort rule.",
+  "top20": {
+    "customers": 20,
+    "trx_events": 2214115,
+    "share_all_trx_pct": 5.711644519930773,
+    "labelled_months": 240,
+    "any_positive_months": 2,
+    "any_positive_rate_pct": 0.8333333333333334,
+    "clients_ever_positive": 2
+  },
+  "maximum_amount": {
+    "amount": 1370187366400.0,
+    "rows": 1,
+    "clients": 1,
+    "raw_p999_currency11_reference": 57322644.54399991,
+    "owner_stats": [
+      {
+        "events": 56,
+        "currency11_events": 56,
+        "median_currency11": 164539424768.0,
+        "occurrences_of_max": 1,
+        "rows_above_reference_p999": 53,
+        "sum_currency11": 13773248197516.906,
+        "capped_sum_currency11_eda": 3038194573.739376,
+        "max_to_median_currency11": 8.327410700091843
+      }
+    ]
+  },
+  "peak_day": {
+    "day": "2022-12-11",
+    "weekday": "Sunday",
+    "events": 65302,
+    "customers": 32664,
+    "max_events_one_client": 1196,
+    "top1_share_pct": 1.8314906128449358,
+    "top10_share_pct": 3.915653425622492,
+    "top20_share_pct": 4.220391412207896,
+    "median_events_per_client": 1.0
+  },
+  "currency11": {
+    "currency_group": "11",
+    "rows": 38724240,
+    "finite_n": 38724240,
+    "nonpositive_n": 0,
+    "max_amount": 1370187366400.0,
+    "raw_q1": 2452.6372680664062,
+    "raw_median": 18025.0234375,
+    "raw_q3": 94562.37890625,
+    "raw_lower": -135711.97518920898,
+    "raw_upper": 232726.9913635254,
+    "ln_q1": 7.804919160542452,
+    "ln_median": 9.799516262429691,
+    "ln_q3": 11.457014989961483,
+    "ln_lower": 2.3267754164139065,
+    "ln_upper": 16.935158734090027,
+    "log1p_q1": 7.805326801821587,
+    "log1p_median": 9.799571739320763,
+    "log1p_q3": 11.457025564935634,
+    "log1p_lower": 2.3277786571505166,
+    "log1p_upper": 16.934573709606703,
+    "raw_p99": 5257531.794999965,
+    "raw_p999": 57322644.54399991,
+    "iqr_applicable": true,
+    "raw_outside": 5521385.0,
+    "ln_below": 516970.0,
+    "ln_above": 97222.0,
+    "log1p_below": 486868.0,
+    "log1p_above": 97271.0,
+    "above_p999": 38725,
+    "ln_outside": 614192.0,
+    "log1p_outside": 584139.0,
+    "raw_outside_pct": 14.258213976568682,
+    "ln_outside_pct": 1.5860659886417396,
+    "log1p_outside_pct": 1.5084582679995786
+  },
+  "raw_deleted": false,
+  "thresholds_fitted_for_model": false
+}

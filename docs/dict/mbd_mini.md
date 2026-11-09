@@ -3,9 +3,10 @@ https://huggingface.co/datasets/ai-lab/MBD-mini
 
 ## 1. Tổng quan
 
-**Bài toán.** Dự đoán xác suất một khách hàng mua từng sản phẩm ngân hàng
-trong tháng đích, dựa trên lịch sử giao dịch, vị trí và hội thoại trước thời
-điểm dự đoán (cutoff).
+**Bài toán hiện tại.** Dự đoán xác suất một khách hàng mua ít nhất một trong bốn sản
+phẩm có nhãn trong tháng đích, dựa trên lịch sử trước cutoff. Đầu ra là `p_any`,
+target suy ra là `y_any`. Benchmark gốc dự đoán riêng bốn sản phẩm; cấu trúc bốn nhãn
+nguồn được giữ nguyên. Xem [thiết kế hiện tại](../propensity_feasibility/any_product/design.md).
 
 **Đơn vị mẫu.** Mỗi mẫu có nhãn là một cặp *khách hàng–tháng*, với khóa
 `client_id`, `mon`. Điều này khác với các bảng `detail`, nơi mỗi dòng là
@@ -16,14 +17,18 @@ một sự kiện, và các bảng `ptls`, nơi mỗi dòng là một chuỗi c�
 
 - Mỗi nhãn nhận 1 nếu ghi nhận mua sản phẩm tương ứng trong khoảng nhãn,
   bằng 0 nếu không ghi nhận mua sản phẩm đó.
-- Chưa xác định tên nghiệp vụ của bốn sản phẩm, nên giữ nguyên tên nhãn.
+- Giữ nguyên tên nhãn để tạo `y_any`; tên nghiệp vụ từng sản phẩm không còn là yêu cầu
+  xác minh trong phạm vi đầu ra gộp theo quyết định người dùng.
 - Tháng lịch chứa `mon` là tháng nhãn theo quy ước đã đối chiếu với các bài báo;
-  cutoff là ngày đầu tháng và lịch sử chỉ gồm sự kiện `event_time < cutoff`.
-  Ví dụ `mon=2022-02-28` dùng cutoff `2022-02-01`. Xem
+  lịch sử chỉ gồm sự kiện `event_time < cutoff`. Người dùng quyết định tạm dùng UTC
+  thống nhất; ví dụ `mon=2022-02-28` có cutoff `2022-02-01 00:00 UTC`, không dịch 3 giờ.
+  Đây là quy ước nghiên cứu, không phải xác nhận timezone của ETL nhãn gốc. Xem
   [nghiên cứu `mon` và giới hạn về múi giờ](../propensity_feasibility/mon_research.md).
 
-**Đầu ra.** Mô hình trả về 1 trong 4 xác suất `p_target_1`–`p_target_4 ∈ [0, 1]`
-cho mỗi khách hàng tại cutoff. Đây là bài toán nhiều nhãn, để xây dựng dự án này có thể lựa chọn 1 trong 4 hoặc giữ cả 4
+**Đầu ra.** Đề tài trả về `p_any ∈ [0,1]` cho mỗi khách hàng tại cutoff.
+`y_any=1` khi có ít nhất một target bằng 1, bằng 0 khi đủ bốn target bằng 0.
+Nếu không có 1 và có nhãn thiếu thì `y_any` không xác định, không điền thành 0.
+Các đầu ra riêng `p_target_1`–`p_target_4` thuộc bài toán nhiều nhãn gốc.
 
 **Lưu ý về ý nghĩa của nhãn.**
 
@@ -59,7 +64,7 @@ Có **100.224 khách hàng × 12 tháng = 1.202.688 mẫu có nhãn**. Bảng `t
 | `fold` | Partition | Nhóm khách hàng để chia dữ liệu; dùng quản lý split |
 | `mon` | string ngày `YYYY-MM-DD` | Ngày cuối tháng nhãn; cutoff ở ngày đầu tháng chứa `mon`, chỉ dùng lịch sử trước cutoff |
 | `target_1`–`target_4` | int32 | Bốn nhãn nhị phân; không đưa vào feature cùng mẫu |
-| `trans_count` | int32 | Trường đếm giao dịch trong `targets`; chưa xác minh khoảng thời gian tính |
+| `trans_count` | int32 | Trường đếm trong targets, không giảm theo tháng; chưa tái tạo được từ log được phát hành. Chưa dùng làm predictor; tự đếm từ detail trước cutoff |
 | `diff_trans_date` | int32 | Trường chênh lệch thời gian liên quan giao dịch; chưa xác minh công thức, đơn vị và cutoff |
 
 ### Giao dịch — `detail/trx`
@@ -76,6 +81,16 @@ Có **100.224 khách hàng × 12 tháng = 1.202.688 mẫu có nhãn**. Bảng `t
 | `src_type21`, `src_type22`, `src_type31`, `src_type32` | int32 | Các thuộc tính nguồn bổ sung đã mã hóa |
 
 Các mã không có bảng quy đổi nghiệp vụ đã xác minh; không tự gán tên ngân hàng, kênh giao dịch hay nhóm chi tiêu.
+
+**Cờ currency tự tạo theo quyết định người dùng:** mã 11 là mã chính; mã khác có giá
+trị là ngoại tệ theo quy ước dự án. Hàm [currency_flags](../../src/mbd_mini_eda/currency.py)
+tạo `currency_is_main`, `currency_is_foreign` (boolean nullable) và `currency_missing`.
+Currency null có hai cờ đầu null, cờ missing=True; giữ currency nguồn, không gán tên
+đồng tiền thật. Các cờ này không phải cột có sẵn trong raw.
+
+Xem [xác minh trans_count, missing và thời điểm nhãn](../propensity_feasibility/remaining_questions/assessment.md).
+Targets không có mốc label_available_at; lịch train/calibration phải ghi rõ giả định
+độ trễ công bố nhãn, thay vì coi mon là thời điểm thông tin đã sẵn sàng.
 
 ### Vị trí và hội thoại
 

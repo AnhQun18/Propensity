@@ -2,6 +2,19 @@
 
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
 
+## Chuẩn bị dữ liệu propensity
+
+Pipeline mới ở [`src/propensity_data/`](src/propensity_data/), cấu hình tại
+[`configs/propensity_data.json`](configs/propensity_data.json). Pipeline tạo một dòng
+khách–tháng, nhãn `y_any`, đặc trưng trước cutoff UTC, quarantine và lịch đánh giá;
+giữ khách thiếu nguồn, không cap cực trị hoặc gộp amount khác currency.
+Xem [hướng dẫn chuẩn bị và chạy trên máy khác](docs/propensity_data_preparation.md).
+
+**Theo yêu cầu ngày 09/11/2026: mới viết code và kiểm thử tổng hợp, chưa thực thi
+pipeline hoặc chạy kiểm thử trên máy này.** Chưa có kết quả huấn luyện mới.
+Mã chuẩn bị tách riêng khỏi EDA; output nằm trong `outputs/` và không đưa lên Git.
+Bản PDF sơ bộ cũ đã chuyển vào [kho báo cáo cũ](deliverables/archive/README.md).
+
 Bản rà soát mới hoàn thành **12 yêu cầu EDA**: giữ toàn bộ lịch sử, null theo nguồn,
 duplicate toàn bộ, nhóm độ phủ có chủ đích, biểu đồ tuyến tính, nhãn zoom Y và outlier.
 Đọc [báo cáo hiện tại](docs/mbd_mini_eda/report.md),
@@ -37,8 +50,10 @@ Xem [kiểm kê cuối và giới hạn diễn giải](docs/mbd_mini_eda_audit.m
 
 Đối chiếu tài liệu và kết quả hiện có trong repository với hai bước **Hiểu yêu cầu /
 Hiểu nghiệp vụ (Business Understanding)** và **Hiểu dữ liệu (Data Understanding)**:
-**bước 1 chưa hoàn chỉnh; bước 2 đã khá đầy đủ về kỹ thuật, còn một số giới hạn
-về ý nghĩa dữ liệu cần xác nhận**.
+**bước 1 đã có đặc tả nghiên cứu đề xuất, còn thiếu xác nhận nghiệp vụ thực tế;
+bước 2 đã khá đầy đủ về kỹ thuật, các giới hạn của dữ liệu ẩn danh được ghi rõ**.
+Kết quả xác minh tiếp theo và câu trả lời đầy đủ nằm tại
+[các câu hỏi còn bỏ ngỏ](docs/propensity_feasibility/open_questions/answers.md).
 
 ### 1. Hiểu yêu cầu / Hiểu nghiệp vụ (Business Understanding)
 
@@ -47,30 +62,37 @@ của việc khai thác dữ liệu và lập kế hoạch triển khai.
 
 | Nội dung cần có | Đánh giá hiện tại |
 | --- | --- |
-| Mục tiêu kinh doanh | Có định hướng dự đoán khả năng mua; chưa xác định rõ ai sử dụng kết quả, dùng cho quyết định nào và lợi ích cần đạt. |
-| Đánh giá hiện trạng | Đã đánh giá dữ liệu, mất cân bằng nhãn, thiếu nguồn và giới hạn tài nguyên; chưa có hiện trạng quy trình chọn khách hoặc hiệu quả kinh doanh để đối chiếu. |
-| Mục tiêu kỹ thuật | Đã định nghĩa nhãn, cutoff, lịch sử đầu vào, cách chia thời gian và chỉ số đánh giá; chưa có ngưỡng thành công cụ thể. |
-| Kế hoạch triển khai | Có hướng thực nghiệm; chưa có kế hoạch gồm mốc công việc, đầu ra, người phụ trách và điều kiện nghiệm thu. |
+| Mục tiêu kinh doanh | Đề xuất xếp hạng khách hiện hữu hằng tháng để CRM/marketing ưu tiên liên hệ; đo số khách có mua được tìm thấy trong cùng ngân sách chọn khách. Chưa xác nhận đơn vị tiếp nhận hoặc hiệu quả chiến dịch thực tế. |
+| Đánh giá hiện trạng | Có raw, EDA và audit; chưa có mô hình đã đánh giá. Không có dữ liệu quy trình chọn khách hiện hành, chi phí, lợi nhuận hoặc phân bổ chiến dịch để xác định ROI. |
+| Mục tiêu kỹ thuật | Một xác suất `p_any`; top 1% làm ngân sách mô phỏng, thêm 0,5%/5%; so với random và baseline giao dịch. Đề xuất Lift@1% > 1, báo cáo chênh lệch paired, bất định và độ ổn định theo tháng; chưa có kết quả chứng minh đã đạt. |
+| Kế hoạch triển khai | Đã đề xuất M0–M5: khóa protocol → chuẩn bị dữ liệu → baseline → đối chứng → test → bàn giao, với đầu ra và vai trò đề xuất. Tên người phụ trách, deadline và ngân sách thực tế chưa được duyệt. |
 
-**Điểm cần sửa trước tiên là thống nhất bài toán.**
-[Thiết kế mới](docs/propensity_feasibility/any_product/design.md) dùng **một xác suất
-mua ít nhất một trong bốn sản phẩm**, trong khi [DATASETS.md](DATASETS.md) vẫn mô tả
-**bốn xác suất riêng**. Hai đầu ra phục vụ những quyết định khác nhau. Đây là điểm
-chưa thống nhất giữa các tài liệu tại thời điểm rà soát.
+**Bài toán hiện tại đã được thống nhất trong tài liệu tổng quan:**
+[thiết kế mới](docs/propensity_feasibility/any_product/design.md) dùng **một xác suất
+mua ít nhất một trong bốn sản phẩm**; bốn nhãn gốc được giữ để tạo `y_any`.
+[DATASETS.md](DATASETS.md) và từ điển đã phân biệt đầu ra đề tài với benchmark bốn sản
+phẩm. Các báo cáo nghiên cứu cũ vẫn là tài liệu theo phạm vi/thời điểm ghi trong file.
 
-Để hoàn thiện bước này, cần bổ sung:
+Các câu hỏi nghiệp vụ được trả lời bằng đặc tả nghiên cứu sau; đây là **đề xuất**, chưa
+phải cam kết đã được ngân hàng nghiệm thu:
 
-- **Mục đích sử dụng:** chẳng hạn xếp hạng khách để ưu tiên liên hệ hằng tháng.
-  Đây cần được ghi là mục tiêu đã xác nhận hoặc giả định của đề tài.
-- **Tiêu chí thành công:** chọn bao nhiêu khách mỗi tháng — K hoặc tỷ lệ top-K;
-  so với cách chọn nào; yêu cầu Recall/Lift@K và chi phí xử lý ra sao.
-- **Phạm vi:** khách hiện hữu hay khách mới, một nhãn any-product hay từng sản phẩm,
-  đầu ra nghiên cứu hay hệ thống sử dụng thực tế.
-- **Kế hoạch:** hoàn thiện dữ liệu → tạo đặc trưng → baseline → đối chứng → đánh giá
-  → bàn giao, với đầu ra và điều kiện hoàn thành từng phần.
+- **Mục đích sử dụng:** danh sách ưu tiên liên hệ cho CRM/marketing hoặc quản lý quan
+  hệ khách hàng; tăng số khách có mua được tìm thấy trong cùng K. Bối cảnh MBD là khách
+  hàng doanh nghiệp. Không suy ra tác động của việc liên hệ từ nhãn mua quan sát được.
+- **Tiêu chí thành công:** K = ceil(1% × N), bằng 1.003 khi N = 100.224; đo
+  Precision/Recall/Lift@K, AP và calibration. So với chọn ngẫu nhiên, xếp hạng bằng hành
+  vi đơn giản và CatBoost giao dịch, trên cùng cohort/split. Chưa có ngân sách thực tế
+  hoặc đủ dữ liệu để đặt mục tiêu doanh thu/ROI. Thời gian và RAM phải được đo khi chạy.
+- **Phạm vi:** nghiên cứu offline cho khách hiện hữu, đầu ra `p_any`; giữ khách thiếu
+  nguồn/cold-start với fallback. Không đưa ra tên sản phẩm đề xuất hoặc kết luận cho
+  khách hoàn toàn mới khi chưa có thí nghiệm tương ứng.
+- **Kế hoạch:** tuning cuốn chiếu 09–11/2022, fit cuối trên 02–11, calibration tháng 12,
+  test khóa tháng 01/2023. Bảng M0–M5 trong [bản trả lời](docs/propensity_feasibility/open_questions/answers.md)
+  nêu đầu ra, điều kiện hoàn thành và vai trò đề xuất; chưa tự gán tên người/deadline.
 
 Chưa có kết quả huấn luyện **không làm bước 1 thiếu**; phần còn thiếu là mục tiêu
-và cách xác định dự án thành công.
+và cách xác định dự án thành công. Đặc tả trên đóng phần thiết kế nghiên cứu; mục tiêu
+kinh doanh thực tế vẫn cần đầu mối sử dụng xác nhận.
 
 ### 2. Hiểu dữ liệu (Data Understanding)
 
@@ -103,22 +125,87 @@ Bằng chứng và cách diễn giải nằm trong
 [báo cáo EDA](docs/mbd_mini_eda/report.md) và
 [thiết kế any-product](docs/propensity_feasibility/any_product/design.md).
 
-Những phần còn chưa xác minh được gồm **tên nghiệp vụ của bốn sản phẩm, đơn vị
-amount và mapping currency, timezone, công thức/thời điểm tạo các trường phụ trợ,
-nguyên nhân thiếu nguồn**. Cần quản lý chúng thành danh sách giả định và giới hạn
-sử dụng; chưa có căn cứ để tự gán ý nghĩa hoặc loại dữ liệu.
+Kết quả xác minh bổ sung ngày 09/11/2026:
+
+| Câu hỏi | Câu trả lời và cách áp dụng |
+| --- | --- |
+| Bốn sản phẩm là gì? | Tên thương mại không còn là yêu cầu xác minh của đề tài any-product theo quyết định người dùng. Giữ bốn nhãn nguồn để tạo và đối soát `y_any`. |
+| Amount/currency xử lý thế nào? | Theo quyết định người dùng, mã 11 là mã chính, mã khác có giá trị mang cờ ngoại tệ của dự án. Đã thêm hàm tạo cờ: 38.724.240 dòng chính, 40.572 ngoại tệ, 118 missing tách riêng. Không gán tên đồng tiền thật; giữ currency gốc. |
+| Tháng nhãn và timezone? | Người dùng quyết định tạm dùng UTC thống nhất: raw diễn giải UTC, cutoff đầu tháng lúc 00:00 UTC, không dịch 3 giờ. Đây là quy ước triển khai, không phải xác nhận ETL gốc. Moscow trong EventGPT giữ làm tài liệu đối chiếu và sensitivity check. |
+| Biên 3 giờ có ảnh hưởng không? | Quét 1.275 shard detail: 88.976 sự kiện khác biệt, ảnh hưởng 71.467 cặp khách–tháng / 35.660 khách. Cutoff tháng 01/2023 không khác sự kiện, nhưng train/validation/calibration có khác. Đây chưa phải mức thay đổi metric. |
+| Công thức các trường phụ trợ? | Trans_count không giảm giữa các tháng, nhưng 612 cấu hình không tái tạo được cột nguồn; 102.932 dòng vượt toàn bộ trx trước cutoff, 9.459 dòng dương thuộc khách không có trx toàn lịch sử. Chưa dùng count/diff nguồn làm predictor; tự tạo count/recency từ detail trước cutoff. |
+| Vì sao không có log? | MBD mục 3.1 xác nhận cơ chế chung: khách có thể không giao dịch, không gọi hỗ trợ hoặc không để lại vị trí khi dùng ứng dụng. Audit đã tách các trạng thái trống theo tháng; không có cờ quan sát liên tục để gán nguyên nhân chính xác cho từng khách. Giữ khách và masks. |
+| Nhãn có cần loại do thiếu không? | Audit mới xác nhận 0 null/giá trị nhãn ngoài 0/1, 0 trùng khóa; không cần loại dòng vì mất nhãn. `y_any` có 12.854 dòng dương. |
+| Khi nào nhãn sẵn có? | Đã kiểm tra 435 shard và metadata: không có thời điểm chốt/công bố nhãn từng tháng. Snapshot được công bố ngày 27/08/2024, không cho biết độ trễ trong ngân hàng. Lịch calibration 12/2022 → test 01/01/2023 chỉ khả thi dưới giả định trễ 0; kịch bản trễ dương cần dựng lại lịch fit. |
+
+Nguồn sơ cấp, commit mã nguồn, mức độ chắc chắn, các câu hỏi cần nhà phát hành/đơn vị
+sử dụng trả lời và kế hoạch chi tiết nằm trong
+[bản trả lời đầy đủ](docs/propensity_feasibility/open_questions/answers.md).
 
 ### Kiểm chứng và điều kiện chuyển bước
 
 Ngày 09/11/2026 đã chạy lại bộ xác nhận: **225/225 kiểm tra đạt** cho báo cáo, bảng,
-hình, cache và dữ liệu mẫu. Lần rà soát này không quét lại toàn bộ dữ liệu gốc.
+hình, cache và dữ liệu mẫu. Bộ xác nhận EDA này không quét lại toàn bộ dữ liệu gốc.
 Kết quả của lần chạy được lưu cục bộ tại
 `outputs/business_data_understanding_review_20261109/docs/mbd_mini_eda_validation.json`;
 snapshot xác nhận EDA đã lưu trong Git nằm tại
 [docs/mbd_mini_eda_validation.json](docs/mbd_mini_eda_validation.json).
 
-Có thể tiếp tục bước chuẩn bị dữ liệu theo thiết kế hiện tại, đồng thời hoàn thiện
-mục tiêu nghiệp vụ và thống nhất tài liệu trước khi chốt đánh giá mô hình.
+Audit bổ sung đọc lại toàn bộ targets và chỉ chiếu ID/timestamp trên toàn bộ shard
+detail để kiểm tra nhãn, trường phụ trợ và biên timezone; không sửa raw hoặc fit mô hình.
+Kết quả: [verification.json](docs/propensity_feasibility/open_questions/verification.json).
+Chạy lại bằng `.\.venv\Scripts\python.exe -B -X utf8 src/audit_open_questions.py`.
+
+Đã kiểm chứng thêm ba giả thuyết cho `diff_trans_date` trên toàn bộ targets và
+detail/trx, với 1.134 cấu hình mốc/cửa sổ/timezone/làm tròn; chưa công thức nào tái tạo
+hoàn toàn cột nguồn. Xem [báo cáo ba công thức](docs/propensity_feasibility/three_formulas/assessment.md)
+và script `src/audit_three_diff_formulas.py` để chạy lại.
+
+Đã tự kiểm chứng thêm trans_count, thiếu nguồn, độ trễ nhãn và quy ước cờ currency
+trong [báo cáo các điểm còn lại](docs/propensity_feasibility/remaining_questions/assessment.md).
+Kết quả máy đọc và 612 cấu hình nằm cùng thư mục. Hàm tạo cờ có tại
+`src/mbd_mini_eda/currency.py`; currency thiếu không bị gán ngoại tệ. Các ngày sẵn có
+nhãn theo độ trễ 0/1/7/30 ngày hoặc một tháng lịch là **kịch bản giả định**, chưa phải
+ngày chốt nhãn đã xác minh. Chưa chạy mô hình để đo ảnh hưởng của độ trễ.
+
+Có thể tiếp tục bước chuẩn bị dữ liệu với UTC được ghi rõ, đồng thời xác nhận mục tiêu
+nghiệp vụ trước khi chốt đánh giá mô hình. Các audit/cohort cũ giữ nguyên phạm vi; cần
+ghi rõ chúng được diễn giải theo quy ước UTC, không chuyển sang cutoff Moscow.
+
+### Kiểm tra lại cực trị và top khách theo giao dịch (09/11/2026)
+
+Đã rà soát raw amount theo currency, lịch sử/loại giao dịch của top 50 khách,
+nhãn của top 20 và mức tập trung đỉnh ngày. Kết quả đầy đủ trong
+[báo cáo đuôi phân phối](docs/propensity_feasibility/tail_review/assessment.md).
+
+- **IQR không phải tỷ lệ lỗi:** với mã 11, số dòng ngoài hàng rào giảm từ
+  5.521.385 (**14,2582%**) trên thang gốc xuống 584.139 (**1,5085%**) trên
+  `log1p(amount)`. Cả hai chỉ mô tả phân phối. Nhóm mã 5/9/12/16 được gộp thành
+  `other_currency` (19 dòng), không diễn giải IQR nhóm này; 118 dòng thiếu mã giữ riêng.
+- **Max amount 1.370.187.366.400** xuất hiện một lần, nhưng khách sở hữu có
+  53/56 giao dịch vượt P99,9 mã 11 và median khoảng 164,54 tỷ đơn vị amount gốc.
+  Max bằng 8,33 lần median khách: chưa thỏa giả thuyết vài điểm cao đơn lẻ để cap
+  tự động. P99,9 toàn kỳ khoảng 57,32 triệu chỉ là tham chiếu EDA.
+- **Top 20** có 2.214.115 log (5,7116% toàn bộ trx), đủ 12 tháng nhãn/khách.
+  Chỉ hạng 14 và 16 có một tháng `y_any=1` mỗi người (8,33%); 18 khách còn lại 0%.
+  Tỷ lệ gộp là 2/240 khách–tháng (0,8333%), không phải tỷ lệ trên số giao dịch.
+  CSV đủ ID, từng nhãn và loại giao dịch nằm ở
+  `outputs/tail_review_20261109/top20_trx_customers.csv` sau khi chạy script.
+- **Đỉnh 11/12/2022 UTC:** 65.302 log từ 32.664 khách; top 1 chiếm 1,83%,
+  top 20 chiếm 4,22%. Đây là đỉnh có nhiều khách tham gia; chưa xác minh nguyên
+  nhân lịch. Giữ dữ liệu và kiểm định đặc trưng lịch thay vì xóa ngày này.
+- **Count:** giữ nhóm geo/dialog bị IQR đánh dấu; thêm log1p count, has_dialog,
+  active days và cờ heavy/ngoại tệ/thiếu currency khi tạo features. P99 count toàn
+  kỳ là trx 2.233,54; geo 5.082,54; dialog 21. Có 892 khách dialog >P99 do ties,
+  không mặc định mọi nguồn đều có 1.003 khách. MBD là tệp khách doanh nghiệp theo
+  [bài báo nguồn](https://arxiv.org/html/2409.17587v2), chưa có căn cứ loại heavy
+  users chỉ vì tần suất lớn hoặc không có nhãn dương.
+
+Giữ raw và chưa xóa dòng/khách nào. Log/cap/rank hoặc ngưỡng heavy dùng cho mô hình
+phải fit trên train trước cutoff; chưa huấn luyện để chọn phương án. Cây ít phụ
+thuộc thang đo nhưng không bảo đảm miễn nhiễm với cực trị, nhất là khi sum/mean đã
+bị chi phối trước khi vào mô hình. Chạy lại bằng
+`.\.venv\Scripts\python.exe -B -X utf8 src/audit_tail_cases.py`.
 
 ## Setup trên máy khác
 
@@ -154,7 +241,7 @@ thư mục dữ liệu, Linux/macOS và xử lý lỗi thường gặp nằm t�
 .
 ├── docs/             # Tài liệu dự án
 ├── notebooks/        # Notebook EDA
-├── src/              # Package mbd_mini_eda và script kiểm chứng MBD-mini
+├── src/              # Package propensity_data, mbd_mini_eda và script audit
 ├── tests/            # Kiểm thử bằng dữ liệu tổng hợp
 ├── configs/          # Cấu hình package MBD-mini
 ├── data/             # Dữ liệu gốc cục bộ, không đưa lên Git

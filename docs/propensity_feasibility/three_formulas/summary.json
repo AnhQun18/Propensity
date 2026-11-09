@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-11-09T04:27:52.635542+00:00",
+  "scope": "All target rows and all detail/trx events, processed fold by fold; aggregate outputs only.",
+  "totals": {
+    "rows": 1202688,
+    "clients": 100224,
+    "trx_rows": 38764930,
+    "source_nonnull": 1081902,
+    "source_null": 120786,
+    "source_count_one": 50460,
+    "source_count_one_positive_diff": 49293,
+    "source_count_one_null_diff": 0,
+    "source_count_one_zero_diff": 1167
+  },
+  "candidate_configurations": 1134,
+  "perfect_formulas": 0,
+  "best_by_family": [
+    {
+      "family": "average_interval",
+      "formula": "elapsed_days/source_trans_count_minus_1/floor",
+      "window": "30d",
+      "reference": "label_month_start",
+      "utc_offset_hours": 3,
+      "comparable": 898235,
+      "exact_nonnull": 269172,
+      "null_agreement": 120786,
+      "exact_with_matching_count": 1008,
+      "comparable_with_matching_count": 13738,
+      "source_nonnull": 1081902,
+      "exact_fraction_source_nonnull": 0.24879517738205495,
+      "exact_fraction_comparable": 0.299667681620066,
+      "exact_including_null": 389958
+    },
+    {
+      "family": "recency",
+      "formula": "elapsed_days/floor",
+      "window": "all_available",
+      "reference": "label_month_start",
+      "utc_offset_hours": 0,
+      "comparable": 1068794,
+      "exact_nonnull": 205177,
+      "null_agreement": 75464,
+      "exact_with_matching_count": 1138,
+      "comparable_with_matching_count": 30606,
+      "source_nonnull": 1081902,
+      "exact_fraction_source_nonnull": 0.18964471828317167,
+      "exact_fraction_comparable": 0.19197057618212676,
+      "exact_including_null": 280641
+    },
+    {
+      "family": "last_two_gap",
+      "formula": "elapsed_days/floor",
+      "window": "all_available",
+      "reference": "label_month_start",
+      "utc_offset_hours": 3,
+      "comparable": 1051815,
+      "exact_nonnull": 203069,
+      "null_agreement": 83714,
+      "exact_with_matching_count": 670,
+      "comparable_with_matching_count": 19789,
+      "source_nonnull": 1081902,
+      "exact_fraction_source_nonnull": 0.18769629781625322,
+      "exact_fraction_comparable": 0.1930653204223176,
+      "exact_including_null": 286783
+    }
+  ],
+  "elapsed_seconds": 182.666,
+  "caveats": [
+    "References mon_midnight and following_month_start are diagnostics, not automatically valid prediction cutoffs.",
+    "Best means closest among tested candidates, not a confirmed generating formula.",
+    "last_two_gap is a customer-month surrogate of the event-row lag formula.",
+    "Zero-event and one-event histories are undefined for the mean interval; source-count denominator additionally requires source trans_count > 1."
+  ]
+}

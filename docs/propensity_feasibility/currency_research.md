@@ -2,6 +2,20 @@
 
 Ngày đối chiếu: 07/11/2026. Trọng tâm: MBD/MBD-mini; phân biệt nội dung bài báo, cấu hình công khai và đề xuất cho dự án.
 
+**Quyết định người dùng sau đối chiếu:** mã 11 là mã chính; mã khác có giá trị mang
+cờ ngoại tệ của dự án; currency null có cờ missing riêng và không bị gán ngoại tệ.
+Đã thêm hàm tạo cờ trong `src/mbd_mini_eda/currency.py`. Audit raw xác nhận
+38.724.240 / 40.572 / 118 giao dịch tương ứng ba nhóm; xem
+[kết quả mới](remaining_questions/assessment.md#2-mã-11-là-mã-chính-mã-khác-flag-ngoại-tệ).
+Đây là quy ước phân nhóm được chấp nhận, không cần mapping ISO để tạo cờ; không khẳng
+định danh tính đồng tiền hoặc đơn vị amount gốc.
+
+**Bổ sung ngày 09/11/2026:** đối chiếu lại mục 3.3 bài MBD xác nhận categorical đổi
+thành chỉ số, numerical và ngày có thêm nhiễu, tham số ẩn danh không được công bố.
+Vì vậy không suy ngược mã tiền hoặc tiền gốc bằng tỷ giá thị trường; chưa có mapping
+để gọi mã 11 là RUB/USD/VND. [Kết quả xác minh và nguồn mã](open_questions/answers.md)
+phân biệt thông tin công bố với quy ước triển khai của đề tài.
+
 ## Kết quả chính
 
 Trong ba nghiên cứu trực tiếp trên MBD/MBD-mini đã kiểm tra, chưa tìm thấy mô tả quy đổi amount theo tỷ giá về một đồng tiền chung. Có bằng chứng về ba cách biểu diễn khác nhau: không đưa currency vào encoder, ghép currency vào token giao dịch, hoặc chỉ thêm token cho currency hiếm. Không được suy từ việc không mô tả tỷ giá thành khẳng định toàn bộ ETL của tác giả chưa từng quy đổi.

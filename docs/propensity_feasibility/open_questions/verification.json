@@ -1,0 +1,76 @@
+{
+  "checked_on": "2026-11-09",
+  "labels": {
+    "rows": 1202688,
+    "clients": 100224,
+    "months": 12,
+    "duplicate_keys": 0,
+    "positive_rows": 12854,
+    "negative_rows": 1189834,
+    "unknown_rows": 0,
+    "invalid_label_rows": 0,
+    "null_label_cells": 0,
+    "positive_rate": 0.010687726160068115
+  },
+  "auxiliary": {
+    "rows": 1202688,
+    "diff_null": 120786,
+    "diff_min": 0,
+    "diff_max": 364,
+    "zero_count_null_diff": 120786,
+    "positive_count_null_diff": 0,
+    "zero_count_present_diff": 0,
+    "one_count_positive_diff": 49293
+  },
+  "timezone_metadata": {
+    "targets": {
+      "files": 435,
+      "representative_file": "targets/fold=0/part-00000-44ca8b70-9d42-48f7-9dec-0a7a012af308.c000.snappy.parquet",
+      "event_time_type": null,
+      "metadata_keys": [
+        "org.apache.spark.sql.parquet.row.metadata",
+        "org.apache.spark.version"
+      ],
+      "scope": "Schema metadata from the first shard; not proof of the original timezone."
+    },
+    "trx": {
+      "files": 400,
+      "representative_file": "detail/trx/fold=0/part-00001-f1f2463d-80e2-4335-8981-4fc9e73f56f4.c000.snappy.parquet",
+      "event_time_type": "timestamp[ns]",
+      "metadata_keys": [
+        "org.apache.spark.sql.parquet.row.metadata",
+        "org.apache.spark.version"
+      ],
+      "scope": "Schema metadata from the first shard; not proof of the original timezone."
+    },
+    "geo": {
+      "files": 460,
+      "representative_file": "detail/geo/fold=0/part-00049-3a5c9be9-480a-4e2f-ac45-6d5650d2af64.c000.snappy.parquet",
+      "event_time_type": "timestamp[ns]",
+      "metadata_keys": [
+        "org.apache.spark.sql.parquet.row.metadata",
+        "org.apache.spark.version"
+      ],
+      "scope": "Schema metadata from the first shard; not proof of the original timezone."
+    },
+    "dialog": {
+      "files": 415,
+      "representative_file": "detail/dialog/fold=0/part-00098-b8643b72-b2d8-4a22-a1b1-207b3954bb83.c000.snappy.parquet",
+      "event_time_type": "timestamp[ns]",
+      "metadata_keys": [
+        "org.apache.spark.sql.parquet.row.metadata",
+        "org.apache.spark.version"
+      ],
+      "scope": "Schema metadata from the first shard; not proof of the original timezone."
+    }
+  },
+  "boundary_sensitivity": {
+    "events": 88976,
+    "client_months": 71467,
+    "clients": 35660,
+    "test_2023_01_events": 0,
+    "meaning": "Events included by naive UTC midnight but excluded by Moscow midnight; this measures a protocol difference, not proof of original label timezone."
+  },
+  "raw_edited": false,
+  "model_fitted": false
+}

@@ -2,6 +2,11 @@
 
 Ngày kiểm tra dữ liệu: 03/11/2026. Phạm vi: MBD-mini trong `data/MBD-mini/`. Đây là kiểm tra dữ liệu và thiết kế bài toán; chưa huấn luyện mô hình.
 
+**Phạm vi lịch sử:** tài liệu này mô tả bài toán bốn sản phẩm ban đầu. Thiết kế đề tài
+hiện dùng [một nhãn any-product](any_product/design.md); câu trả lời và xác minh mới
+ngày 09/11/2026 nằm tại [open_questions/answers.md](open_questions/answers.md).
+Các mốc cutoff raw-naive dưới đây chưa được tính lại theo protocol Moscow đề xuất mới.
+
 ## Bài toán và đầu ra
 
 Dự đoán khả năng khách hàng mua từng sản phẩm trong tháng đích từ lịch sử trước khoảng nhãn. Nhãn có sẵn là `target_1`–`target_4`, mỗi cột 0/1. Đầu ra mô hình là bốn xác suất `p_target_1`–`p_target_4`; khách hàng có thể mua nhiều sản phẩm, nên tổng bốn xác suất không bắt buộc bằng 1. Tên nghiệp vụ của bốn sản phẩm chưa được xác định.

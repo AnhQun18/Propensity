@@ -16,14 +16,16 @@ dependencies = [
 
 [project.scripts]
 mbd-mini-eda = "mbd_mini_eda.cli:main"
+propensity-data = "propensity_data.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mbd_mini_eda*"]
+include = ["mbd_mini_eda*", "propensity_data*"]
 
 [project.optional-dependencies]
 plots = ["matplotlib>=3.10"]
 supplement = ["duckdb>=2.0,<3; python_version >= '3.11'"]
+prepare = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 dev = ["build>=1.0"]
 notebook = [
     "ipykernel>=6.0",

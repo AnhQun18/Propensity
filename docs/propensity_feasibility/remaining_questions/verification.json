@@ -1,0 +1,113 @@
+{
+  "checked_at": "2026-11-09T05:20:08.517620+00:00",
+  "cache_inventory_fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "cache_validation": "All source paths/byte sizes/mtime_ns match inventory; not a full raw content checksum.",
+  "trans_count": {
+    "rows": 1202688,
+    "min": 0,
+    "max": 1000,
+    "distinct": 1001,
+    "mean": 96.08586682497871,
+    "median": 33.0,
+    "zero": 120786,
+    "at_1000": 11,
+    "source_exceeds_all_past_trx_rows": 102932,
+    "clients_without_any_raw_trx": 1503,
+    "positive_source_rows_without_any_raw_trx": 9459,
+    "best_trx_at_utc_cutoff": {
+      "source": "trx",
+      "reference_month_shift": 0,
+      "window": "fixed_start_2022-01",
+      "mode": "capped_1000",
+      "rows": 1202688,
+      "exact": 221448,
+      "exact_positive": 116242,
+      "source_positive": 1081902,
+      "exact_fraction": 0.18412755427841634,
+      "exact_positive_fraction": 0.10744226371704646
+    },
+    "perfect_candidates": 0,
+    "tested_candidates": 612,
+    "transitions": {
+      "transitions": 1102464,
+      "decreasing": 0,
+      "increasing": 856549
+    }
+  },
+  "source_coverage": [
+    {
+      "source": "trx",
+      "with_source": 98721,
+      "without_source": 1503,
+      "first_extracted_month": "2020-12",
+      "last_extracted_month": "2022-12"
+    },
+    {
+      "source": "geo",
+      "with_source": 72573,
+      "without_source": 27651,
+      "first_extracted_month": "2021-12",
+      "last_extracted_month": "2022-12"
+    },
+    {
+      "source": "dialog",
+      "with_source": 46320,
+      "without_source": 53904,
+      "first_extracted_month": "2021-02",
+      "last_extracted_month": "2022-12"
+    }
+  ],
+  "collection_or_observation_field_candidates": [],
+  "readiness": {
+    "target_shards": 435,
+    "columns": [
+      "client_id",
+      "diff_trans_date",
+      "mon",
+      "target_1",
+      "target_2",
+      "target_3",
+      "target_4",
+      "trans_count"
+    ],
+    "parquet_metadata_keys": [
+      "org.apache.spark.sql.parquet.row.metadata",
+      "org.apache.spark.version"
+    ],
+    "possible_availability_fields": [],
+    "possible_availability_metadata": [],
+    "observed_label_available_at_field": false,
+    "actual_release_delay_identifiable": false,
+    "december_calibration_available_at_january_test": [
+      {
+        "assumed_delay": "0_days",
+        "available_at_test_2023_01_01": true
+      },
+      {
+        "assumed_delay": "1_days",
+        "available_at_test_2023_01_01": false
+      },
+      {
+        "assumed_delay": "7_days",
+        "available_at_test_2023_01_01": false
+      },
+      {
+        "assumed_delay": "30_days",
+        "available_at_test_2023_01_01": false
+      },
+      {
+        "assumed_delay": "one_calendar_month",
+        "available_at_test_2023_01_01": false
+      }
+    ]
+  },
+  "currency": {
+    "primary_code": 11,
+    "main_rows": 38724240,
+    "foreign_rows": 40572,
+    "missing_rows": 118,
+    "semantics": "Foreign is the project flag for known codes other than 11; missing remains unknown."
+  },
+  "raw_edited": false,
+  "model_fitted": false
+}

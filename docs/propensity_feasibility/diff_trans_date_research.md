@@ -2,6 +2,22 @@
 
 Ngày kiểm tra: 07/11/2026.
 
+**Kiểm chứng bổ sung ba công thức ngày 09/11/2026:** đã chạy đủ 1.202.688 dòng targets
+và 38.764.930 giao dịch qua 1.134 cấu hình trung bình khoảng cách, recency và khoảng
+cách hai giao dịch cuối. Không cấu hình nào tái tạo hoàn toàn cột nguồn. Bằng chứng,
+mẫu số tỷ lệ khớp và giới hạn kết luận nằm trong
+[báo cáo ba công thức](three_formulas/assessment.md).
+
+Đã tự kiểm chứng thêm trans_count qua 612 cấu hình đếm và toàn bộ cặp tháng: không
+có lần giảm nhưng không tái tạo được từ log được phát hành; xem
+[bằng chứng và cách dùng count tự tạo](remaining_questions/assessment.md#1-tự-xác-minh-trans_count).
+
+**Đọc lại toàn bộ targets và đối chiếu lại repository MBD ngày 09/11/2026:** các số
+null, min/max và quan hệ với trans_count dưới đây vẫn khớp. Notebook công khai đọc
+targets có sẵn, không chứa ETL tạo hai trường phụ trợ; công thức/cutoff vẫn chưa xác
+minh được. [Kết quả kiểm chứng mới](open_questions/verification.json) và
+[cách xử lý cho đề tài](open_questions/answers.md#8-công-thức-trans_count-và-diff_trans_date-là-gì).
+
 ## Kết luận
 
 Nhà phát hành mô tả `diff_trans_date` là **“Time difference between transactions”** (chênh lệch thời gian giữa các giao dịch). Tuy nhiên, nguồn đã kiểm tra không công bố hai mốc thời gian, đơn vị, cửa sổ lịch sử hoặc công thức tạo trường này. Chưa thể khẳng định đây là khoảng cách giữa hai giao dịch liên tiếp, trung bình khoảng cách, hay số ngày từ giao dịch gần nhất đến ngày báo cáo.

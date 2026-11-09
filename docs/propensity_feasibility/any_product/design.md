@@ -2,6 +2,22 @@
 
 Ngày cập nhật: **08/11/2026**. Thực hiện bốn điều chỉnh của người dùng: lịch sử dài, chấp nhận nguồn chưa thu thập là null, đầu ra any-product, loại mẫu không xác định được nhãn và có chính sách cho khách ít dữ liệu. Đây là thiết kế và audit dữ liệu; chưa tạo training features, huấn luyện mô hình hoặc xóa dữ liệu gốc.
 
+**Bổ sung xác minh 09/11/2026:** [bản trả lời các câu hỏi còn mở](../open_questions/answers.md)
+định nghĩa mục tiêu nghiên cứu, baseline, top-K, kế hoạch và bằng chứng nguồn.
+**Quyết định người dùng sau rà soát:** tạm dùng UTC thống nhất cho raw, cutoff và
+cửa sổ. Nhãn tháng 12 dùng cutoff `2022-12-01 00:00 UTC`, không dịch 3 giờ.
+Đây là quy ước nghiên cứu, chưa phải xác nhận timezone ETL gốc. Protocol Moscow của
+EventGPT và audit biên 3 giờ được giữ làm đối chiếu. Các số cohort ngày 08/11 vẫn là
+snapshot raw-naive được diễn giải theo quy ước UTC; số lượng nhãn không đổi.
+Tên thương mại của từng sản phẩm không còn là yêu cầu xác minh cho đầu ra `p_any`;
+giữ bốn nhãn nguồn để tạo và đối soát `y_any`.
+
+**Cập nhật tự xác minh:** [báo cáo trans_count/missing/độ trễ nhãn](../remaining_questions/assessment.md)
+ghi 612 cấu hình không tái tạo được trans_count nguồn. Chưa dùng trans_count hoặc
+diff_trans_date nguồn làm predictor; tự tạo count/recency từ detail trước cutoff.
+Currency 11 là mã chính, các mã khác có giá trị gắn cờ ngoại tệ của dự án, currency
+null giữ unknown với cờ missing riêng. Hàm tạo cờ tại `src/mbd_mini_eda/currency.py`.
+
 ## 1. Lịch sử dài và null có ý nghĩa
 
 Giữ toàn bộ lịch sử **trước cutoff** theo từng nguồn; không yêu cầu trx, geo, dialog cùng ngày bắt đầu. Ví dụ dự đoán tháng 12/2022 thì chỉ dùng sự kiện trước 01/12/2022. Không cần dời cutoff để kéo dài quá khứ.
@@ -94,7 +110,7 @@ Nguồn: [cohorts_2022_12.csv](cohorts_2022_12.csv). Script [audit_any_product_c
 
 - **Một CatBoost binary**, log loss trên phân bố tự nhiên, NaN số và token thiếu riêng cho categorical. So sánh tăng trọng số dương vừa phải trên validation; không mặc định balanced 1:1. Nghiên cứu nền và giới hạn từng phương pháp nằm tại [bản tổng quan](../imbalance_missing_modalities_research.md).
 - Fit toàn bộ bước xử lý, PCA, mô hình và fallback chỉ trên phần quá khứ hợp lệ. Không dùng các cột phụ trợ trong targets khi chưa xác nhận thời điểm tạo.
-- Tuning cuốn chiếu trên 09–11/2022; fit cấu hình cuối trên 02–11; tháng 12 fit calibration theo quy tắc đã chọn; test khóa tháng 01/2023. Mô hình cơ sở giữ nguyên sau khi fit calibrator. Điều chỉnh thêm nếu nhãn có độ trễ công bố.
+- Tuning cuốn chiếu trên 09–11/2022; fit cấu hình cuối trên 02–11; tháng 12 fit calibration theo quy tắc đã chọn; test khóa tháng 01/2023. **Đây là protocol offline với giả định nhãn sẵn ngay khi tháng kết thúc (độ trễ 0), chưa được xác minh là lịch vận hành thực tế.** Mô hình cơ sở giữ nguyên sau khi fit calibrator. Audit 435 shard không có ngày chốt nhãn; với độ trễ dương phải dựng lại lịch tuning/train/calibration theo thời điểm sẵn có giả định. Các kịch bản 0/1/7/30 ngày và một tháng lịch được đối chiếu trong báo cáo mới, chưa có kết quả mô hình theo các kịch bản này.
 - Chỉ số chính: Recall/Precision/Lift@K theo ngân sách; AP và ROC-AUC bổ sung; log loss/calibration cho chất lượng xác suất. Báo cáo theo nhóm độ phủ, gồm cold-start; bootstrap theo khách khi gộp nhiều tháng.
 - Lịch sử dài, bất kỳ ngưỡng lọc nào và class weight chỉ được chốt sau đối chứng cùng cohort/split. Hiện không áp ngưỡng xóa khách vì thưa.
 
