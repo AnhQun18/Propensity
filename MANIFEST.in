@@ -11,5 +11,8 @@ include docs/propensity_feasibility/mon_research.md
 include configs/mbd_mini_eda.json
 include configs/propensity_data.json
 include docs/propensity_data_preparation.md
+include notebooks/README.md
+include notebooks/02_data_preparation.ipynb
+include scripts/sync_preparation_notebook.py
 recursive-include tests *.py
 recursive-include deliverables/mbd_mini_eda_fixes *.py

@@ -4,14 +4,18 @@ Repository chứa package **7 bước thống kê mô tả** và tài liệu ngh
 
 ## Chuẩn bị dữ liệu propensity
 
-Pipeline mới ở [`src/propensity_data/`](src/propensity_data/), cấu hình tại
-[`configs/propensity_data.json`](configs/propensity_data.json). Pipeline tạo một dòng
+Mở [`notebooks/02_data_preparation.ipynb`](notebooks/02_data_preparation.ipynb) để đọc
+và thực hiện quy trình theo từng cell. Notebook có đầy đủ mã xử lí, từ nhãn đến
+quarantine, feature và xuất dữ liệu. Danh mục ở [notebooks/README.md](notebooks/README.md).
+
+Helper dùng chung và CLI ở [`src/propensity_data/`](src/propensity_data/), cấu hình tại
+[`configs/propensity_data.json`](configs/propensity_data.json). Quy trình tạo một dòng
 khách–tháng, nhãn `y_any`, đặc trưng trước cutoff UTC, quarantine và lịch đánh giá;
 giữ khách thiếu nguồn, không cap cực trị hoặc gộp amount khác currency.
 Xem [hướng dẫn chuẩn bị và chạy trên máy khác](docs/propensity_data_preparation.md).
 
 **Theo yêu cầu ngày 09/11/2026: mới viết code và kiểm thử tổng hợp, chưa thực thi
-pipeline hoặc chạy kiểm thử trên máy này.** Chưa có kết quả huấn luyện mới.
+notebook, pipeline hoặc chạy kiểm thử trên máy này.** Chưa có kết quả huấn luyện mới.
 Mã chuẩn bị tách riêng khỏi EDA; output nằm trong `outputs/` và không đưa lên Git.
 Bản PDF sơ bộ cũ đã chuyển vào [kho báo cáo cũ](deliverables/archive/README.md).
 
@@ -240,7 +244,8 @@ thư mục dữ liệu, Linux/macOS và xử lý lỗi thường gặp nằm t�
 ```text
 .
 ├── docs/             # Tài liệu dự án
-├── notebooks/        # Notebook EDA
+├── notebooks/        # Xem mẫu và chuẩn bị dữ liệu theo cell
+├── scripts/          # Công cụ đồng bộ nội dung notebook
 ├── src/              # Package propensity_data, mbd_mini_eda và script audit
 ├── tests/            # Kiểm thử bằng dữ liệu tổng hợp
 ├── configs/          # Cấu hình package MBD-mini

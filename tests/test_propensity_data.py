@@ -66,7 +66,7 @@ class PreparationTests(unittest.TestCase):
                     targets[f"target_{i}"].append(value)
         self.targets = targets
         self.write("targets", targets)
-        from propensity_data.pipeline import CATEGORIES
+        from propensity_data.schema import CATEGORIES
         rows = 7
         self.trx = {
             "client_id": ["a", "a", "a", "a", "a", "outside", "a"],

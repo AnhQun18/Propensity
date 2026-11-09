@@ -1,6 +1,10 @@
 # Chuẩn bị dữ liệu propensity any-product
 
-Pipeline mới nằm riêng tại `src/propensity_data/`; package `mbd_mini_eda` tiếp tục
+Quy trình để đọc và chạy từng bước nằm tại
+[`notebooks/02_data_preparation.ipynb`](../notebooks/02_data_preparation.ipynb).
+Notebook có đầy đủ mã xử lí và SQL, chia riêng cấu hình, nhãn, từng nguồn log,
+feature theo tháng và hoàn tất. Các cell định nghĩa đồng bộ với helper trong
+`src/propensity_data/`; package `mbd_mini_eda` tiếp tục
 phục vụ thống kê mô tả. Pipeline này **chưa được chạy trên dữ liệu thật hoặc chạy
 kiểm thử tại máy hiện tại**, theo yêu cầu ngày 09/11/2026. Các ví dụ bên dưới dành
 cho máy sẽ thực thi sau này. Chưa có training features hoặc kết quả mô hình mới.
@@ -12,7 +16,7 @@ Dùng **Python >=3.11**, dữ liệu gốc có `client_split/`, `targets/`, `det
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[prepare]"
+.\.venv\Scripts\python.exe -m pip install -e ".[prepare,notebook]"
 Copy-Item configs/propensity_data.json configs/propensity_data.local.json
 ```
 
@@ -21,6 +25,16 @@ file JSON. Cấu hình mặc định dùng DuckDB 6 GB, hai luồng; đây là g
 không phải cam kết tổng RAM tiến trình. Cần dung lượng đĩa cho bản chuẩn hóa, spill,
 audit và features; chưa đo dung lượng hoặc thời gian trên raw. Không nạp toàn bộ
 log thành pandas DataFrame. Tắt embedding mặc định để giảm chi phí baseline.
+
+Mở `notebooks/02_data_preparation.ipynb`, chọn kernel đã cài dependency rồi thực hiện
+cell theo thứ tự. Mục 1–4 định nghĩa quy tắc và helper; từ mục 5 bắt đầu đọc raw và
+ghi output. Nhãn, trx, geo, dialog và tạo feature có bước riêng để xem kiểm kê.
+Hàm `iter_supervised_batches` chỉ trả dòng có nhãn hợp lệ cho bước mô hình, không
+xóa các dòng chưa có nhãn khỏi quần thể scoring.
+
+Notebook mới chưa thực thi, mọi output trống. Mã helper tương ứng chia theo nhiệm
+vụ trong `src/propensity_data/{schema,storage,quality,features,protocol,config}.py`.
+Nếu cần dùng terminal thay cho notebook, các lệnh CLI bên dưới vẫn được hỗ trợ.
 
 ```powershell
 # Chỉ đọc cấu hình, không mở raw hoặc tạo output.
