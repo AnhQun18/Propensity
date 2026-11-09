@@ -33,6 +33,93 @@ cho phép hoàn tất phân vị, tần suất mã và kiểm tra trùng trên t
 Kết quả đã chạy nằm tại [báo cáo 7 bước](docs/mbd_mini_eda/report.md).
 Xem [kiểm kê cuối và giới hạn diễn giải](docs/mbd_mini_eda_audit.md).
 
+## Rà soát bước 1 và bước 2 — 09/11/2026
+
+Đối chiếu tài liệu và kết quả hiện có trong repository với hai bước **Hiểu yêu cầu /
+Hiểu nghiệp vụ (Business Understanding)** và **Hiểu dữ liệu (Data Understanding)**:
+**bước 1 chưa hoàn chỉnh; bước 2 đã khá đầy đủ về kỹ thuật, còn một số giới hạn
+về ý nghĩa dữ liệu cần xác nhận**.
+
+### 1. Hiểu yêu cầu / Hiểu nghiệp vụ (Business Understanding)
+
+Yêu cầu: xác định mục tiêu kinh doanh, đánh giá hiện trạng, đặt mục tiêu kỹ thuật
+của việc khai thác dữ liệu và lập kế hoạch triển khai.
+
+| Nội dung cần có | Đánh giá hiện tại |
+| --- | --- |
+| Mục tiêu kinh doanh | Có định hướng dự đoán khả năng mua; chưa xác định rõ ai sử dụng kết quả, dùng cho quyết định nào và lợi ích cần đạt. |
+| Đánh giá hiện trạng | Đã đánh giá dữ liệu, mất cân bằng nhãn, thiếu nguồn và giới hạn tài nguyên; chưa có hiện trạng quy trình chọn khách hoặc hiệu quả kinh doanh để đối chiếu. |
+| Mục tiêu kỹ thuật | Đã định nghĩa nhãn, cutoff, lịch sử đầu vào, cách chia thời gian và chỉ số đánh giá; chưa có ngưỡng thành công cụ thể. |
+| Kế hoạch triển khai | Có hướng thực nghiệm; chưa có kế hoạch gồm mốc công việc, đầu ra, người phụ trách và điều kiện nghiệm thu. |
+
+**Điểm cần sửa trước tiên là thống nhất bài toán.**
+[Thiết kế mới](docs/propensity_feasibility/any_product/design.md) dùng **một xác suất
+mua ít nhất một trong bốn sản phẩm**, trong khi [DATASETS.md](DATASETS.md) vẫn mô tả
+**bốn xác suất riêng**. Hai đầu ra phục vụ những quyết định khác nhau. Đây là điểm
+chưa thống nhất giữa các tài liệu tại thời điểm rà soát.
+
+Để hoàn thiện bước này, cần bổ sung:
+
+- **Mục đích sử dụng:** chẳng hạn xếp hạng khách để ưu tiên liên hệ hằng tháng.
+  Đây cần được ghi là mục tiêu đã xác nhận hoặc giả định của đề tài.
+- **Tiêu chí thành công:** chọn bao nhiêu khách mỗi tháng — K hoặc tỷ lệ top-K;
+  so với cách chọn nào; yêu cầu Recall/Lift@K và chi phí xử lý ra sao.
+- **Phạm vi:** khách hiện hữu hay khách mới, một nhãn any-product hay từng sản phẩm,
+  đầu ra nghiên cứu hay hệ thống sử dụng thực tế.
+- **Kế hoạch:** hoàn thiện dữ liệu → tạo đặc trưng → baseline → đối chứng → đánh giá
+  → bàn giao, với đầu ra và điều kiện hoàn thành từng phần.
+
+Chưa có kết quả huấn luyện **không làm bước 1 thiếu**; phần còn thiếu là mục tiêu
+và cách xác định dự án thành công.
+
+### 2. Hiểu dữ liệu (Data Understanding)
+
+Yêu cầu: thu thập dữ liệu ban đầu, mô tả dữ liệu, khám phá dữ liệu (EDA) và kiểm tra
+chất lượng để phát hiện thiếu sót hoặc bất thường.
+
+| Nội dung cần có | Đánh giá hiện tại |
+| --- | --- |
+| Thu thập dữ liệu ban đầu | Đã ghi nguồn, vị trí lưu, định dạng và kiểm kê 3.820 file Parquet. |
+| Mô tả dữ liệu | Có từ điển, schema, khóa nối, đơn vị quan sát, quy mô và phạm vi thời gian. |
+| Khám phá dữ liệu | Có 61 bảng, 24 hình: phân phối, độ phủ nguồn, thời gian, nhãn, hành vi và ngoại lai. |
+| Kiểm tra chất lượng | Có kiểm tra null, duplicate, khóa, timestamp, amount, embedding và đối chiếu detail–ptls. |
+
+Các phát hiện chất lượng đã được ghi nhận rõ:
+
+- **Không thiếu bốn nhãn gốc**, không trùng khóa khách–tháng.
+- `diff_trans_date` thiếu **120.786 dòng, khoảng 10,04%**; đây là thiếu thuộc tính
+  phụ trợ, không phải thiếu nhãn.
+- Có **468 khách không có log** trong toàn lịch sử; thiết kế hiện tại giữ nhóm này.
+- Không có trùng nguyên dòng; có **một ứng viên giao dịch cùng khách và timestamp**,
+  cần phân biệt với giao dịch trùng thật.
+- `ptls/trx` ít hơn `detail/trx` **2.020.020 sự kiện ở 13 khách**; dùng `detail`
+  làm nguồn lịch sử đầy đủ.
+- Nhãn any-product có tỷ lệ dương khoảng **1,07%**, vẫn mất cân bằng mạnh.
+
+Bằng chứng và cách diễn giải nằm trong
+[kiểm kê EDA](docs/mbd_mini_eda_audit.md),
+[kiểm kê nguồn](docs/mbd_inventory/assessment.md),
+[từ điển dữ liệu](docs/dict/mbd_mini.md),
+[báo cáo EDA](docs/mbd_mini_eda/report.md) và
+[thiết kế any-product](docs/propensity_feasibility/any_product/design.md).
+
+Những phần còn chưa xác minh được gồm **tên nghiệp vụ của bốn sản phẩm, đơn vị
+amount và mapping currency, timezone, công thức/thời điểm tạo các trường phụ trợ,
+nguyên nhân thiếu nguồn**. Cần quản lý chúng thành danh sách giả định và giới hạn
+sử dụng; chưa có căn cứ để tự gán ý nghĩa hoặc loại dữ liệu.
+
+### Kiểm chứng và điều kiện chuyển bước
+
+Ngày 09/11/2026 đã chạy lại bộ xác nhận: **225/225 kiểm tra đạt** cho báo cáo, bảng,
+hình, cache và dữ liệu mẫu. Lần rà soát này không quét lại toàn bộ dữ liệu gốc.
+Kết quả của lần chạy được lưu cục bộ tại
+`outputs/business_data_understanding_review_20261109/docs/mbd_mini_eda_validation.json`;
+snapshot xác nhận EDA đã lưu trong Git nằm tại
+[docs/mbd_mini_eda_validation.json](docs/mbd_mini_eda_validation.json).
+
+Có thể tiếp tục bước chuẩn bị dữ liệu theo thiết kế hiện tại, đồng thời hoàn thiện
+mục tiêu nghiệp vụ và thống nhất tài liệu trước khi chốt đánh giá mô hình.
+
 ## Setup trên máy khác
 
 Yêu cầu Python 3.10 trở lên và dữ liệu MBD-mini đã giải nén. Tải toàn bộ repo
