@@ -1,0 +1,19 @@
+{
+  "checked_on": "2026-11-08",
+  "rows": 1202688,
+  "clients": 100224,
+  "positive_rows": 12854,
+  "negative_rows": 1189834,
+  "unknown_label_rows": 0,
+  "raw_label_null_cells": 0,
+  "positive_rate": 0.010687726160068115,
+  "expected_client_months": 1202688,
+  "missing_client_month_rows": 0,
+  "cohort_cutoff": "2022-12-01",
+  "cohort_label_month": "2022-12",
+  "cohort_recent_history": "[2022-09-01, 2022-12-01); three calendar months, not 84 days",
+  "cohort_history": "All available cached raw events strictly before cutoff; includes partial boundary days.",
+  "source_fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "cohort_note": "Rows overlap except no-history / old-history-only / recent-history partition. Descriptive, not threshold tuning.",
+  "model_fitted": false
+}

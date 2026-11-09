@@ -8,6 +8,12 @@ duplicate toàn bộ, nhóm độ phủ có chủ đích, biểu đồ tuyến t
 [danh mục bảng/biến](docs/mbd_mini_eda/data_catalog.md),
 [mẫu phân tầng 1.000 khách](sampledata/README.md).
 
+Báo cáo xuất bản nằm trong [deliverables/mbd-mini-full-report](deliverables/mbd-mini-full-report/README.md).
+Thiết kế mới cho nhãn mua bất kỳ sản phẩm nào và kết quả audit nằm tại
+[any-product](docs/propensity_feasibility/any_product/design.md).
+Gói ZIP mẫu/báo cáo trùng lặp đã được dọn; tải repository bằng **Code → Download ZIP**
+để nhận dữ liệu mẫu, notebook và báo cáo cùng nhau.
+
 ```powershell
 .\.venv\Scripts\python.exe -u -X utf8 src/review_mbd_eda.py
 ```

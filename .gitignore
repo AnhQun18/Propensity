@@ -42,3 +42,7 @@ configs/*.local.json
 
 # Local report exports; published copies live in deliverables/.
 /output/
+
+# Redundant bundles and copied presentation templates.
+/MBD-mini_propensity_sample_report.zip
+/deliverables/propensity-pitch/template-origin.html.txt

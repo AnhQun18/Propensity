@@ -10,7 +10,7 @@ sổ 84 ngày trong deck là đề xuất thử nghiệm, không phải quy tắ
 - In từ trình duyệt để lưu PDF theo chế độ landscape; mỗi slide một trang.
 - HTML chứa toàn bộ CSS, SVG và runtime. Các link nguồn cuối deck trỏ về docs trong workspace; nếu chuyển deck sang máy khác, mang theo docs để giữ link.
 - Dựa trên template pitch-deck và layout KPI của html-ppt; thiết kế lại bằng token kem/xanh ngọc/cam nhạt. Không nhúng ảnh biểu đồ report.
-- build_pitch_deck.py ở workspace là script tái tạo. Chỉ sử dụng số liệu tổng hợp, không có client ID.
+- Chỉ sử dụng số liệu tổng hợp, không có client ID. Các script dựng pitch cũ đã được dọn vì phụ thuộc vào bảng không còn trong repo; dùng trực tiếp bản HTML đã lưu.
 
 Nguồn: docs/mbd_mini_eda/report.md và tables; docs/mbd_temporal_coverage/assessment.md; docs/propensity_feasibility/assessment.md; docs/propensity_feasibility/last_month_purchase/assessment.md.
 Các bước mô hình, chia tập và metric trong deck là đề xuất, chưa phải kết quả huấn luyện.
