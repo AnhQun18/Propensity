@@ -2,6 +2,11 @@
 
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
 
+**Báo cáo baseline:** [BASELINE_REPORT.md](BASELINE_REPORT.md) trình bày bài toán,
+ý tưởng, input, công việc đã thực hiện, output và kết quả thực nghiệm so với rule
+mua tháng trước. Baseline dùng **trx + geo + dialog**, đạt Recall@1% validation
+trung bình **8,70%**, so với **6,18%** của rule; test 01/2023 chưa được đánh giá.
+
 ## Chuẩn bị dữ liệu propensity
 
 Mở [`notebooks/03_data_processing.ipynb`](notebooks/03_data_processing.ipynb) để đọc
@@ -23,14 +28,25 @@ giữ output trống và mới được kiểm thử trên dữ liệu tổng h�
 `outputs/notebook_execution_20261110_01/`. Notebook nguồn giữ output trống.
 Schema v2 khóa 221 predictor mặc định theo tên/thứ tự/dtype; CLI và hai notebook
 dùng chung kiểm tra dữ liệu trước `ready`. Đã kiểm thử tổng hợp và kiểm tra lại
-output thật bằng quy tắc mới, không tái tạo features. Chưa có kết quả huấn luyện mới.
+output thật bằng quy tắc mới, không tái tạo features. Kết quả baseline calendar mới
+được ghi trong [báo cáo baseline](BASELINE_REPORT.md).
 Mã chuẩn bị tách riêng khỏi EDA; output nằm trong `outputs/` và không đưa lên Git.
 Bản PDF sơ bộ cũ đã chuyển vào [kho báo cáo cũ](deliverables/archive/README.md).
 
 **Rà soát trước baseline:** [báo cáo 09/11](docs/propensity_feasibility/baseline_readiness/assessment.md)
 là snapshot lịch sử; [bản xử lí tồn đọng 10/11](docs/preprocessing_fixes_20261110.md)
 ghi trạng thái hiện tại. Cờ currency unknown đã sửa và kiểm thử đạt. Feature src/dst
-hiện chỉ có cardinality/missing. Trainer/evaluator/calibrator chưa được xây dựng.
+hiện chỉ có cardinality/missing. Luồng baseline mới đã được triển khai tại
+[`src/propensity_baseline/`](src/propensity_baseline/), có tạo feature **tháng lịch
+gần nhất + lịch sử cũ**, hai baseline CatBoost đa nguồn đã chạy, hỗ trợ thêm đối
+chứng chỉ trx, calibration và test tách bước.
+Đọc [đặc tả và lệnh chạy](docs/propensity_baseline_design.md), hoặc dùng
+[notebook 05](notebooks/05_calendar_baseline.ipynb). Luồng mới dùng schema v3/output
+riêng; đã kiểm thử tổng hợp, tạo đủ 12 tháng feature thật và chạy validation
+cuốn chiếu 09–11/2022. Xem [kết quả với rule mua tháng trước](BASELINE_REPORT.md).
+Baseline mặc định hiện dùng **trx + geo + dialog** (dialog metadata), với
+`multi_recent`/`multi_history`. Lệnh `compare-rule` so sánh cùng cohort/ngân sách
+với `y_hat(M)=y_any(M−1)`; giữ unknown khi thiếu nhãn trước hoặc nhãn chưa sẵn.
 Cờ `cold_start` dùng cả ba nguồn chỉ dùng để phân nhóm báo cáo trong baseline
 "chỉ trx". Giữ giả định UTC, nhãn any-product và độ trễ nhãn 0.
 
@@ -43,6 +59,9 @@ duplicate toàn bộ, nhóm độ phủ có chủ đích, biểu đồ tuyến t
 Báo cáo xuất bản nằm trong [deliverables/mbd-mini-full-report](deliverables/mbd-mini-full-report/README.md).
 Thiết kế mới cho nhãn mua bất kỳ sản phẩm nào và kết quả audit nằm tại
 [any-product](docs/propensity_feasibility/any_product/design.md).
+Biểu đồ cập nhật cho nhãn gộp `target_any` (`y_any`):
+[PNG](docs/propensity_feasibility/any_product/target_any_by_month.png) ·
+[SVG](docs/propensity_feasibility/any_product/target_any_by_month.svg).
 Gói ZIP mẫu/báo cáo trùng lặp đã được dọn; tải repository bằng **Code → Download ZIP**
 để nhận dữ liệu mẫu, notebook và báo cáo cùng nhau.
 
@@ -66,6 +85,9 @@ Kết quả đã chạy nằm tại [báo cáo 7 bước](docs/mbd_mini_eda/repo
 Xem [kiểm kê cuối và giới hạn diễn giải](docs/mbd_mini_eda_audit.md).
 
 ## Rà soát bước 1 và bước 2 — 09/11/2026
+
+Phần dưới giữ đánh giá tại ngày 09/11. Kết quả baseline đã thực hiện sau thời điểm
+đó được cập nhật trong [báo cáo baseline ngày 10/11](BASELINE_REPORT.md).
 
 Đối chiếu tài liệu và kết quả hiện có trong repository với hai bước **Hiểu yêu cầu /
 Hiểu nghiệp vụ (Business Understanding)** và **Hiểu dữ liệu (Data Understanding)**:

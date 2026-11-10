@@ -11,3 +11,7 @@ notebook, lưu bản thực thi và log vào thư mục mới bên trong `output
 đã xuất mà không tạo lại features. Thêm `--upgrade-contract` để nâng metadata
 schema cũ lên v2 sau khi tất cả tháng đạt; metadata cũ được sao lưu. Xem
 [hướng dẫn](../docs/propensity_data_preparation.md).
+
+`report_baseline_rule.py --config configs/propensity_baseline.json --output FILE.md`
+tạo báo cáo Markdown chỉ gồm số liệu tổng hợp từ so sánh rule đã ready; từ chối
+ghi đè file báo cáo có sẵn. Không fit mô hình hoặc mở test.

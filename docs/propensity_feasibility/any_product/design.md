@@ -56,6 +56,16 @@ Toàn kỳ có 1.189.834 dòng âm, khoảng 92,57 âm cho một dương. Đây 
 
 Nguồn: [summary.json](summary.json), [monthly.csv](monthly.csv). Kết quả khớp bảng phân bố số sản phẩm mua đã có trong EDA.
 
+Biểu đồ nhãn gộp cập nhật ngày 09/11/2026 (`target_any` là tên hiển thị của `y_any`):
+
+![Tỷ lệ nhãn target_any dương theo tháng](target_any_by_month.png)
+
+Số cạnh điểm là số mẫu dương, mỗi tháng có 100.224 khách; trục Y tuyến tính được
+phóng và không bắt đầu từ 0. Tỷ lệ toàn kỳ tính bằng tổng mẫu dương chia tổng
+khách–tháng có nhãn. [SVG để chỉnh sửa/xuất bản](target_any_by_month.svg).
+Chạy lại bằng `.\.venv\Scripts\python.exe -B -X utf8 src/plot_target_any.py` từ bảng
+audit hiện có; lệnh chỉ vẽ biểu đồ, không chạy pipeline chuẩn bị dữ liệu hoặc mô hình.
+
 ## 3. Loại mẫu mất target ở đúng đơn vị khách–tháng
 
 Chính sách: **không dùng dòng không xác định được y_any để huấn luyện supervised hoặc tính metric**. Không xóa cả client_id chỉ vì một tháng mất nhãn; các tháng khác có nhãn vẫn dùng được. Khách không có nhãn ở thời điểm cần dự đoán vẫn có thể thuộc tập inference. Không điền nhãn mất thành 0.

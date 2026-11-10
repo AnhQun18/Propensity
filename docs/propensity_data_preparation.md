@@ -1,5 +1,12 @@
 # Chuẩn bị dữ liệu propensity any-product
 
+**Luồng baseline bổ sung 10/11/2026:** [đặc tả tháng lịch + lịch sử cũ](propensity_baseline_design.md)
+và [notebook 05](../notebooks/05_calendar_baseline.ipynb) tái sử dụng cache chuẩn
+hóa của notebook 03 để tạo schema v3/output mới, rồi tune/fit/calibration/test.
+Luồng cũ bên dưới giữ cửa sổ 30/84 ngày + all và schema v2. Notebook 04 chỉ hỗ
+trợ schema v2; trainer mới đọc trực tiếp các file tháng v3. Đã có validation
+thật trong [báo cáo baseline](../BASELINE_REPORT.md).
+
 Quy trình hiện tại để đọc và chạy từng bước nằm tại
 [`notebooks/03_data_processing.ipynb`](../notebooks/03_data_processing.ipynb),
 viết ngày 10/11/2026, có bảng mục tiêu/cách làm/đầu ra cho 12 bước.

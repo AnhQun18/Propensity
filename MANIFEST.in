@@ -11,11 +11,17 @@ include docs/propensity_feasibility/mon_research.md
 include configs/mbd_mini_eda.json
 include configs/propensity_data.json
 include configs/propensity_processing.json
+include configs/propensity_calendar.json configs/propensity_baseline.json
+include docs/propensity_baseline_design.md
+include BASELINE_REPORT.md
+include docs/baseline_rule_comparison_20261110.md
 include docs/propensity_data_preparation.md
 include notebooks/README.md
 include notebooks/02_data_preparation.ipynb
 include notebooks/03_data_processing.ipynb
 include notebooks/04_merge_processed.ipynb
+include notebooks/05_calendar_baseline.ipynb
 include scripts/sync_preparation_notebook.py
+include scripts/report_baseline_rule.py
 recursive-include tests *.py
 recursive-include deliverables/mbd_mini_eda_fixes *.py

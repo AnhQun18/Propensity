@@ -5,14 +5,15 @@ CATEGORIES = ("event_type", "event_subtype", "src_type11", "src_type12", "dst_ty
               "dst_type12", "src_type21", "src_type22", "src_type31", "src_type32")
 
 
-def feature_schema(config) -> dict:
+def feature_schema(config, *, window_tags=None) -> dict:
     """Approved names, order and DuckDB types; never infer predictors from input."""
     excluded = ["client_id", "cutoff", "y_any", *LABELS, "supervised_eligible"]
     dtypes = {"client_id": "VARCHAR", "cutoff": "TIMESTAMP", "y_any": "TINYINT",
               **{c: "DOUBLE" for c in LABELS}, "supervised_eligible": "BOOLEAN"}
     for source in SOURCES:
-        for days in (*config.windows_days, None):
-            prefix = f"{source}_{'all' if days is None else str(days) + 'd'}_"
+        tags = window_tags if window_tags is not None else [*(str(d) + 'd' for d in config.windows_days), 'all']
+        for tag in tags:
+            prefix = f"{source}_{tag}_"
             window = {
                 "source_window_overlap_days": "DOUBLE", "history_truncated": "TINYINT",
                 "has_event": "TINYINT", "event_count": "BIGINT", "active_days": "BIGINT",
@@ -38,7 +39,7 @@ def feature_schema(config) -> dict:
                                "event_type_top_share": "DOUBLE", "event_subtype_top_share": "DOUBLE"})
             elif source == "geo":
                 window["top_geohash_6_share"] = "DOUBLE"
-            elif config.include_dialog_embeddings and days == config.embedding_window_days:
+            elif config.include_dialog_embeddings and tag == str(config.embedding_window_days) + 'd':
                 window["valid_embedding_count"] = "BIGINT"
                 for pooling in ("mean", "last"):
                     window.update({f"embedding_{pooling}_{i}": "DOUBLE"
@@ -50,7 +51,7 @@ def feature_schema(config) -> dict:
     dtypes["cold_start"] = "TINYINT"
     predictors = [c for c in dtypes if c not in excluded]
     return {
-        "schema_version": 2, "columns": list(dtypes), "dtypes": dtypes,
+        "schema_version": 2 if window_tags is None else 3, "columns": list(dtypes), "dtypes": dtypes,
         "keys": ["client_id", "cutoff"], "target": "y_any", "excluded_from_predictors": excluded,
         "predictors": predictors,
         "groups": {s: [c for c in predictors if c.startswith(s + '_')] for s in SOURCES},

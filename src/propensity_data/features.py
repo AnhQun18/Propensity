@@ -3,20 +3,28 @@ from .schema import CATEGORIES, LABELS, SOURCES
 from .storage import assert_empty, export, literal
 
 
-def window_features(con, source, cutoff, days, config, out):
+def window_features(con, source, cutoff, days, config, out, *, tag=None,
+                    lower_bound=None, upper_bound=None):
     """Aggregate one source/window before joining to the customer universe."""
-    tag = "all" if days is None else f"{days}d"
+    tag = tag or ("all" if days is None else f"{days}d")
     prefix = f"{source}_{tag}_"
     end = f"TIMESTAMP {literal(cutoff)}"
+    window_end = f"TIMESTAMP {literal(upper_bound)}" if upper_bound is not None else end
     lower = "" if days is None else f"AND event_time >= {end} - INTERVAL {days} DAY"
-    con.execute(f"CREATE OR REPLACE TEMP VIEW events AS SELECT * FROM {source} WHERE event_time < {end} {lower}")
+    if lower_bound is not None:
+        lower = f"AND event_time >= TIMESTAMP {literal(lower_bound)}"
+    con.execute(f"CREATE OR REPLACE TEMP VIEW events AS SELECT * FROM {source} WHERE event_time < {window_end} {lower}")
     scope_start = con.execute("SELECT first_valid_event FROM source_bounds WHERE source = ?", [source]).fetchone()[0]
     start = f"TIMESTAMP {literal(scope_start)}" if scope_start else "NULL::TIMESTAMP"
     # Use source start only: a future last-event timestamp must not define coverage.
     overlap_start = start if days is None else f"greatest({start}, {end} - INTERVAL {days} DAY)"
-    overlap = f"CASE WHEN {start} IS NULL THEN 0 ELSE greatest(0, epoch({end} - {overlap_start}) / 86400.0) END"
-    truncated = (f"({start} IS NULL OR {start} >= {end})" if days is None else
+    if lower_bound is not None:
+        overlap_start = f"greatest({start}, TIMESTAMP {literal(lower_bound)})"
+    overlap = f"CASE WHEN {start} IS NULL THEN 0 ELSE greatest(0, epoch({window_end} - {overlap_start}) / 86400.0) END"
+    truncated = (f"({start} IS NULL OR {start} >= {window_end})" if days is None else
                  f"({start} IS NULL OR {start} > {end} - INTERVAL {days} DAY)")
+    if lower_bound is not None:
+        truncated = f"({start} IS NULL OR {start} > TIMESTAMP {literal(lower_bound)})"
     numeric = {
         "event_count": "count(*)", "active_days": "count(DISTINCT cast(event_time AS DATE))",
         "days_since_last_event": f"epoch({end} - max(event_time)) / 86400.0",

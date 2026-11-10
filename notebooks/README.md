@@ -6,6 +6,14 @@
 | [02_data_preparation.ipynb](02_data_preparation.ipynb) | Chuẩn hóa nhãn/log, feature khách–tháng, audit và protocol | Raw `data/MBD-mini/` hoặc đường dẫn cấu hình |
 | [03_data_processing.ipynb](03_data_processing.ipynb) | Quy trình xử lí hiện tại, có bảng các bước, kiểm tra ma trận và tách supervised/unlabelled | Raw theo `configs/propensity_processing.json` |
 | [04_merge_processed.ipynb](04_merge_processed.ipynb) | Ghép các bảng khách–tháng đã nối nguồn thành một Parquet, đối soát và lưu vào `processed/` | Output ready/schema v2 của notebook 03 |
+| [05_calendar_baseline.ipynb](05_calendar_baseline.ipynb) | Tạo feature tháng lịch gần nhất/lịch sử cũ; tune, fit/calibration và test riêng | Cache chuẩn hóa ready của notebook 03, qua module `propensity_baseline` |
+
+Notebook 05 theo [đặc tả baseline](../docs/propensity_baseline_design.md), dùng
+schema v3/output độc lập; không cần chạy notebook 04 trước. Chưa chạy notebook
+05 trực tiếp trên dữ liệu thật; các lệnh module đã tạo feature và chạy
+validation thật, có [báo cáo baseline](../BASELINE_REPORT.md).
+Notebook có thể đọc lại output ready đã khóa để xem kết quả mà không ghi đè.
+Tập test có cờ `OPEN_FINAL_TEST=False`, chỉ đổi sau khi chốt thiết kế/mô hình.
 
 Sau notebook 03, dùng notebook 04 nếu cần một bảng hợp nhất: mặc định xuất
 `processed/propensity.parquet`, giữ đủ các nguồn, khóa và nhãn. Kèm manifest,
@@ -36,6 +44,7 @@ có thể cập nhật notebook trên máy được phép thao tác:
 python scripts/sync_preparation_notebook.py
 ```
 
-Công cụ đồng bộ notebook 02, 03 và 04 bằng văn bản, không execute cell hoặc đọc dataset. Các cell điều
+Công cụ đồng bộ notebook 02, 03 và 04 bằng văn bản, không execute cell hoặc đọc dataset.
+Notebook 05 gọi module trực tiếp, không thuộc công cụ đồng bộ này. Các cell điều
 phối được giữ nguyên. Không commit output, ma trận hoặc dữ liệu khách hiển thị từ
 lần chạy cục bộ. Xem [quy tắc và cấu hình](../docs/propensity_data_preparation.md).
