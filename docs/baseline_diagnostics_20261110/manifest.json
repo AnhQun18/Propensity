@@ -1,0 +1,34 @@
+{
+  "scope": "Saved validation predictions only; no fitting or test prediction evaluation",
+  "months": [
+    "2022-09",
+    "2022-10",
+    "2022-11"
+  ],
+  "winner": "multi_history",
+  "seed": 20261110,
+  "input_sha256": {
+    "outputs\\propensity_baseline_geo_dialog_v1\\manifest.json": "acad0a145eb3745532bdfc99f2e1c8eca185e4247c3d33ceade3c81543e8fba7",
+    "outputs\\propensity_baseline_geo_dialog_v1\\selection.json": "de02c50252ed48077efde879b5f2fa9a765fb2eb4b997075109d0182f26de987",
+    "outputs\\propensity_baseline_geo_dialog_v1\\validation_metrics.json": "e1e1e2aa42ac59ec83d32db6354f23fbcc18f13a22422874c7c1f2f11c9a17dd",
+    "outputs\\propensity_baseline_geo_dialog_v1\\validation_predictions.parquet": "acd9cc09be4ddc2f025b75d0c78b891eae4b29068944b839f481c8baae032d8e",
+    "outputs\\propensity_baseline_geo_dialog_v1\\rule_validation\\rule_predictions.parquet": "841865ba4ee108221688cd109dca0d2d1a84944088066a35ca10f46e4835e929",
+    "docs\\propensity_feasibility\\any_product\\monthly.csv": "07e2d4991cdf4f6a8ff314af778e0af42ef4921f0d3ce820e4eb788c8375a37b",
+    "outputs\\propensity_baseline_geo_dialog_v1\\final\\model.cbm": "3d1ca139ae979f9984ee404b6556817d3dd96911bee97629c7a1b07daf99c106",
+    "outputs\\propensity_calendar_v2\\protocol.json": "4eb01e3ff94325e2da4db8afed2d31d675c42f20cb1f954f1bfb26b657cdf9b3",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-02\\part.parquet": "23978f0ab80d6d31c71a4ec75ccd051b4fd9d97286bed3149a2bada47b9fd3b8",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-03\\part.parquet": "be85fb7c03b769f2b18b788b6cab78b075c28f5870aabf7225f2be82dc788c5f",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-04\\part.parquet": "22136d602c58bc00114de21e7430763e7e2d7d7e4b2d238e8eccca284dc80163",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-05\\part.parquet": "4aa6716cbbc6173820e645c4eb19caf8ee31efb03e884797b2443d9d10dfe0d7",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-06\\part.parquet": "e3b860092d1ca59a7be85b5bd4d0909dbdb37be66dc20d4d60ed54c02afd7020",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-07\\part.parquet": "89c31a904635df6119e7beb2d5f6dfabc40ce5fae1cfbc2aee3b7cdf061cfb03",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-08\\part.parquet": "1112ec5773a1bcc5a2162a78b38f3b5068058c775ecf4847313c843974c9ad05",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-09\\part.parquet": "a757b3e96c0691ae6cf5fc21b4599b07006ca7491062087da3834fbf351794c9",
+    "outputs\\propensity_calendar_v2\\features\\month=2022-10\\part.parquet": "9bc287a287bfa87a572dbf735bd20a389b1d623bf48d1b24fe965d3f0a66cc54"
+  },
+  "history_definition": "Observed labels from 2022-02 strictly before each cutoff; not lifetime purchases",
+  "segment_selection": "Select global top 1%, then restrict; subgroup denominators kept separate",
+  "validation_selection_bias": "Exploratory: these months already selected the model",
+  "learning_curve": "Final base training Logloss only; no saved fold validation/AP curves; not evidence of underfit",
+  "test_summary": "January aggregate label counts were already published; no test prediction file read"
+}

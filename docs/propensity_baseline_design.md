@@ -5,6 +5,13 @@ Ngày: 10/11/2026. Đã triển khai và chạy baseline trên MBD-mini: feature
 [báo cáo baseline và so sánh với rule mua tháng trước](../BASELINE_REPORT.md).
 Kiểm thử bằng fixture được phân biệt với metric thực nghiệm trên dữ liệu thật.
 
+**Rà soát sau phản biện:** đặc tả dưới mô tả run hành vi đã khóa, không phải
+kiến trúc cuối. [Mục 9 của báo cáo](../BASELINE_REPORT.md#9-đối-chiếu-phản-biện-và-thứ-tự-ưu-tiên)
+điều chỉnh ưu tiên: đối chứng lịch sử target đã khả dụng và kết hợp hành vi;
+thử cửa sổ 7/14/30/90 ngày, ablation nguồn và learning curve trong run mới.
+Chẩn đoán nhiều K/phân nhóm/overlap đã tính từ dự đoán validation cũ; các model
+nâng cấp chưa train. Nhãn tháng hiện có chưa đủ dựng target trượt 30 ngày theo tuần.
+
 **Cập nhật theo yêu cầu tiếp theo:** baseline mặc định dùng cả **trx + geo +
 dialog**, với hai biến thể `multi_recent` và `multi_history`. Trx-only giữ làm
 đối chứng tùy chọn. Đã bổ sung rule `y_hat(M)=y_any(M−1)` và lệnh `compare-rule`.
@@ -79,7 +86,8 @@ không undersample, không class weight ở vòng đầu. Seed 20261110, hai thr
 Baseline mặc định mới: depth 4, 200 cây, learning rate 0,04, L2 leaf 5.
 Hai biến thể đa nguồn × một cấu hình × ba fold = sáu lần fit validation.
 Grid 4/6 × 200/500 cây vẫn có thể cấu hình cho nghiên cứu tiếp theo, với cùng
-lịch đánh giá. Không early stopping để tránh thêm tập chọn số cây.
+lịch đánh giá. Run đã khóa không dùng early stopping; nghiên cứu tiếp theo cần
+learning curve và tập dừng bên trong train để đánh giá số cây phù hợp.
 Đây là điểm xuất phát có giới hạn tính toán, không phải thông số tối ưu đã biết.
 
 | Bước | Nhãn train | Tháng đánh giá |

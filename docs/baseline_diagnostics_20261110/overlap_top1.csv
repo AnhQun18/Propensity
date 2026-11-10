@@ -1,0 +1,4 @@
+month,k,common,overlap_fraction,jaccard,ml_selected_prior_buyers,ml_selected_observed_ever_buyers,ml_hits_prior_buyers,ml_hits_no_prior_purchase,ml_hits_no_observed_purchase,common_hits,ml_only_hits,rule_only_hits
+2022-09,1003,185,0.18444666001994017,0.1015925315760571,203,379,17,63,55,14,66,43
+2022-10,1003,139,0.13858424725822532,0.07445099089448312,139,357,10,66,52,10,66,45
+2022-11,1003,139,0.13858424725822532,0.07445099089448312,139,330,9,73,64,9,73,48

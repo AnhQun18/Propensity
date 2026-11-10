@@ -15,3 +15,13 @@ schema cũ lên v2 sau khi tất cả tháng đạt; metadata cũ được sao l
 `report_baseline_rule.py --config configs/propensity_baseline.json --output FILE.md`
 tạo báo cáo Markdown chỉ gồm số liệu tổng hợp từ so sánh rule đã ready; từ chối
 ghi đè file báo cáo có sẵn. Không fit mô hình hoặc mở test.
+
+`review_baseline.py --output OUTPUT_DIR` kiểm tra lại dự đoán validation đã lưu,
+xuất CSV tổng hợp nhiều K, nhóm theo lịch sử mua trước cutoff, overlap với rule,
+cumulative gain và biểu đồ tỷ lệ nhãn. Script đối chiếu metric cũ, kiểm tra hash
+nguồn, trích đường train Logloss từ model cuối, từ chối ghi đè output và không
+train hoặc đọc dự đoán/feature test. Xem
+[báo cáo baseline](../BASELINE_REPORT.md); các CSV/PNG công bố ở
+[`docs/baseline_diagnostics_20261110/`](../docs/baseline_diagnostics_20261110/).
+Cần cài cả extra `baseline` và `plots` để xuất biểu đồ:
+`pip install -e ".[baseline,plots]"`.

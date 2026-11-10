@@ -7,6 +7,11 @@ Repository chứa package **7 bước thống kê mô tả** và tài liệu ngh
 mua tháng trước. Baseline dùng **trx + geo + dialog**, đạt Recall@1% validation
 trung bình **8,70%**, so với **6,18%** của rule; test 01/2023 chưa được đánh giá.
 
+**Sau rà soát phản biện:** đây là baseline chỉ dùng hành vi; ưu tiên tiếp theo
+là đối chứng lịch sử mua và hành vi + lịch sử mua. Báo cáo đã bổ sung nhiều K,
+cumulative gain, phân nhóm và độ chồng danh sách từ dự đoán validation cũ;
+những nâng cấp feature/tuning đề xuất chưa được train.
+
 ## Chuẩn bị dữ liệu propensity
 
 Mở [`notebooks/03_data_processing.ipynb`](notebooks/03_data_processing.ipynb) để đọc

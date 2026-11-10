@@ -23,5 +23,7 @@ include notebooks/04_merge_processed.ipynb
 include notebooks/05_calendar_baseline.ipynb
 include scripts/sync_preparation_notebook.py
 include scripts/report_baseline_rule.py
+include scripts/review_baseline.py
+recursive-include docs/baseline_diagnostics_20261110 *.md *.csv *.json *.png
 recursive-include tests *.py
 recursive-include deliverables/mbd_mini_eda_fixes *.py
