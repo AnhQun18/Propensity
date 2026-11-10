@@ -1,0 +1,56 @@
+{
+  "run_status": "complete",
+  "test_opened": false,
+  "calibration_opened": false,
+  "original_baseline_parity": [
+    {
+      "month": "2022-09",
+      "status": "matched"
+    },
+    {
+      "month": "2022-10",
+      "status": "matched"
+    },
+    {
+      "month": "2022-11",
+      "status": "matched"
+    }
+  ],
+  "source_fingerprint": "781eeb4e5393cb2b3f61b6b02514a8356f6e53cbf10e0e5f11321ad7b4a48cd1",
+  "code_sha256": {
+    "ablation.py": "c743406058a0c69f9d03314ac30d45306b960a99c6640cf4e9fa6d39776522cd",
+    "cli.py": "40c1705efc438d0191eddffd7a11929d934d5b98722bcba542e0a224c28993f8",
+    "config.py": "9bbea30443a46234f8fe0bd0a97a4e7f846879553f9b252aab369f2e872a2858",
+    "data.py": "10eafebb9fc0af1d711df4ecd2da374a0a3746f017a40f12a03e74d1ef0015f1",
+    "metrics.py": "ee3ae654879c4a02579b1e700ceea8ea44f2db23ea66bdb57f1972ffa6b78973",
+    "persistence.py": "9b463267160da616c8ca2fd229a777cc8a1d16676558b3ecb15daaae6dbbb200",
+    "runner.py": "e6b7209d3e268fdaa731aff9a881f3ae39e781eecd3e9b952b64d2093a37e31e",
+    "__init__.py": "75a5c6950bce77476b0e5ef66342ac3fdd7de45ac17a6a42cb89472de19a8a7f",
+    "__main__.py": "f38fd2f2c920c29c828645e87ed64743d567aaaef7fba7a15d2c7d7f8094f91f"
+  },
+  "parameters": {
+    "depth": 4,
+    "iterations": 200
+  },
+  "elapsed_seconds": 866.058286499996,
+  "environment": {
+    "catboost": "1.2.10",
+    "scikit-learn": "1.9.1",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "duckdb": "2.0.0",
+    "pyarrow": "26.0.0"
+  },
+  "aggregate_artifact_sha256": {
+    "feature_contract.json": "6a37bdbf6e2d565ac5fbcc229a9eccaf08eeae2993a39eb104744fae416debf9",
+    "monthly_budget_metrics.csv": "146b1330aa3dc0f418bdbf965278fae55418ea8ff85693945d8301448cf422b5",
+    "monthly_metrics.json": "929d227e04aeebdd0a768e07ef212c354b7b1c5a1131038959f0d8d723a237b0",
+    "monthly_recall.png": "4fcc0ccf0848b51dd1008962feb171e230dd8cc545a824781b3deba4b522559b",
+    "paired_comparisons.json": "c0c639e1b785117ef3302506cc790566a4843033c480d0f9c6281b984618df8c",
+    "recall_comparison.png": "a5c57876e5718bf4d83b83577a3eb74c98b657d07e76c6158e00de523f9576a1",
+    "report.html": "28e4b37031ed2e678f104ba66d0cde8e5b55a31c9e3bfe122e9496f97312af18",
+    "REPORT.md": "27c1bc0ac77e615e8947bf791cdab656854fe6d322c53b539ca49d1c53eacbf6",
+    "summary.csv": "0fb1e01ce4653676dbb3d2e84e25f7322f050892bf15ac4c9cb03ebcc0b74449"
+  },
+  "raw_prediction_and_model_files_published": false
+}

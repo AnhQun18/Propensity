@@ -42,6 +42,10 @@ def source_contract(config):
     preparation_config = PreparationConfig(**prepared['config'])
     if schema != calendar_schema(preparation_config):
         raise ValueError('Calendar predictor/schema contract was changed')
+    from propensity_data.protocol import evaluation_protocol
+    expected_protocol = evaluation_protocol(preparation_config, [m['month'] for m in manifest['months']])
+    if protocol != expected_protocol:
+        raise ValueError('Calendar evaluation protocol differs from preparation configuration')
     for protected in (preparation_config.data_root, Path(manifest['source_dir']).resolve()):
         if config.output_dir == protected or protected in config.output_dir.parents or config.output_dir in protected.parents:
             raise ValueError('Model output must not overlap raw/prepared data')

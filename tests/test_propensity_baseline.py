@@ -117,6 +117,27 @@ class CalendarTests(unittest.TestCase):
         for month in prep.MONTHS:
             pd.testing.assert_frame_equal(self.frame(month),self.frame(month,direct))
 
+    def test_trainer_rejects_future_overlapping_and_modified_protocols(self):
+        from copy import deepcopy
+        from propensity_baseline import runner
+        config = BaselineConfig(self.calendar, self.calendar.parent/'protocol_checks')
+        protocol = read_json(self.calendar/'protocol.json')
+        for change in ('future', 'overlap', 'timezone', 'availability'):
+            altered = deepcopy(protocol)
+            if change == 'future':
+                altered['rolling_validation'][0]['train'].append('2023-01')
+            elif change == 'overlap':
+                altered['rolling_validation'][0]['train'].append(altered['rolling_validation'][0]['validate'])
+            elif change == 'timezone':
+                altered['timezone'] = 'Europe/Moscow'
+            else:
+                altered['assumed_label_available_at']['2022-08'] = '2022-08-01T00:00:00Z'
+            def edited(path):
+                return altered if Path(path) == self.calendar/'protocol.json' else read_json(path)
+            with self.subTest(change=change), patch.object(runner, 'read_json', side_effect=edited):
+                with self.assertRaisesRegex(ValueError, 'evaluation protocol differs'):
+                    runner.source_contract(config)
+
     def test_future_cache_event_values_do_not_change_past_calendar_features(self):
         import duckdb
         before = self.frame('2022-03')
@@ -129,6 +150,28 @@ class CalendarTests(unittest.TestCase):
         pd.testing.assert_frame_equal(before,self.frame('2022-03',second))
         with self.assertRaises(FileExistsError):
             build_calendar(self.fixture.config.output_dir,self.calendar)
+
+    @unittest.skipUnless(importlib.util.find_spec('catboost') and importlib.util.find_spec('sklearn'), 'Install .[baseline]')
+    def test_purchase_ablation_never_reads_calibration_or_test(self):
+        from propensity_baseline import ablation
+        config = BaselineConfig(self.calendar, self.calendar.parent/'ablation', depths=(2,), iterations=(8,),
+                                variants=('multi_history',), threads=1, bootstrap_replicates=3)
+        seen = []
+        original = ablation.read_months
+        def tracked(config, months, *args):
+            seen.extend(months)
+            return original(config, months, *args)
+        with patch.object(ablation, 'read_months', side_effect=tracked), redirect_stdout(io.StringIO()):
+            ablation.run_ablation(config)
+        state = read_json(config.output_dir/'manifest.json')
+        self.assertEqual(state['status'], 'complete')
+        self.assertFalse(state['test_opened'])
+        self.assertNotIn('2022-12', seen)
+        self.assertNotIn('2023-01', seen)
+        self.assertEqual(len(read_json(config.output_dir/'summary.json')), 5)
+        self.assertEqual(len(read_json(config.output_dir/'paired_comparisons.json')), 4)
+        with self.assertRaises(FileExistsError):
+            ablation.run_ablation(config)
 
     @unittest.skipUnless(importlib.util.find_spec('catboost') and importlib.util.find_spec('sklearn'), 'Install .[baseline]')
     def test_real_model_stages_keep_holdout_locked_and_preserve_unknown_predictions(self):

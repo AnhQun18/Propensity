@@ -1,5 +1,20 @@
 # Báo cáo baseline dự đoán mua sản phẩm — MBD-mini
 
+**Cập nhật 11/11/2026:** đã hoàn tất 12 lần fit đối chứng trên dữ liệu thật,
+giữ nguyên split/cohort/ngân sách. **Kết hợp hành vi + lịch sử mua (156 biến)**
+đạt Recall@1% validation **9,74%**, so với **6,44%** của lịch sử mua và **8,89%**
+của hành vi bỏ biến độ phủ theo lịch. Chênh kết hợp − lịch sử mua **+3,30 điểm
+phần trăm**, khoảng bootstrap 95% **[+2,12; +4,28]**. Test 01/2023 vẫn chưa mở.
+
+Đọc [báo cáo hoàn thiện](deliverables/baseline-final/REPORT.md),
+[bản HTML](deliverables/baseline-final/report.html),
+[PDF 3 trang](deliverables/baseline-final/Baseline_Propensity_Report.pdf) và
+[danh mục bàn giao/Canva](deliverables/baseline-final/README.md).
+Baseline gốc 153 biến tái lập khớp metric cả ba tháng. Đã sửa guard protocol
+ở trainer; xem [hợp đồng feature](docs/baseline_feature_contract_20261111.md).
+Phần còn lại của trang giữ kết quả và diễn giải snapshot **10/11/2026** để truy vết;
+các thí nghiệm H/B/B+H được ghi “chưa chạy” trong snapshot đó nay đã có báo cáo mới.
+
 Ngày cập nhật: **10/11/2026 — đã rà soát lại sau phản biện**. Báo cáo phân biệt kết quả đã chạy, chẩn đoán bổ sung từ artifact cũ và thí nghiệm mới chưa thực hiện.
 
 **Baseline đã dùng đủ giao dịch (trx), geo và dialog metadata.** Mô hình được chọn là CatBoost `multi_history`, kết hợp hành vi tháng gần nhất với lịch sử cũ. Trên validation cuốn chiếu 09–11/2022, Recall@1% trung bình đạt **8,70%**, so với **6,18%** của rule “tháng này mua thì tháng sau mua”. Mô hình cuối và bộ hiệu chỉnh xác suất đã được lưu; **test 01/2023 chưa được đánh giá**.

@@ -9,15 +9,18 @@ Xem [phạm vi và cách chạy lại](deliverables/eda/README.md).
 Bản trình bày ngày 11/11/2026: [PDF tóm tắt 3 trang](deliverables/eda/executive_report.pdf)
 và [Canva 9 trang](https://www.canva.com/d/fzrKYASPTN_2Tif).
 
-**Báo cáo baseline:** [BASELINE_REPORT.md](BASELINE_REPORT.md) trình bày bài toán,
-ý tưởng, input, công việc đã thực hiện, output và kết quả thực nghiệm so với rule
-mua tháng trước. Baseline dùng **trx + geo + dialog**, đạt Recall@1% validation
-trung bình **8,70%**, so với **6,18%** của rule; test 01/2023 chưa được đánh giá.
+**Baseline hoàn thiện 11/11/2026:** [báo cáo mới](deliverables/baseline-final/REPORT.md),
+[PDF tóm tắt 3 trang](deliverables/baseline-final/Baseline_Propensity_Report.pdf) và
+[Canva 8 slide](https://www.canva.com/d/YUag-LZ1qm4-TYU).
+Đã chạy 12 lần fit đối chứng trên dữ liệu thật. Kết hợp hành vi + lịch sử mua
+(156 biến) đạt Recall@1% validation trung bình **9,74%**, so với **6,44%** của
+lịch sử mua, **8,89%** của hành vi bỏ biến độ phủ theo lịch và **6,18%** của rule.
+Chênh kết hợp − lịch sử mua **+3,30 điểm phần trăm**, bootstrap 95%
+**[+2,12; +4,28]**. Test 01/2023 chưa đánh giá.
 
-**Sau rà soát phản biện:** đây là baseline chỉ dùng hành vi; ưu tiên tiếp theo
-là đối chứng lịch sử mua và hành vi + lịch sử mua. Báo cáo đã bổ sung nhiều K,
-cumulative gain, phân nhóm và độ chồng danh sách từ dự đoán validation cũ;
-những nâng cấp feature/tuning đề xuất chưa được train.
+[Báo cáo baseline gốc](BASELINE_REPORT.md) giữ kết quả 10/11 và liên kết bản cập
+nhật; baseline 153 biến tái lập khớp cả ba tháng. Trainer đã sửa guard protocol.
+Cửa sổ mới, dialog PCA, CoLES và tuning rộng vẫn là thí nghiệm tiếp theo.
 
 ## Chuẩn bị dữ liệu propensity
 

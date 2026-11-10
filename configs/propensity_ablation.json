@@ -1,0 +1,12 @@
+{
+  "source_dir": "../outputs/propensity_calendar_v2",
+  "output_dir": "../outputs/propensity_ablation_20261111",
+  "seed": 20261110,
+  "threads": 2,
+  "depths": [4],
+  "iterations": [200],
+  "learning_rate": 0.04,
+  "l2_leaf_reg": 5.0,
+  "variants": ["multi_history"],
+  "bootstrap_replicates": 500
+}

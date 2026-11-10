@@ -1,0 +1,68 @@
+{
+  "title": "Baseline propensity",
+  "date": "2026-11-11",
+  "language": "vi",
+  "canvas": [
+    1280,
+    720
+  ],
+  "template": "html-ppt weekly-report, cover, table, stat-highlight",
+  "slides": [
+    {
+      "index": 1,
+      "title": "Baseline propensity",
+      "content": "<p class=\"date\">MBD-mini · 11/11/2026</p><h1>Baseline<br>propensity</h1><div class=\"cover-result\"><strong>9,74%</strong><p>Recall@1%<br>hành vi + lịch sử mua</p></div><p class=\"lead\">Chọn 1.003 khách mỗi tháng<br>Validation cuốn chiếu 09–11/2022</p>",
+      "notes": "Đây là báo cáo kết quả nghiên cứu offline. Mô hình kết hợp 156 biến đạt Recall@1% trung bình ba tháng 9,74%. Không diễn giải kết quả như hiệu quả chiến dịch. Test 01/2023 chưa được đánh giá.",
+      "cover": true
+    },
+    {
+      "index": 2,
+      "title": "Một khách hàng, một tháng",
+      "content": "<div class=\"metrics\"><div><strong>100.224</strong><span>khách mỗi tháng</span></div><div><strong>1,20 triệu</strong><span>dòng khách–tháng</span></div><div><strong>1,07%</strong><span>nhãn dương</span></div></div><div class=\"flow\"><div>Trx<br>Geo<br>Dialog</div><div>Bảng biến<br>trước cutoff</div><div>GBDT<br>xác suất mua tháng M</div></div><p class=\"takeaway\">y_any = mua ít nhất một trong bốn sản phẩm có nhãn</p><p class=\"muted\">Giữ khách thiếu nguồn. Count 0 khác thống kê chưa xác định.</p>",
+      "notes": "Có 100.224 khách qua 12 tháng, 1.202.688 dòng khách-tháng và 12.854 dòng dương. Sự kiện trước đầu tháng M tạo feature, nhãn mô tả mua trong tháng M. Không đưa client_id hoặc fold vào predictor. Nhãn không đủ căn cứ xác định được giữ unknown.",
+      "cover": false
+    },
+    {
+      "index": 3,
+      "title": "Đánh giá bằng ba tháng tương lai",
+      "content": "<table class=\"t \"><thead><tr><th>Fold</th><th>Nhãn train</th><th>Validation</th><th>Dòng train</th></tr></thead><tbody><tr><td>1</td><td>02–08/2022</td><td>09/2022</td><td>701.568</td></tr><tr><td>2</td><td>02–09/2022</td><td>10/2022</td><td>801.792</td></tr><tr><td>3</td><td>02–10/2022</td><td>11/2022</td><td>902.016</td></tr></tbody></table><p class=\"takeaway\">Cùng cohort, cùng ngân sách 1.003 khách/tháng</p><p class=\"muted\">UTC và độ trễ nhãn 0 là giả định nghiên cứu.<br>Calibration 12/2022 và test 01/2023 không mở trong ablation mới.</p>",
+      "notes": "Khách được phép lặp qua tháng train và validation vì câu hỏi là khách hiện hữu ở tháng tương lai. Nhãn lịch sử chỉ dùng khi đã khả dụng tại cutoff. Năm fold theo client là thí nghiệm riêng cho khách chưa thấy. Trainer đã kiểm tra protocol từ preparation config.",
+      "cover": false
+    },
+    {
+      "index": 4,
+      "title": "Bốn bộ biến, cùng một cấu hình",
+      "content": "<table class=\"t \"><thead><tr><th>Biến</th><th>Đầu vào</th><th>Vai trò</th></tr></thead><tbody><tr><td>153</td><td>Hành vi gốc</td><td>Tái lập mốc đã công bố</td></tr><tr><td>141</td><td>Bỏ 12 biến độ phủ nguồn theo lịch</td><td>Kiểm tra biến đại diện thời gian</td></tr><tr><td>15</td><td>Lịch sử mua đã khả dụng</td><td>Đối chứng mạnh hơn rule một lag</td></tr><tr><td>156</td><td>141 hành vi + 15 lịch sử mua</td><td>Đo giá trị tăng thêm</td></tr></tbody></table><p class=\"takeaway\">12 lần fit CatBoost trên dữ liệu thật</p><p class=\"muted\">Depth 4 · 200 cây · learning rate 0,04 · L2 5<br>Không class weight, resampling hoặc early stopping</p>",
+      "notes": "Các bộ biến giữ cùng cấu hình seed 20261110 và CPU 2 threads. Hành vi gồm trx, geo và dialog metadata trong tháng gần nhất và lịch sử cũ. Lịch sử mua có lag y_any, target từng sản phẩm, tần suất và recency. Độ dài lịch sử có nhãn cũng có thể gợi thời gian. Tái lập baseline gốc khớp metric cả ba tháng.",
+      "cover": false
+    },
+    {
+      "index": 5,
+      "title": "Kết hợp đạt Recall@1% 9,74%",
+      "content": "<p class=\"muted\">Trung bình ba tháng · Cùng ngân sách 1.003 khách/tháng</p><div class=\"bars\"><div class=\"bar-row\"><span>Rule mua tháng trước</span><div class=\"bar-track\"><div class=\"bar-fill \" style=\"width:51.493475%\"></div></div><b>6,18%</b></div><div class=\"bar-row\"><span>Hành vi gốc</span><div class=\"bar-track\"><div class=\"bar-fill \" style=\"width:72.530544%\"></div></div><b>8,70%</b></div><div class=\"bar-row\"><span>Hành vi bỏ biến lịch</span><div class=\"bar-track\"><div class=\"bar-fill \" style=\"width:74.085946%\"></div></div><b>8,89%</b></div><div class=\"bar-row\"><span>Lịch sử mua</span><div class=\"bar-track\"><div class=\"bar-fill \" style=\"width:53.687179%\"></div></div><b>6,44%</b></div><div class=\"bar-row\"><span>Kết hợp</span><div class=\"bar-track\"><div class=\"bar-fill best\" style=\"width:81.175264%\"></div></div><b>9,74%</b></div><div class=\"axis\"><span>0%</span><span>12%</span></div></div>",
+      "notes": "Các giá trị lần lượt là rule 6,18%, hành vi gốc 8,70%, hành vi bỏ biến lịch 8,89%, lịch sử mua 6,44% và kết hợp 9,74%. Đây là tỷ lệ tìm được trong tổng người mua, không phải precision, accuracy hoặc tỷ lệ tăng mua do chiến dịch.",
+      "cover": false
+    },
+    {
+      "index": 6,
+      "title": "Giá trị tăng thêm của hành vi",
+      "content": "<p class=\"delta\"><strong>+3,30</strong> điểm phần trăm so với lịch sử mua</p><table class=\"t intervals\"><thead><tr><th>So sánh Recall@1%</th><th>Chênh lệch</th><th>Khoảng bootstrap 95%</th></tr></thead><tbody><tr><td>Hành vi bỏ biến lịch − Hành vi gốc</td><td>+0,19</td><td>[-0,33; +0,59]</td></tr><tr><td>Lịch sử mua − Rule mua tháng trước</td><td>+0,26</td><td>[-0,17; +0,75]</td></tr><tr><td>Kết hợp − Lịch sử mua</td><td>+3,30</td><td>[+2,12; +4,28]</td></tr><tr><td>Kết hợp − Hành vi bỏ biến lịch</td><td>+0,85</td><td>[+0,02; +1,65]</td></tr></tbody></table><p class=\"muted\">Đơn vị: điểm phần trăm. 500 lần bootstrap theo khách.<br>Khoảng có điều kiện theo model và ba tháng đã quan sát.</p>",
+      "notes": "Kết hợp so với lịch sử mua có chênh 3,2986 điểm phần trăm, khoảng 2,1207 đến 4,2780. So với hành vi 141 biến, chênh 0,8507 điểm, khoảng 0,0230 đến 1,6545. Hai khoảng khác còn chứa 0. Validation đã được dùng phát triển nên đây là so sánh khám phá, không phải xác nhận độc lập hay hiệu quả can thiệp.",
+      "cover": false
+    },
+    {
+      "index": 7,
+      "title": "Kết quả theo từng tháng",
+      "content": "<table class=\"t monthly\"><thead><tr><th>Tháng</th><th>Rule</th><th>Hành vi 141</th><th>Lịch sử mua</th><th>Kết hợp</th></tr></thead><tbody><tr><td>2022-09</td><td>5,63%</td><td>8,00%</td><td>6,42%</td><td>8,59%</td></tr><tr><td>2022-10</td><td>6,34%</td><td>8,87%</td><td>6,34%</td><td>9,68%</td></tr><tr><td>2022-11</td><td>6,57%</td><td>9,80%</td><td>6,57%</td><td>10,96%</td></tr></tbody></table><p class=\"takeaway\">Kết hợp dẫn đầu Recall@1% trong cả ba tháng</p><p class=\"muted\">AP kết hợp: 0,0455 · ROC-AUC: 0,7924<br>Chỉ số xác suất dùng model từng fold, trước calibration.</p>",
+      "notes": "Recall kết hợp theo tháng 09, 10 và 11 là 8,5884%, 9,6774% và 10,9573%. Không gộp thứ hạng giữa các tháng. AP và ROC-AUC là metric bổ sung trung bình đều ba tháng. Nhãn được xác định trên cùng 100.224 khách mỗi tháng.",
+      "cover": false
+    },
+    {
+      "index": 8,
+      "title": "Bước tiếp theo và giới hạn",
+      "content": "<div class=\"next-row\"><strong>01</strong><p>Ablation từng nguồn<br>trên cùng nền lịch sử mua</p></div><div class=\"next-row\"><strong>02</strong><p>Cửa sổ 7/14/30/90 ngày<br>và dialog PCA</p></div><div class=\"next-row\"><strong>03</strong><p>Khóa mô hình, kiểm tra calibration<br>trước test độc lập</p></div><p class=\"muted\">Các nâng cấp này chưa chạy. CoLES là thí nghiệm sau.<br>Chưa đánh giá test độc lập hoặc tác động tăng mua do chiến dịch.</p><p class=\"sources\">Nguồn: github.com/AnhQun18/Propensity · arxiv.org/abs/2409.17587</p>",
+      "notes": "Giữ hướng bảng phẳng và GBDT. Số chiều PCA hay tổng số biến được chốt bằng validation thay vì quy tắc theo số dòng dương. PCA, vocabulary và encoder chỉ fit trên phần train và thời gian được phép. Các cửa sổ mới, dialog PCA và CoLES chưa được triển khai trong lần báo cáo này. Không chọn lại mô hình từ test.",
+      "cover": false
+    }
+  ]
+}

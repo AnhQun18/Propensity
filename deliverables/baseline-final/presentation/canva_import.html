@@ -1,0 +1,363 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Baseline propensity · 11/11/2026</title><style>/* html-ppt :: base.css — reset + shared tokens + layout primitives */
+/* Default tokens. Themes in assets/themes/*.css override the :root block. */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f7f7f8;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --border: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.16);
+  --text-1: #111216;
+  --text-2: #55596a;
+  --text-3: #8a8f9e;
+  --accent: #3b6cff;
+  /* Text drawn on top of an --accent fill. Every theme in assets/themes/
+   * and every full-deck style.css overrides this with whichever of white /
+   * near-black clears WCAG AA against its own accent — a hardcoded ink
+   * cannot, because accents here range from #ffffff to #000000.
+   * This default is black rather than white on purpose: against the default
+   * --accent #3b6cff, white measures 4.40:1 and black 4.77:1, so only black
+   * clears AA for normal text. Reached by any deck that links no theme. */
+  --accent-ink: #000000;
+  --accent-2: #7a5cff;
+  --accent-3: #ff5c8a;
+  --good: #1aaf6c;
+  --warn: #f5a524;
+  --bad:  #e0445a;
+  --grad: linear-gradient(135deg,#3b6cff,#7a5cff 55%,#ff5c8a);
+  --grad-soft: linear-gradient(135deg,#eef2ff,#f5ecff 55%,#ffeef5);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 26px;
+  --shadow: 0 10px 30px rgba(18,24,40,.08), 0 2px 6px rgba(18,24,40,.04);
+  --shadow-lg: 0 24px 60px rgba(18,24,40,.14), 0 6px 16px rgba(18,24,40,.06);
+  --font-sans: 'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --font-serif: 'Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-mono: 'JetBrains Mono','IBM Plex Mono',SFMono-Regular,Menlo,monospace;
+  --font-display: var(--font-sans);
+  --letter-tight: -.03em;
+  --letter-normal: -.01em;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text-1);
+  font-family:var(--font-sans);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  letter-spacing:var(--letter-normal)}
+
+/* Viewport host: centres the fixed-size design canvas and letterboxes the rest.
+   Every px in a slide therefore means the same thing in the browser, in the
+   presenter preview, in the overview thumbnail and in a headless render. */
+body{width:100vw;height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+img,svg,video{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,pre,samp{font-family:var(--font-mono)}
+
+/* ================= SLIDE SYSTEM ================= */
+/* ================= DESIGN CANVAS =================
+   Slides are authored against a FIXED 1920x1080 canvas and scaled to fit the
+   viewport by runtime.js (--deck-scale). Before this, .deck was 100vw/100vh
+   while type and spacing stayed in absolute px, so a 1512x850 laptop window
+   and a 1920x1080 render produced visibly different pages (issue #20).
+
+   Escape hatches:
+     <body data-fit="fluid">      -> old behaviour, canvas follows the viewport
+     <div class="deck" data-w=".." data-h="..">  -> custom canvas (e.g. 1080x1440 for 3:4)
+*/
+.deck{position:relative;flex:none;
+  width:var(--deck-w,1920px);height:var(--deck-h,1080px);
+  overflow:hidden;background:var(--bg);
+  transform:scale(var(--deck-scale,1));transform-origin:center center}
+
+/* Opt out: fluid canvas, exactly what the deck did before. */
+body[data-fit="fluid"]{display:block}
+body[data-fit="fluid"] .deck{width:100vw;height:100vh;transform:none}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:72px 96px;
+  box-sizing:border-box;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+  transform:translateX(30px);
+  overflow:hidden;
+}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+
+/* single-page standalone (used when a layout file is opened directly) */
+body.single .slide{position:relative;width:100%;height:100%;opacity:1;transform:none;pointer-events:auto}
+body[data-fit="fluid"].single .slide{width:100vw;height:100vh}
+
+/* ================= TYPOGRAPHY ================= */
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.kicker{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+h1.title,.h1{font-family:var(--font-display);font-size:72px;line-height:1.05;font-weight:800;letter-spacing:var(--letter-tight);margin:0 0 18px;color:var(--text-1)}
+h2.title,.h2{font-family:var(--font-display);font-size:54px;line-height:1.1;font-weight:700;letter-spacing:var(--letter-tight);margin:0 0 14px}
+h3,.h3{font-size:32px;line-height:1.2;font-weight:600;letter-spacing:var(--letter-normal);margin:0 0 10px}
+h4,.h4{font-size:22px;line-height:1.3;font-weight:600;margin:0 0 8px}
+.lede{font-size:22px;line-height:1.55;color:var(--text-2);font-weight:300;max-width:62ch}
+.dim{color:var(--text-2)}
+.dim2{color:var(--text-3)}
+.mono{font-family:var(--font-mono)}
+.serif{font-family:var(--font-serif)}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+
+/* ================= LAYOUT PRIMITIVES ================= */
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid{display:grid;gap:24px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.fill{flex:1}
+.sp-t{padding-top:24px}.sp-b{padding-bottom:24px}
+.mt-s{margin-top:8px}.mt-m{margin-top:18px}.mt-l{margin-top:32px}
+.mb-s{margin-bottom:8px}.mb-m{margin-bottom:18px}.mb-l{margin-bottom:32px}
+
+/* ================= CARDS ================= */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card-soft{background:var(--surface-2);border:1px solid var(--border)}
+.card-outline{background:transparent;border:1.5px solid var(--border-strong);box-shadow:none}
+.card-accent{background:var(--surface);border-top:3px solid var(--accent)}
+.card-hover{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500;
+  background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.pill-accent{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 28%,transparent)}
+
+/* ================= BARS / DIVIDERS ================= */
+.divider{height:1px;background:var(--border);width:100%}
+.divider-accent{height:3px;width:72px;background:var(--accent);border-radius:2px}
+
+/* ================= IMAGES (issue #17) =================
+ * Framing primitives shared by every image-* layout. The frame owns the
+ * aspect ratio and the crop; the <img> just fills it. That's what lets you
+ * swap in a photo of any shape without touching the layout.
+ *   <figure class="img-frame"><img src="…" alt=""></figure>
+ *   .img-frame.contain  -> letterbox instead of crop (screenshots, diagrams,
+ *                          logos — anything where cropping loses information)
+ *   --img-ratio         -> aspect ratio of the frame (default 16/10)
+ *   --img-pos           -> object-position, e.g. "top" to protect a headline
+ */
+.img-frame{position:relative;margin:0;overflow:hidden;
+  border-radius:var(--radius);box-shadow:var(--shadow);background:var(--surface-2);
+  aspect-ratio:var(--img-ratio,16/10)}
+.img-frame > img{width:100%;height:100%;object-fit:cover;object-position:var(--img-pos,center)}
+.img-frame.contain{background:var(--bg-soft);box-shadow:none;border:1px solid var(--border)}
+.img-frame.contain > img{object-fit:contain}
+.img-frame.fill{height:100%;aspect-ratio:auto}
+.img-scrim{position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 42%,rgba(8,10,20,.72))}
+.img-cap{margin:10px 2px 0;font-size:14px;line-height:1.5;color:var(--text-3)}
+.img-tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:999px;
+  background:rgba(10,12,20,.55);color:#fff;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;backdrop-filter:blur(6px)}
+
+/* ================= CHROME (header/footer/progress) ================= */
+.deck-header{position:absolute;top:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;z-index:10;pointer-events:none}
+.deck-footer{position:absolute;bottom:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);z-index:10;pointer-events:none}
+.slide-number::before{content:attr(data-current)}
+.slide-number::after{content:" / " attr(data-total)}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar > span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s var(--ease)}
+
+/* ---- custom logo (issue #11) ----
+ * One logo per deck, drawn over the slide area. Two ways in, same CSS:
+ *   1. hand-author it  -> <img class="deck-logo" data-pos="bottom-right" src="…">
+ *   2. declare it once -> <body data-logo="…" data-logo-position="bottom-right">
+ * (1) needs no JS at all; (2) is created by runtime.js. It lives inside .deck
+ * so it scales with the deck. On an exported PDF it is painted per page by the
+ * @media print block below, not by this element — see the note there. */
+.deck-logo{position:absolute;z-index:11;pointer-events:none;
+  height:var(--logo-size,44px);width:auto;max-width:30%;object-fit:contain;
+  opacity:var(--logo-opacity,.9)}
+.deck-logo[data-pos="top-left"]     {top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="top-right"]    {top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-left"]  {bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-right"] {bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo:not([data-pos])          {top:28px;right:40px}
+
+/* ================= PRESENTER / OVERVIEW ================= */
+/* Keep this list in sync with NOTE_SEL in assets/runtime.js — the runtime
+ * reads speaker notes from all of these, so all of them must be hidden
+ * from the audience. */
+.notes,.speaker-notes{display:none!important}
+.notes-overlay{position:fixed;inset:auto 0 0 0;max-height:42vh;background:rgba(20,22,30,.95);color:#e8ebf4;
+  padding:20px 32px;font-size:16px;line-height:1.6;border-top:1px solid rgba(255,255,255,.1);transform:translateY(100%);
+  transition:transform .3s var(--ease);z-index:40;overflow:auto;font-family:var(--font-sans)}
+.notes-overlay.open{transform:translateY(0)}
+.overview{position:fixed;inset:0;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);z-index:50;
+  display:none;padding:40px;overflow:auto}
+.overview.open{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-content:start}
+.overview .thumb{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  aspect-ratio:16/9;overflow:hidden;cursor:pointer;position:relative;color:var(--text-1);padding:16px;
+  font-size:11px;transition:transform .2s var(--ease)}
+.overview .thumb:hover{transform:scale(1.04)}
+.overview .thumb .n{position:absolute;top:8px;left:10px;font-weight:700;font-size:14px;color:var(--text-3)}
+.overview .thumb .t{position:absolute;bottom:10px;left:14px;right:14px;font-weight:600;color:var(--text-1)}
+
+/* ================= PRESENTER VIEW ================= */
+/* Presenter view opens in a separate popup window (S key).
+ * All presenter styles are self-contained in the popup HTML generated by runtime.js.
+ * The audience window (this file) is NOT affected — it stays as normal deck view.
+ * Only the .notes class below is needed to hide speaker notes from audience. */
+
+/* ================= UTILITY ================= */
+.hidden{display:none!important}
+.nowrap{white-space:nowrap}
+.tr{text-align:right}.tc{text-align:center}.tl{text-align:left}
+.uppercase{text-transform:uppercase;letter-spacing:.12em}
+
+/* ================= PRINT ================= */
+@media print{
+  /* Every declaration here is !important on purpose. A template stylesheet
+   * scopes its rules as `.tpl-name .slide`, which is specificity (0,2,0) and
+   * beats a bare `.slide` at (0,1,0) — so without !important a template
+   * silently keeps its screen layout in print. That is how dir-key-nav-minimal
+   * (position:absolute) printed 8 slides onto 1 page and xhs-post printed 9
+   * onto 2: only the opacity/transform declarations on this rule carried
+   * !important, and the ones that decide pagination did not. */
+  body{display:block!important;width:auto!important;height:auto!important;overflow:visible!important}
+  .deck{transform:none!important;width:100%!important;height:auto!important;
+        min-height:0!important;display:block!important}
+  .slide{position:relative!important;inset:auto!important;
+         opacity:1!important;transform:none!important;
+         page-break-after:always;break-after:page;
+         width:100%!important;height:100vh!important;max-height:100vh!important}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .deck-header,.deck-footer,.progress-bar,.notes-overlay,.overview{display:none!important}
+
+  /* Logo in print. The .deck-logo element is position:absolute inside .deck,
+   * and print collapses .deck to height:auto with every slide stacked — so the
+   * element can only anchor ONCE against the whole document and lands on a
+   * single page (or none). Hide it and paint the logo per slide instead: in
+   * print one .slide is exactly one page. runtime.js mirrors the image URL and
+   * placement onto .deck (--logo-print / data-logo-print), so this only kicks
+   * in when the runtime is present; a JS-less deck keeps the element. */
+  .deck[data-logo-print] > .deck-logo{display:none!important}
+  .deck[data-logo-print] .slide:not([data-no-logo])::after{
+    content:"";position:absolute;z-index:11;pointer-events:none;
+    width:30%;height:var(--logo-size,44px);
+    background-image:var(--logo-print);background-repeat:no-repeat;
+    background-size:contain;opacity:var(--logo-opacity,.9)}
+  .deck[data-logo-print="top-left"]     .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left top}
+  .deck[data-logo-print="top-right"]    .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right top}
+  .deck[data-logo-print="bottom-left"]  .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left bottom}
+  .deck[data-logo-print="bottom-right"] .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right bottom}
+}
+
+/* theme: corporate-clean — 企业商务 */
+:root{
+  --bg:#ffffff;--bg-soft:#f5f7fa;--surface:#ffffff;--surface-2:#f0f3f7;
+  --border:rgba(10,37,64,.12);--border-strong:rgba(10,37,64,.28);
+  --text-1:#0a2540;--text-2:#425466;--text-3:#8898aa;
+  --accent:#0a2540;--accent-2:#1d4ed8;--accent-3:#64748b;
+  --accent-ink:#ffffff;  /* text on --accent — 15.5:1 */
+  --good:#0e9f6e;--warn:#d97706;--bad:#dc2626;
+  --grad:linear-gradient(135deg,#0a2540,#1d4ed8);
+  --grad-soft:linear-gradient(135deg,#f0f4fb,#e4ecf7);
+  --radius:6px;--radius-sm:4px;--radius-lg:10px;
+  --shadow:0 1px 3px rgba(10,37,64,.08),0 4px 12px rgba(10,37,64,.05);
+  --shadow-lg:0 4px 12px rgba(10,37,64,.1),0 16px 40px rgba(10,37,64,.08);
+  --font-sans:'Inter','Noto Sans SC',sans-serif;
+  --font-display:'Inter','Noto Sans SC',sans-serif;
+}
+.card{border:1px solid var(--border)}
+.divider-accent{background:var(--accent);height:3px;width:56px}
+.kicker{color:var(--accent-2)}
+h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
+
+/* weekly-report — corporate clarity */
+.tpl-weekly-report{
+  --bg:#fafbfc;--bg-soft:#f3f5f9;--surface:#ffffff;--surface-2:#f3f5f9;
+  --border:rgba(22,30,55,.09);--border-strong:rgba(22,30,55,.2);
+  --text-1:#161e37;--text-2:#50586b;--text-3:#8b92a5;
+  --accent:#2e63eb;--accent-2:#0ea5b5;--accent-3:#f59e0b;
+  --accent-ink:#ffffff;  /* text on --accent — 5.1:1 */
+  --good:#10b981;--warn:#f59e0b;--bad:#ef4444;
+  --grad:linear-gradient(120deg,#2e63eb,#0ea5b5);
+  --radius:14px;--radius-lg:18px;
+  --shadow:0 6px 20px rgba(22,30,55,.06),0 1px 3px rgba(22,30,55,.04);
+  font-family:'Inter','Noto Sans SC',sans-serif;
+}
+.tpl-weekly-report .slide{padding:64px 88px;background:var(--bg)}
+.tpl-weekly-report .h1{font-size:64px;line-height:1.05;font-weight:800;letter-spacing:-.025em}
+.tpl-weekly-report .h2{font-size:42px;font-weight:700;letter-spacing:-.02em}
+.tpl-weekly-report .kicker{color:var(--accent);font-size:12px;font-weight:700}
+.tpl-weekly-report .cover-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:48px}
+.tpl-weekly-report .logo{font-weight:800;font-size:18px;letter-spacing:-.01em}
+.tpl-weekly-report .logo::before{content:"■";color:var(--accent);margin-right:8px}
+.tpl-weekly-report .week-chip{display:inline-block;padding:8px 18px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-2)}
+.tpl-weekly-report .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;position:relative;overflow:hidden}
+.tpl-weekly-report .kpi .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:600}
+.tpl-weekly-report .kpi .value{font-size:48px;font-weight:800;letter-spacing:-.03em;margin-top:8px;line-height:1}
+.tpl-weekly-report .kpi .delta{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700;margin-top:10px}
+.tpl-weekly-report .kpi .delta.up{background:rgba(16,185,129,.12);color:var(--good)}
+.tpl-weekly-report .kpi .delta.down{background:rgba(239,68,68,.12);color:var(--bad)}
+.tpl-weekly-report .kpi .delta.flat{background:rgba(139,146,165,.14);color:var(--text-2)}
+.tpl-weekly-report .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.tpl-weekly-report .kpi.good::before{background:var(--good)}
+.tpl-weekly-report .kpi.warn::before{background:var(--warn)}
+.tpl-weekly-report .kpi.bad::before{background:var(--bad)}
+.tpl-weekly-report .ship-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.tpl-weekly-report .ship-item .tag{flex:none;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;height:22px;display:inline-flex;align-items:center}
+.tpl-weekly-report .tag.feat{background:rgba(46,99,235,.12);color:var(--accent)}
+.tpl-weekly-report .tag.fix{background:rgba(16,185,129,.12);color:var(--good)}
+.tpl-weekly-report .tag.exp{background:rgba(245,158,11,.14);color:var(--warn)}
+.tpl-weekly-report .tag.infra{background:rgba(14,165,181,.12);color:var(--accent-2)}
+.tpl-weekly-report .ship-item b{color:var(--text-1);font-weight:600}
+.tpl-weekly-report .ship-item span.owner{margin-left:auto;color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace}
+.tpl-weekly-report .chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+.tpl-weekly-report .chart-bars{display:flex;align-items:flex-end;gap:16px;height:220px;margin-top:20px}
+.tpl-weekly-report .chart-bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.tpl-weekly-report .chart-bars .col .b{width:100%;background:var(--grad);border-radius:6px 6px 0 0;min-height:6px;position:relative}
+.tpl-weekly-report .chart-bars .col .b::after{content:attr(data-v);position:absolute;top:-22px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:var(--text-1)}
+.tpl-weekly-report .chart-bars .col .lbl{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace}
+.tpl-weekly-report .blocker{background:var(--surface);border-left:3px solid var(--bad);padding:16px 20px;border-radius:8px;margin-bottom:12px}
+.tpl-weekly-report .blocker h4{font-size:16px;margin-bottom:4px}
+.tpl-weekly-report .blocker p{font-size:13px;color:var(--text-2);margin:0}
+.tpl-weekly-report .blocker .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);margin-top:6px}
+.tpl-weekly-report .next-row{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:14px 0;border-bottom:1px dashed var(--border);align-items:baseline}
+.tpl-weekly-report .next-row .owner{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)}
+.tpl-weekly-report .next-row .task{color:var(--text-1);font-weight:500}
+.tpl-weekly-report .next-row .task span{color:var(--text-3);font-size:12px;margin-left:8px}
+.tpl-weekly-report .lede{color:var(--text-2)}
+.tpl-weekly-report .card{background:var(--surface)}
+
+
+    .tpl-weekly-report{--bg:#fff;--text-1:#142c48;--text-2:#536779;--text-3:#647889;--accent:#142c48;--accent-2:#087f8c;--accent-3:#8093a8;--font-sans:'Segoe UI',Arial,sans-serif;--font-display:'Segoe UI',Arial,sans-serif;font-family:var(--font-sans)}
+    .tpl-weekly-report .slide{padding:50px 78px 78px;background:var(--bg);justify-content:flex-start;gap:0}
+    .slide:before{content:'';position:absolute;left:78px;top:28px;width:58px;height:5px;background:var(--accent-2)}
+    .slide h1{font-size:84px;line-height:1.03;letter-spacing:-2px;margin:26px 0 20px;font-weight:700}
+    .slide h2{font-size:42px;line-height:1.16;letter-spacing:-.8px;margin:15px 0 28px;font-weight:700;color:var(--accent)}
+    .slide p{font-size:25px;line-height:1.4;margin:0 0 20px}.slide .date{font-size:20px;color:var(--text-2);margin:8px 0 0}
+    .slide .lead{font-size:27px;line-height:1.4;margin-top:24px;color:var(--text-2)}
+    .cover-result{display:flex;align-items:center;gap:32px;margin-top:0}.cover-result strong{font-size:96px;line-height:1.05;color:var(--accent-2);letter-spacing:-2px}.cover-result p{font-size:28px;margin:0}
+    .metrics{display:flex;gap:40px;margin:15px 0 36px}.metrics>div{flex:1}.metrics strong{display:block;font-size:57px;letter-spacing:-1px;color:var(--accent-2);line-height:1.2}.metrics span{display:block;font-size:23px;margin-top:8px;color:var(--text-2)}
+    .flow{display:flex;margin:12px 0 33px;border-top:2px solid var(--border);border-bottom:2px solid var(--border);padding:24px 0}.flow>div{flex:1;font-size:27px;font-weight:600;line-height:1.4;border-right:1px solid var(--border);padding-left:28px}.flow>div:first-child{padding-left:0}.flow>div:last-child{border:0}
+    .t{width:100%;border-collapse:collapse;margin:5px 0 24px;table-layout:fixed}.t th,.t td{text-align:left;padding:16px 16px 16px 0;border-bottom:1px solid var(--border);font-size:24px;line-height:1.3;vertical-align:middle}.t th{font-size:20px;color:var(--text-2);font-weight:500;border-bottom:2px solid var(--accent)}.t td:first-child{font-weight:600}.t th:first-child,.t td:first-child{width:19%}
+    .intervals th:first-child,.intervals td:first-child{width:49%}.intervals th:nth-child(2),.intervals td:nth-child(2){width:18%}.intervals td{font-size:22px;padding:15px 16px 15px 0}.intervals{margin:0 0 21px}
+    .monthly td{font-size:29px;padding:27px 16px 27px 0}.monthly th{font-size:21px}.monthly td:last-child{color:var(--accent-2);font-weight:700}
+    .slide .takeaway{font-size:28px;line-height:1.35;font-weight:700;color:var(--accent);margin:20px 0 16px}.slide .muted{font-size:22px;line-height:1.45;color:var(--text-2);margin:10px 0 15px}
+    .bars{margin:24px 0 28px}.bar-row{display:grid;grid-template-columns:335px 1fr 100px;align-items:center;gap:20px;height:65px}.bar-row>span{font-size:24px}.bar-row>b{font-size:28px;text-align:right}.bar-track{height:36px;border-left:1px solid var(--text-2);background:var(--surface-2)}.bar-fill{height:100%;background:var(--accent-3)}.bar-fill.best{background:var(--accent-2)}.axis{display:flex;justify-content:space-between;font-size:18px;color:var(--text-2);margin:10px 120px 0 355px}
+    .slide .delta{font-size:24px;margin:0 0 20px}.delta strong{font-size:56px;line-height:1;color:var(--accent-2);margin-right:12px}
+    .next-row{display:flex;gap:32px;border-bottom:1px solid var(--border);padding:14px 0 20px;margin-bottom:9px}.next-row strong{font-size:47px;line-height:1.2;color:var(--accent-2);min-width:80px}.next-row p{font-size:28px;line-height:1.3;margin:0}.slide .sources{font-size:17px;line-height:1.3;color:var(--text-3);margin-top:18px}
+    .slide .deck-footer{position:absolute;left:78px;right:78px;bottom:24px;display:flex;justify-content:space-between;color:var(--text-3);font-size:16px;line-height:1.2}.notes{display:none}
+    body{display:block;width:1280px;height:auto;overflow:visible}.slide,.tpl-weekly-report .slide{position:relative;inset:auto;opacity:1;transform:none;pointer-events:auto;width:1280px;height:720px;margin:0;page-break-after:always}</style></head><body class="tpl-weekly-report"><section class="slide" data-title="Baseline propensity" data-label="Baseline propensity" data-document-role="page" data-speaker-notes="Đây là báo cáo kết quả nghiên cứu offline. Mô hình kết hợp 156 biến đạt Recall@1% trung bình ba tháng 9,74%. Không diễn giải kết quả như hiệu quả chiến dịch. Test 01/2023 chưa được đánh giá."><p class="date">MBD-mini · 11/11/2026</p><h1>Baseline<br>propensity</h1><div class="cover-result"><strong>9,74%</strong><p>Recall@1%<br>hành vi + lịch sử mua</p></div><p class="lead">Chọn 1.003 khách mỗi tháng<br>Validation cuốn chiếu 09–11/2022</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>01 / 08</span></div><aside class="notes">Đây là báo cáo kết quả nghiên cứu offline. Mô hình kết hợp 156 biến đạt Recall@1% trung bình ba tháng 9,74%. Không diễn giải kết quả như hiệu quả chiến dịch. Test 01/2023 chưa được đánh giá.</aside></section>
+<section class="slide" data-title="Một khách hàng, một tháng" data-label="Một khách hàng, một tháng" data-document-role="page" data-speaker-notes="Có 100.224 khách qua 12 tháng, 1.202.688 dòng khách-tháng và 12.854 dòng dương. Sự kiện trước đầu tháng M tạo feature, nhãn mô tả mua trong tháng M. Không đưa client_id hoặc fold vào predictor. Nhãn không đủ căn cứ xác định được giữ unknown."><h2>Một khách hàng, một tháng</h2><div class="metrics"><div><strong>100.224</strong><span>khách mỗi tháng</span></div><div><strong>1,20 triệu</strong><span>dòng khách–tháng</span></div><div><strong>1,07%</strong><span>nhãn dương</span></div></div><div class="flow"><div>Trx<br>Geo<br>Dialog</div><div>Bảng biến<br>trước cutoff</div><div>GBDT<br>xác suất mua tháng M</div></div><p class="takeaway">y_any = mua ít nhất một trong bốn sản phẩm có nhãn</p><p class="muted">Giữ khách thiếu nguồn. Count 0 khác thống kê chưa xác định.</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>02 / 08</span></div><aside class="notes">Có 100.224 khách qua 12 tháng, 1.202.688 dòng khách-tháng và 12.854 dòng dương. Sự kiện trước đầu tháng M tạo feature, nhãn mô tả mua trong tháng M. Không đưa client_id hoặc fold vào predictor. Nhãn không đủ căn cứ xác định được giữ unknown.</aside></section>
+<section class="slide" data-title="Đánh giá bằng ba tháng tương lai" data-label="Đánh giá bằng ba tháng tương lai" data-document-role="page" data-speaker-notes="Khách được phép lặp qua tháng train và validation vì câu hỏi là khách hiện hữu ở tháng tương lai. Nhãn lịch sử chỉ dùng khi đã khả dụng tại cutoff. Năm fold theo client là thí nghiệm riêng cho khách chưa thấy. Trainer đã kiểm tra protocol từ preparation config."><h2>Đánh giá bằng ba tháng tương lai</h2><table class="t "><thead><tr><th>Fold</th><th>Nhãn train</th><th>Validation</th><th>Dòng train</th></tr></thead><tbody><tr><td>1</td><td>02–08/2022</td><td>09/2022</td><td>701.568</td></tr><tr><td>2</td><td>02–09/2022</td><td>10/2022</td><td>801.792</td></tr><tr><td>3</td><td>02–10/2022</td><td>11/2022</td><td>902.016</td></tr></tbody></table><p class="takeaway">Cùng cohort, cùng ngân sách 1.003 khách/tháng</p><p class="muted">UTC và độ trễ nhãn 0 là giả định nghiên cứu.<br>Calibration 12/2022 và test 01/2023 không mở trong ablation mới.</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>03 / 08</span></div><aside class="notes">Khách được phép lặp qua tháng train và validation vì câu hỏi là khách hiện hữu ở tháng tương lai. Nhãn lịch sử chỉ dùng khi đã khả dụng tại cutoff. Năm fold theo client là thí nghiệm riêng cho khách chưa thấy. Trainer đã kiểm tra protocol từ preparation config.</aside></section>
+<section class="slide" data-title="Bốn bộ biến, cùng một cấu hình" data-label="Bốn bộ biến, cùng một cấu hình" data-document-role="page" data-speaker-notes="Các bộ biến giữ cùng cấu hình seed 20261110 và CPU 2 threads. Hành vi gồm trx, geo và dialog metadata trong tháng gần nhất và lịch sử cũ. Lịch sử mua có lag y_any, target từng sản phẩm, tần suất và recency. Độ dài lịch sử có nhãn cũng có thể gợi thời gian. Tái lập baseline gốc khớp metric cả ba tháng."><h2>Bốn bộ biến, cùng một cấu hình</h2><table class="t "><thead><tr><th>Biến</th><th>Đầu vào</th><th>Vai trò</th></tr></thead><tbody><tr><td>153</td><td>Hành vi gốc</td><td>Tái lập mốc đã công bố</td></tr><tr><td>141</td><td>Bỏ 12 biến độ phủ nguồn theo lịch</td><td>Kiểm tra biến đại diện thời gian</td></tr><tr><td>15</td><td>Lịch sử mua đã khả dụng</td><td>Đối chứng mạnh hơn rule một lag</td></tr><tr><td>156</td><td>141 hành vi + 15 lịch sử mua</td><td>Đo giá trị tăng thêm</td></tr></tbody></table><p class="takeaway">12 lần fit CatBoost trên dữ liệu thật</p><p class="muted">Depth 4 · 200 cây · learning rate 0,04 · L2 5<br>Không class weight, resampling hoặc early stopping</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>04 / 08</span></div><aside class="notes">Các bộ biến giữ cùng cấu hình seed 20261110 và CPU 2 threads. Hành vi gồm trx, geo và dialog metadata trong tháng gần nhất và lịch sử cũ. Lịch sử mua có lag y_any, target từng sản phẩm, tần suất và recency. Độ dài lịch sử có nhãn cũng có thể gợi thời gian. Tái lập baseline gốc khớp metric cả ba tháng.</aside></section>
+<section class="slide" data-title="Kết hợp đạt Recall@1% 9,74%" data-label="Kết hợp đạt Recall@1% 9,74%" data-document-role="page" data-speaker-notes="Các giá trị lần lượt là rule 6,18%, hành vi gốc 8,70%, hành vi bỏ biến lịch 8,89%, lịch sử mua 6,44% và kết hợp 9,74%. Đây là tỷ lệ tìm được trong tổng người mua, không phải precision, accuracy hoặc tỷ lệ tăng mua do chiến dịch."><h2>Kết hợp đạt Recall@1% 9,74%</h2><p class="muted">Trung bình ba tháng · Cùng ngân sách 1.003 khách/tháng</p><div class="bars"><div class="bar-row"><span>Rule mua tháng trước</span><div class="bar-track"><div class="bar-fill " style="width:51.493475%"></div></div><b>6,18%</b></div><div class="bar-row"><span>Hành vi gốc</span><div class="bar-track"><div class="bar-fill " style="width:72.530544%"></div></div><b>8,70%</b></div><div class="bar-row"><span>Hành vi bỏ biến lịch</span><div class="bar-track"><div class="bar-fill " style="width:74.085946%"></div></div><b>8,89%</b></div><div class="bar-row"><span>Lịch sử mua</span><div class="bar-track"><div class="bar-fill " style="width:53.687179%"></div></div><b>6,44%</b></div><div class="bar-row"><span>Kết hợp</span><div class="bar-track"><div class="bar-fill best" style="width:81.175264%"></div></div><b>9,74%</b></div><div class="axis"><span>0%</span><span>12%</span></div></div><div class="deck-footer"><span>Validation 09–11/2022</span><span>05 / 08</span></div><aside class="notes">Các giá trị lần lượt là rule 6,18%, hành vi gốc 8,70%, hành vi bỏ biến lịch 8,89%, lịch sử mua 6,44% và kết hợp 9,74%. Đây là tỷ lệ tìm được trong tổng người mua, không phải precision, accuracy hoặc tỷ lệ tăng mua do chiến dịch.</aside></section>
+<section class="slide" data-title="Giá trị tăng thêm của hành vi" data-label="Giá trị tăng thêm của hành vi" data-document-role="page" data-speaker-notes="Kết hợp so với lịch sử mua có chênh 3,2986 điểm phần trăm, khoảng 2,1207 đến 4,2780. So với hành vi 141 biến, chênh 0,8507 điểm, khoảng 0,0230 đến 1,6545. Hai khoảng khác còn chứa 0. Validation đã được dùng phát triển nên đây là so sánh khám phá, không phải xác nhận độc lập hay hiệu quả can thiệp."><h2>Giá trị tăng thêm của hành vi</h2><p class="delta"><strong>+3,30</strong> điểm phần trăm so với lịch sử mua</p><table class="t intervals"><thead><tr><th>So sánh Recall@1%</th><th>Chênh lệch</th><th>Khoảng bootstrap 95%</th></tr></thead><tbody><tr><td>Hành vi bỏ biến lịch − Hành vi gốc</td><td>+0,19</td><td>[-0,33; +0,59]</td></tr><tr><td>Lịch sử mua − Rule mua tháng trước</td><td>+0,26</td><td>[-0,17; +0,75]</td></tr><tr><td>Kết hợp − Lịch sử mua</td><td>+3,30</td><td>[+2,12; +4,28]</td></tr><tr><td>Kết hợp − Hành vi bỏ biến lịch</td><td>+0,85</td><td>[+0,02; +1,65]</td></tr></tbody></table><p class="muted">Đơn vị: điểm phần trăm. 500 lần bootstrap theo khách.<br>Khoảng có điều kiện theo model và ba tháng đã quan sát.</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>06 / 08</span></div><aside class="notes">Kết hợp so với lịch sử mua có chênh 3,2986 điểm phần trăm, khoảng 2,1207 đến 4,2780. So với hành vi 141 biến, chênh 0,8507 điểm, khoảng 0,0230 đến 1,6545. Hai khoảng khác còn chứa 0. Validation đã được dùng phát triển nên đây là so sánh khám phá, không phải xác nhận độc lập hay hiệu quả can thiệp.</aside></section>
+<section class="slide" data-title="Kết quả theo từng tháng" data-label="Kết quả theo từng tháng" data-document-role="page" data-speaker-notes="Recall kết hợp theo tháng 09, 10 và 11 là 8,5884%, 9,6774% và 10,9573%. Không gộp thứ hạng giữa các tháng. AP và ROC-AUC là metric bổ sung trung bình đều ba tháng. Nhãn được xác định trên cùng 100.224 khách mỗi tháng."><h2>Kết quả theo từng tháng</h2><table class="t monthly"><thead><tr><th>Tháng</th><th>Rule</th><th>Hành vi 141</th><th>Lịch sử mua</th><th>Kết hợp</th></tr></thead><tbody><tr><td>2022-09</td><td>5,63%</td><td>8,00%</td><td>6,42%</td><td>8,59%</td></tr><tr><td>2022-10</td><td>6,34%</td><td>8,87%</td><td>6,34%</td><td>9,68%</td></tr><tr><td>2022-11</td><td>6,57%</td><td>9,80%</td><td>6,57%</td><td>10,96%</td></tr></tbody></table><p class="takeaway">Kết hợp dẫn đầu Recall@1% trong cả ba tháng</p><p class="muted">AP kết hợp: 0,0455 · ROC-AUC: 0,7924<br>Chỉ số xác suất dùng model từng fold, trước calibration.</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>07 / 08</span></div><aside class="notes">Recall kết hợp theo tháng 09, 10 và 11 là 8,5884%, 9,6774% và 10,9573%. Không gộp thứ hạng giữa các tháng. AP và ROC-AUC là metric bổ sung trung bình đều ba tháng. Nhãn được xác định trên cùng 100.224 khách mỗi tháng.</aside></section>
+<section class="slide" data-title="Bước tiếp theo và giới hạn" data-label="Bước tiếp theo và giới hạn" data-document-role="page" data-speaker-notes="Giữ hướng bảng phẳng và GBDT. Số chiều PCA hay tổng số biến được chốt bằng validation thay vì quy tắc theo số dòng dương. PCA, vocabulary và encoder chỉ fit trên phần train và thời gian được phép. Các cửa sổ mới, dialog PCA và CoLES chưa được triển khai trong lần báo cáo này. Không chọn lại mô hình từ test."><h2>Bước tiếp theo và giới hạn</h2><div class="next-row"><strong>01</strong><p>Ablation từng nguồn<br>trên cùng nền lịch sử mua</p></div><div class="next-row"><strong>02</strong><p>Cửa sổ 7/14/30/90 ngày<br>và dialog PCA</p></div><div class="next-row"><strong>03</strong><p>Khóa mô hình, kiểm tra calibration<br>trước test độc lập</p></div><p class="muted">Các nâng cấp này chưa chạy. CoLES là thí nghiệm sau.<br>Chưa đánh giá test độc lập hoặc tác động tăng mua do chiến dịch.</p><p class="sources">Nguồn: github.com/AnhQun18/Propensity · arxiv.org/abs/2409.17587</p><div class="deck-footer"><span>Validation 09–11/2022</span><span>08 / 08</span></div><aside class="notes">Giữ hướng bảng phẳng và GBDT. Số chiều PCA hay tổng số biến được chốt bằng validation thay vì quy tắc theo số dòng dương. PCA, vocabulary và encoder chỉ fit trên phần train và thời gian được phép. Các cửa sổ mới, dialog PCA và CoLES chưa được triển khai trong lần báo cáo này. Không chọn lại mô hình từ test.</aside></section></body></html>

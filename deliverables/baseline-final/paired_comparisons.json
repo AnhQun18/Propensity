@@ -1,0 +1,54 @@
+[
+  {
+    "reference": "behavior_original",
+    "variant": "behavior",
+    "metric": "macro monthly Recall@1% difference",
+    "estimate": 0.0018664827254567043,
+    "replicates": 500,
+    "valid_replicates": 500,
+    "interval_95": [
+      -0.0033204731096168213,
+      0.005880588142206449
+    ],
+    "scope": "Conditional on fitted models and observed months; not uncertainty across unseen months"
+  },
+  {
+    "reference": "previous_month_purchase",
+    "variant": "purchase",
+    "metric": "macro monthly Recall@1% difference",
+    "estimate": 0.0026324448831852583,
+    "replicates": 500,
+    "valid_replicates": 500,
+    "interval_95": [
+      -0.0017129030681748267,
+      0.007537048491096276
+    ],
+    "scope": "Conditional on fitted models and observed months; not uncertainty across unseen months"
+  },
+  {
+    "reference": "purchase",
+    "variant": "combined",
+    "metric": "macro monthly Recall@1% difference",
+    "estimate": 0.03298570165319281,
+    "replicates": 500,
+    "valid_replicates": 500,
+    "interval_95": [
+      0.021207030757252613,
+      0.04278021853678367
+    ],
+    "scope": "Conditional on fitted models and observed months; not uncertainty across unseen months"
+  },
+  {
+    "reference": "behavior",
+    "variant": "combined",
+    "metric": "macro monthly Recall@1% difference",
+    "estimate": 0.008507180830351638,
+    "replicates": 500,
+    "valid_replicates": 500,
+    "interval_95": [
+      0.00023037311811536902,
+      0.016544948270357653
+    ],
+    "scope": "Conditional on fitted models and observed months; not uncertainty across unseen months"
+  }
+]

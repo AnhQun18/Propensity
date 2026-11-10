@@ -1,5 +1,18 @@
 # Baseline tháng gần nhất và lịch sử tích lũy cũ
 
+**Cập nhật 11/11/2026:** đã bổ sung luồng đối chứng lịch sử mua có kiểm soát
+cutoff, hành vi và kết hợp tại `scripts/run_purchase_ablation.py`, cấu hình
+`configs/propensity_ablation.json`. Báo cáo mới và bằng chứng tổng hợp ở
+[baseline-final](../deliverables/baseline-final/REPORT.md). Luồng mới chỉ dùng
+validation 09–11/2022, giữ calibration/test kín và lưu model từng fold.
+Trainer hiện tái dựng toàn bộ `evaluation_protocol` từ preparation config,
+từ chối protocol bị đổi tháng, timezone hoặc thời điểm nhãn khả dụng.
+
+Run cũ có code hash đã khóa ở commit `edf39da`. Thay đổi code có chủ đích làm
+`locked_run` từ chối tiếp tục fit/test run cũ ở checkout mới. Giữ nguyên artifact
+và manifest cũ để truy vết; không sửa hash để bỏ qua kiểm tra. Lần nghiên cứu mới
+dùng output mới. Ablation không tạo model cuối/calibrator thay cho run cũ.
+
 Ngày: 10/11/2026. Đã triển khai và chạy baseline trên MBD-mini: feature đủ
 12 tháng, validation cuốn chiếu 09–11/2022. Xem
 [báo cáo baseline và so sánh với rule mua tháng trước](../BASELINE_REPORT.md).
