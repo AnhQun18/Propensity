@@ -106,11 +106,11 @@ def build():
     OUT.mkdir(parents=True,exist_ok=True)
     runtime=(SKILL/'assets/runtime.js').read_text(encoding='utf-8').replace('</script','<\\/script')
     runtime='\n'.join(line.rstrip() for line in runtime.splitlines())+'\n'
-    (OUT/'index.html').write_text(head+'<body class="tpl-weekly-report"><div class="deck" data-w="1280" data-h="720">'+sections(False)+'</div><script>'+runtime+'</script></body></html>',encoding='utf-8')
+    (OUT/'index.html').write_text(head+'<body class="tpl-weekly-report"><div class="deck" data-w="1280" data-h="720">'+sections(False)+'</div><script>'+runtime+'</script></body></html>',encoding='utf-8',newline='\n')
     static='body{display:block;width:1280px;height:auto;overflow:visible}.slide,.tpl-weekly-report .slide{position:relative;inset:auto;opacity:1;transform:none;pointer-events:auto;width:1280px;height:720px;margin:0;page-break-after:always}'
-    (OUT/'canva_import.html').write_text(head.replace('</style>',static+'</style>')+'<body class="tpl-weekly-report">'+sections(True)+'</body></html>',encoding='utf-8')
+    (OUT/'canva_import.html').write_text(head.replace('</style>',static+'</style>')+'<body class="tpl-weekly-report">'+sections(True)+'</body></html>',encoding='utf-8',newline='\n')
     (OUT/'outline.json').write_text(json.dumps(dict(title='Baseline propensity',date='2026-11-11',language='vi',canvas=[1280,720],
-                                                  template='html-ppt weekly-report, cover, table, stat-highlight',slides=pages),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+                                                  template='html-ppt weekly-report, cover, table, stat-highlight',slides=pages),ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({'slides':len(pages),'output':str(OUT)},ensure_ascii=False))
 
 

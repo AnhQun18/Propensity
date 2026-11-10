@@ -60,20 +60,20 @@
   "artifacts": {
     ".gitattributes": "8df22cc43d34bc5cf0e2ae4d1cd11a28ad8073b0e53f3ad51d1d693516d12b32",
     "Baseline_Propensity_Report.pdf": "7913792fd655a554030b8a45ae1c1bd74a09ea684b51c8e056db9d36a2ba2322",
-    "feature_contract.json": "6a37bdbf6e2d565ac5fbcc229a9eccaf08eeae2993a39eb104744fae416debf9",
-    "monthly_budget_metrics.csv": "146b1330aa3dc0f418bdbf965278fae55418ea8ff85693945d8301448cf422b5",
-    "monthly_metrics.json": "929d227e04aeebdd0a768e07ef212c354b7b1c5a1131038959f0d8d723a237b0",
+    "feature_contract.json": "d6e5058cb4af8c32f25a5da0867936a2bfc466aecdc687d18607006c35cddb81",
+    "monthly_budget_metrics.csv": "1faaeb236b687be181f09a3de7934272d749ed7b864fc7e1c3b4085ea096608e",
+    "monthly_metrics.json": "3f9f07e907b4e1193f30d195f25dbda78faff2433f60fdbfc5807cfe31d9e6bd",
     "monthly_recall.png": "4fcc0ccf0848b51dd1008962feb171e230dd8cc545a824781b3deba4b522559b",
-    "paired_comparisons.json": "c0c639e1b785117ef3302506cc790566a4843033c480d0f9c6281b984618df8c",
+    "paired_comparisons.json": "da82a65b0ec23f7cf1a71d809472af4e2c42c4a36ad57b713ebf8fae1ebdf1cc",
     "README.md": "b162c253cc8b84ad5c74e07c632ac94f31c247f7ac44c796ba46faea22398574",
     "recall_comparison.png": "a5c57876e5718bf4d83b83577a3eb74c98b657d07e76c6158e00de523f9576a1",
-    "report.html": "28e4b37031ed2e678f104ba66d0cde8e5b55a31c9e3bfe122e9496f97312af18",
-    "REPORT.md": "27c1bc0ac77e615e8947bf791cdab656854fe6d322c53b539ca49d1c53eacbf6",
-    "summary.csv": "0fb1e01ce4653676dbb3d2e84e25f7322f050892bf15ac4c9cb03ebcc0b74449",
-    "verification.json": "d450eaf28ece951a8e1ae6d1b3e7e656ca335ae175af38f21d1e5d2d734e941d",
-    "presentation/canva_import.html": "5736d2e468ea2d9bb2de3374e5f69fac485ba85d88cdb9ba9828e094a161c35e",
-    "presentation/index.html": "08c4cd47d79997a5e8655bf756e2cdec33f95fd5f2e5572b1e767a4b8c2f823a",
+    "report.html": "dfb457d30999a0924fb123b64193f54c0c8f3244e49565549d73c3578cd5a08d",
+    "REPORT.md": "4ae66deb1a13f9c38f5b3b3741dc100499d72b84754fcef16427602436a33487",
+    "summary.csv": "c16a8d64f628eda5454aa29e40dc0bd53a5260be1d6daba916aa7deba38889cd",
+    "verification.json": "8e6b535aae4279a528bd04fde33d3eb198738b2e61892732004519f7bf7acb97",
+    "presentation/canva_import.html": "df26e45abafcd5e775a7be5552c192e6ff95b9f4057206cbb5946c236f19d0da",
+    "presentation/index.html": "c7b098e7cacf329f05cd4ec64cfb7cbf2a453565b06390b7fae034c7f9053135",
     "presentation/LICENSE.txt": "a5ed4059e25a3ec35e439abd2623753d1f42d4aa4989ffb5c6b7a97b61f6a949",
-    "presentation/outline.json": "6ef3845371b220f971cef52043629a0d3b98d20a39252713db6b95012ec1b133"
+    "presentation/outline.json": "e0bd171c2a801016a710956146e974daf947d2eae48b3142d149cfec60ba63a4"
   }
 }

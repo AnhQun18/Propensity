@@ -104,15 +104,15 @@ def publish(run, out):
         parity.append(dict(month=current['month'], status='matched'))
     if len(parity) != 3:
         raise ValueError('Missing original-model validation rerun')
-    pd.DataFrame(summary).to_csv(out/'summary.csv', index=False)
+    pd.DataFrame(summary).to_csv(out/'summary.csv', index=False, lineterminator='\n')
     budget_rows = []
     for row in monthly:
         for budget, values in row['top_k'].items():
             budget_rows.append(dict(model=row['model'], month=row['month'], rows=row['rows'],
                                     positives=row['positives'], budget=float(budget), **values))
     budgets = pd.DataFrame(budget_rows)
-    budgets.to_csv(out/'monthly_budget_metrics.csv', index=False)
-    write = lambda name, value: (out/name).write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    budgets.to_csv(out/'monthly_budget_metrics.csv', index=False, lineterminator='\n')
+    write = lambda name, value: (out/name).write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n', encoding='utf-8', newline='\n')
     write('paired_comparisons.json', comparisons)
     write('monthly_metrics.json', monthly)
     write('feature_contract.json', dict(variants=state['feature_variants'], parameters=state['parameters'],
@@ -244,8 +244,8 @@ Xuất báo cáo bằng `scripts/publish_baseline_ablation.py --run outputs/prop
 
 Nguồn dự án: [báo cáo baseline gốc](../../BASELINE_REPORT.md), [thiết kế baseline](../../docs/propensity_baseline_design.md), [cấu hình ablation](../../configs/propensity_ablation.json), [mã tạo lịch sử mua](../../src/propensity_baseline/ablation.py). Nguồn phương pháp: [bài MBD](https://arxiv.org/html/2409.17587v1), [cross-validation theo thời gian](https://scikit-learn.org/stable/modules/cross_validation.html#cross-validation-of-time-series-data), [tránh rò rỉ tiền xử lý](https://scikit-learn.org/stable/common_pitfalls.html#data-leakage), [tham số XGBoost](https://xgboost.readthedocs.io/en/stable/parameter.html).
 '''
-    (out/'REPORT.md').write_text(report,encoding='utf-8')
-    (out/'report.html').write_text(markdown_html(report,out),encoding='utf-8')
+    (out/'REPORT.md').write_text(report,encoding='utf-8',newline='\n')
+    (out/'report.html').write_text(markdown_html(report,out),encoding='utf-8',newline='\n')
     write('verification.json',dict(run_status=state['status'],test_opened=False,calibration_opened=False,
                                    original_baseline_parity=parity,source_fingerprint=state['source_fingerprint'],
                                    code_sha256=state['code_sha256'],parameters=state['parameters'],
