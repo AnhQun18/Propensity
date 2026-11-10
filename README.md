@@ -2,6 +2,13 @@
 
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
 
+**Notebook EDA đủ 7 bước:** [notebooks/eda.ipynb](notebooks/eda.ipynb) đã chạy toàn bộ raw
+và 221 đặc trưng trên train. [Báo cáo HTML](deliverables/eda/report.html) có 12 biểu đồ,
+56 bảng CSV, kiểm tra thiếu/trùng/ngoại lai và kế hoạch Feature Engineering.
+Xem [phạm vi và cách chạy lại](deliverables/eda/README.md).
+Bản trình bày ngày 11/11/2026: [PDF tóm tắt 3 trang](deliverables/eda/executive_report.pdf)
+và [Canva 9 trang](https://www.canva.com/d/fzrKYASPTN_2Tif).
+
 **Báo cáo baseline:** [BASELINE_REPORT.md](BASELINE_REPORT.md) trình bày bài toán,
 ý tưởng, input, công việc đã thực hiện, output và kết quả thực nghiệm so với rule
 mua tháng trước. Baseline dùng **trx + geo + dialog**, đạt Recall@1% validation

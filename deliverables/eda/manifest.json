@@ -1,0 +1,145 @@
+{
+  "status": "ready",
+  "created_utc": "2026-11-10T12:54:08.855454+00:00",
+  "duration_seconds": 318.24,
+  "versions": {
+    "duckdb": "2.0.0",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "matplotlib": "3.11.2",
+    "scipy": "1.18.1"
+  },
+  "scope": "full raw; features training 2022-02 through 2022-08; all-month target overview only",
+  "input_metadata_sha256": "84d14415f304d401b1877f3ea220f208918ee0bc9a94a8f781731d1c07df0bae",
+  "fingerprint_note": "Paths, sizes and mtimes, not content checksums; no old cache used",
+  "sample": {
+    "method": "ORDER BY hash(client_id, cutoff, 42), client_id, cutoff LIMIT 30000",
+    "rows": 30000,
+    "seed": 42
+  },
+  "raw_modified": false,
+  "prepared_modified": false,
+  "models_fitted": false,
+  "validation": {
+    "target_conflicting_keys": 0,
+    "label_exact_duplicates_removed_in_temp_view": 0,
+    "raw_prepared_target_mismatches": 0,
+    "raw_prepared_join_rows": 1202688,
+    "features_rows": 1202688,
+    "unique_customers": 100224,
+    "positives": 12854,
+    "unknown_labels": 0,
+    "predictors_described": 221,
+    "sample_rows": 30000,
+    "train_max_cutoff": "2022-08-01 00:00:00",
+    "input_metadata_unchanged": true
+  },
+  "tables": [
+    "preview_clients",
+    "preview_targets",
+    "preview_trx",
+    "preview_geo",
+    "preview_dialog",
+    "preview_ptls_trx",
+    "preview_ptls_geo",
+    "preview_ptls_dialog",
+    "preview_features",
+    "preview_train",
+    "overview",
+    "schema",
+    "category_top_clients_fold",
+    "category_top_targets_target_1",
+    "category_top_targets_target_2",
+    "category_top_targets_target_3",
+    "category_top_targets_target_4",
+    "category_top_targets_fold",
+    "category_top_trx_event_type",
+    "category_top_trx_event_subtype",
+    "category_top_trx_currency",
+    "category_top_trx_src_type11",
+    "category_top_trx_src_type12",
+    "category_top_trx_dst_type11",
+    "category_top_trx_dst_type12",
+    "category_top_trx_src_type21",
+    "category_top_trx_src_type22",
+    "category_top_trx_src_type31",
+    "category_top_trx_src_type32",
+    "category_top_trx_fold",
+    "category_top_geo_geohash_4",
+    "category_top_geo_geohash_5",
+    "category_top_geo_geohash_6",
+    "category_top_geo_fold",
+    "raw_numeric",
+    "categorical_summary",
+    "amount_by_currency",
+    "feature_statistics_train",
+    "nested_element_quality",
+    "dialog_vector_lengths",
+    "detail_sequence_reconciliation",
+    "missing_diff_context",
+    "missing_values",
+    "duplicates",
+    "label_conflicts",
+    "target_monthly",
+    "target_counts",
+    "source_coverage",
+    "feature_target_associations",
+    "pearson_feature_matrix_sample",
+    "correlation_pair_counts_sample",
+    "high_correlation_pairs",
+    "feature_band_target_rates",
+    "feature_outliers_train",
+    "amount_outliers_by_currency",
+    "feature_engineering_plan"
+  ],
+  "figures": {
+    "target_distribution": {
+      "caption": "Toàn bộ 12 tháng; nhãn có/không mua. Tháng 12/2022–01/2023 chỉ mô tả độ phủ/nhãn, không lựa chọn biến.",
+      "group": "univariate"
+    },
+    "source_coverage": {
+      "caption": "Độ phủ lịch sử trước cutoff, không phải số khách duy nhất; không loại khách thiếu nguồn.",
+      "group": "univariate"
+    },
+    "amount_histogram": {
+      "caption": "Mẫu hash cố định 50,000 giao dịch currency=11, seed 42. Trái giữ đơn vị gốc, phải bổ sung log1p; thống kê bảng dùng toàn bộ log.",
+      "group": "univariate"
+    },
+    "feature_histograms": {
+      "caption": "Train hash sample n=30,000; giữ trục gốc, null không xuất hiện trong histogram và được đếm riêng.",
+      "group": "univariate"
+    },
+    "categorical_bars": {
+      "caption": "Toàn bộ raw; top 10 nhóm + Other, null hiển thị Missing nếu thuộc top. Mã số là biến phân loại ẩn danh.",
+      "group": "univariate"
+    },
+    "missing_features": {
+      "caption": "20 đặc trưng có tỷ lệ thiếu cao nhất trên toàn bộ train; kiểm tra độ phủ và trạng thái nguồn trước khi imputation.",
+      "group": "univariate"
+    },
+    "correlation_heatmap": {
+      "caption": "Heatmap 16 biến có |Pearson với target| lớn nhất trên train; ma trận hình dùng mẫu hash n=30,000, pairwise-complete (n cặp trong CSV). Không thay NaN thành 0.",
+      "group": "multivariate"
+    },
+    "target_associations": {
+      "caption": "Tương quan với nhãn nhị phân trên toàn bộ train là mô tả liên hệ, chưa phải mức ảnh hưởng nhân quả hoặc feature importance.",
+      "group": "multivariate"
+    },
+    "numeric_scatter": {
+      "caption": "Số–số, mẫu hash train 30,000; trục tuyến tính. Nhãn hiện chỉ nhằm so sánh mô tả.",
+      "group": "multivariate"
+    },
+    "target_boxplots": {
+      "caption": "Số–phân loại trên cùng mẫu hash train n=30,000; giữ tỷ lệ lớp tự nhiên, không cân bằng lại mẫu. Râu 1,5×IQR.",
+      "group": "multivariate"
+    },
+    "band_target_rates": {
+      "caption": "Toàn bộ train, 5 nhóm xếp theo giá trị hữu hạn. Giá trị bằng nhau có thể chia nhiều nhóm: đọc min/max trong bảng; liên hệ chưa kiểm soát tháng/khách.",
+      "group": "multivariate"
+    },
+    "outlier_boxplots": {
+      "caption": "Boxplot trên mẫu hash train n=30,000; số lượng gắn cờ IQR/Z-score trong CSV được tính trên toàn bộ train. Không tự động xóa/cap.",
+      "group": "outliers"
+    }
+  }
+}

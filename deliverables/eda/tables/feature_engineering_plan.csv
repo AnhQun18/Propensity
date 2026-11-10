@@ -1,0 +1,13 @@
+﻿columns_or_group,recommendation,reason_or_implementation
+"client_id, fold, cutoff, mon",Exclude predictors,"ID/partition chỉ để nối, chia tập và audit thời gian"
+"target_1..4, y_any, supervised_eligible",Target/metadata only,Không đưa vào X; giữ unknown nếu nhãn thiếu
+"targets.trans_count, diff_trans_date",Exclude pending definition,Chưa xác minh cửa sổ/cutoff; có nguy cơ leakage
+"Raw event_type/subtype, currency, src/dst, geohash",Categorical encoding,CatBoost category hoặc one-hot/hashing fit trên train; unknown/missing riêng; không scale mã danh nghĩa
+Numeric null,Missing flags + optional imputation,Fit median train nếu estimator cần; giữ NaN cho estimator hỗ trợ; không điền nhãn
+Counts / monetary aggregates,log1p / signed-log; optional scaling,"Theo currency, không gộp đơn vị; Standard/RobustScaler fit train cho linear/distance, tree không bắt buộc"
+Constant/all-missing predictors,Review for removal,Bảng feature_statistics_train; không quyết định từ test; giữ schema nếu pipeline phụ thuộc
+Highly correlated pairs,Review redundancy,Bảng high_correlation_pairs + cỡ mẫu; chọn theo validation và độ ổn định thời gian
+New behavioral features,Candidate engineering,"Recency/frequency/active-day rate, share từng loại, xu hướng 30d/84d, flags coverage/missing; tất cả event_time < cutoff"
+Dialog embedding / geo content,Optional grouped ablation,"Hiện dùng metadata; nếu thêm pooling/entropy/content phải fit trên train, đối chứng và kiểm tra RAM"
+Outliers,Retain + investigate,Không xóa/cap chỉ dựa IQR/Z; nếu cap dùng threshold fit train và so validation
+Evaluation,Time split + group-aware uncertainty,"Train 02–08, validation 09–11, calibration 12, test khóa 01/2023; bootstrap theo khách khi ước lượng bất định"

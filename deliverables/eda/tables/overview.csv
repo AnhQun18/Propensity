@@ -1,0 +1,11 @@
+﻿table,rows,columns,grain,first_time,last_time
+clients,100224,2,customer,,
+targets,1202688,9,customer_month,2022-02-28,2023-01-31
+trx,38764930,15,event,2020-12-31 21:00:02.169545,2022-12-31 20:59:58.460193
+geo,66295724,6,event,2021-12-11 19:27:07.507106,2022-12-31 20:59:58.725788
+dialog,217205,4,event,2021-02-10 09:36:07.022271,2022-12-31 20:25:11.730797
+ptls_trx,98721,15,customer_sequence,,
+ptls_geo,72573,6,customer_sequence,,
+ptls_dialog,46320,4,customer_sequence,,
+features,1202688,229,customer_month,2022-02-01 00:00:00,2023-01-01 00:00:00
+train,701568,229,customer_month,2022-02-01 00:00:00,2022-08-01 00:00:00

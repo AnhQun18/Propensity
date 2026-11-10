@@ -1,0 +1,18 @@
+﻿table,check,extra_rows,groups,scope
+clients,key,0,0.0,full_raw
+clients,full_row,0,0.0,proven by unique key
+targets,key,0,0.0,full_raw
+targets,full_row,0,0.0,proven by unique key
+trx,full_row,0,0.0,full_raw; partitioned by fold (part of full row)
+trx,same_client_timestamp_candidate,1,1.0,full_raw; do not automatically delete
+geo,full_row,0,0.0,full_raw; partitioned by fold (part of full row)
+geo,same_client_timestamp_candidate,0,0.0,full_raw; do not automatically delete
+dialog,full_row,0,0.0,full_raw; partitioned by fold (part of full row)
+dialog,same_client_timestamp_candidate,0,0.0,full_raw; do not automatically delete
+ptls_trx,key,0,0.0,full_raw
+ptls_trx,full_row,0,0.0,proven by unique key
+ptls_geo,key,0,0.0,full_raw
+ptls_geo,full_row,0,0.0,proven by unique key
+ptls_dialog,key,0,0.0,full_raw
+ptls_dialog,full_row,0,0.0,proven by unique key
+features,customer_cutoff_key,0,,all 12 months

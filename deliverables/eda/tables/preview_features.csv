@@ -1,0 +1,7 @@
+﻿client_id,cutoff,y_any,target_1,target_2,target_3,target_4,supervised_eligible,trx_30d_source_window_overlap_days,trx_30d_history_truncated,trx_30d_has_event,trx_30d_event_count,preview
+id_4e521138ec,2022-02-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,1,head
+id_4e521138ec,2022-03-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,8,head
+id_4e521138ec,2022-04-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,8,head
+id_191efc2d26,2022-11-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,10,tail
+id_191efc2d26,2022-12-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,10,tail
+id_191efc2d26,2023-01-01,0,0.0,0.0,0.0,0.0,True,30.0,0,1,5,tail

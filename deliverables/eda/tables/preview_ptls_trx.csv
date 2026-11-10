@@ -1,0 +1,7 @@
+﻿client_id,event_time_length,amount_length,event_type_length,event_subtype_length,currency_length,src_type11_length,src_type12_length,dst_type11_length,dst_type12_length,src_type21_length,src_type22_length,src_type31_length,src_type32_length,fold,preview
+id_4e521138ec,344,344,344,344,344,344,344,344,344,344,344,344,344,2,head
+id_d2b547f0e5,13,13,13,13,13,13,13,13,13,13,13,13,13,4,head
+id_7798f8d228,19,19,19,19,19,19,19,19,19,19,19,19,19,3,head
+id_cabe5dc315,38,38,38,38,38,38,38,38,38,38,38,38,38,0,tail
+id_ae2a5d9c0a,133,133,133,133,133,133,133,133,133,133,133,133,133,0,tail
+id_191efc2d26,178,178,178,178,178,178,178,178,178,178,178,178,178,3,tail

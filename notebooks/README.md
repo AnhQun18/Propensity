@@ -2,6 +2,7 @@
 
 | Notebook | Mục đích | Dữ liệu |
 | --- | --- | --- |
+| [eda.ipynb](eda.ipynb) | EDA đủ 7 bước, thống kê toàn bộ raw, liên hệ với `y_any` trên train, xuất HTML/Markdown/CSV | Raw `data/MBD-mini/` + output ready notebook 03 |
 | [01_data_preview.ipynb](01_data_preview.ipynb) | Xem schema và vài dòng mẫu | `sampledata/mbd_mini/` |
 | [02_data_preparation.ipynb](02_data_preparation.ipynb) | Chuẩn hóa nhãn/log, feature khách–tháng, audit và protocol | Raw `data/MBD-mini/` hoặc đường dẫn cấu hình |
 | [03_data_processing.ipynb](03_data_processing.ipynb) | Quy trình xử lí hiện tại, có bảng các bước, kiểm tra ma trận và tách supervised/unlabelled | Raw theo `configs/propensity_processing.json` |
@@ -31,7 +32,9 @@ Notebook 02 chứa đầy đủ định nghĩa hàm và SQL, chia riêng các b�
 import package nội bộ. Cài dependency và chọn kernel Python >=3.11 theo hướng dẫn
 đầu notebook. Chỉ các cell từ mục 5 trở đi đọc raw và ghi dữ liệu khi được chạy.
 
-Notebook nguồn giữ output trống. Bản sửa schema v2 và validation dùng chung đã
+Notebook chuẩn bị dữ liệu nguồn giữ output trống. Riêng `eda.ipynb` giữ output đã
+thực thi, bảng tổng hợp và head/tail có ID được hash để đọc trực tiếp kết quả.
+Bản sửa schema v2 và validation dùng chung đã
 được kiểm thử tổng hợp; output thật đã kiểm tra lại đủ 12 tháng. Chưa có kết quả mô hình.
 Notebook không tự chạy khi mở file. Sau lỗi, sửa nguyên nhân, đổi output và Restart Kernel; không
 chạy lại nửa chừng trên output đã tồn tại.

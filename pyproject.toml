@@ -24,6 +24,14 @@ where = ["src"]
 include = ["mbd_mini_eda*", "propensity_data*", "propensity_baseline*"]
 
 [project.optional-dependencies]
+eda = [
+    "duckdb>=2.0,<3; python_version >= '3.11'",
+    "matplotlib>=3.10",
+    "scipy>=1.10",
+    "ipykernel>=6.0",
+    "nbformat>=5.0",
+    "nbclient>=0.10",
+]
 plots = ["matplotlib>=3.10"]
 supplement = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 prepare = ["duckdb>=2.0,<3; python_version >= '3.11'"]
