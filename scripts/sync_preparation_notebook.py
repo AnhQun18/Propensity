@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-NOTEBOOK = ROOT / "notebooks/02_data_preparation.ipynb"
+NOTEBOOKS = (ROOT / "notebooks/02_data_preparation.ipynb", ROOT / "notebooks/03_data_processing.ipynb")
 
 
 def render_library_cell(root: Path, metadata: dict) -> str:
@@ -27,11 +27,8 @@ def render_library_cell(root: Path, metadata: dict) -> str:
     return source.strip() + "\n"
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="Compare only; do not write")
-    args = parser.parse_args(argv)
-    notebook = json.loads(NOTEBOOK.read_text(encoding="utf-8"))
+def synchronize(path, *, check=False):
+    notebook = json.loads(path.read_text(encoding="utf-8"))
     stale = []
     for cell in notebook["cells"]:
         if cell["cell_type"] != "code":
@@ -46,14 +43,22 @@ def main(argv=None):
         cell["execution_count"] = None
         cell["outputs"] = []
         cell["metadata"].pop("execution", None)
-    if args.check:
+    if check:
         if stale:
-            raise SystemExit("Notebook needs synchronization: " + ", ".join(stale))
-        print("Source cells match; no execution outputs.")
+            raise SystemExit(f"{path.name} needs synchronization: " + ", ".join(stale))
+        print(f"{path.name}: source cells match; no execution outputs.")
         return
     notebook["metadata"]["workflow"]["execution_status"] = "not_run"
-    NOTEBOOK.write_text(json.dumps(notebook, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"Updated {NOTEBOOK}; no notebook code was executed.")
+    path.write_text(json.dumps(notebook, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"Updated {path}; no notebook code was executed.")
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Compare only; do not write")
+    args = parser.parse_args(argv)
+    for path in NOTEBOOKS:
+        synchronize(path, check=args.check)
 
 
 if __name__ == "__main__":

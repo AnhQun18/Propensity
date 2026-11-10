@@ -173,6 +173,18 @@ class PreparationTests(unittest.TestCase):
         self.assertFalse(schema["ablation_groups"]["dialog_content"])
         self.assertEqual(self.frame("2022-12").loc["a", "dialog_84d_event_count"], 1)
 
+    def test_unknown_currency_is_not_known_absence_of_foreign(self):
+        self.trx["client_id"][3] = "b"  # One valid-time event, missing currency.
+        self.write("detail/trx", self.trx)
+        self.prepare()
+        frame = self.frame("2022-12")
+        self.assertTrue(frame["trx_all_has_foreign"].isna().loc["b"])
+        self.assertEqual(frame.loc["b", "trx_all_known_currency_count"], 0)
+        self.assertTrue(frame["trx_all_foreign_fraction_known_currency"].isna().loc["b"])
+        self.assertEqual(frame.loc["b", "trx_all_foreign_fraction"], 0)  # Observed foreign / all logs.
+        self.assertEqual(frame.loc["a", "trx_all_has_foreign"], 1)
+        self.assertEqual(frame.loc["c", "trx_all_has_foreign"], 0)  # No logs in covered window.
+
 
 if __name__ == "__main__":
     unittest.main()

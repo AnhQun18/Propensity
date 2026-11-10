@@ -23,5 +23,10 @@ def feature_schema(columns: list[str]) -> dict:
         },
         "missing_numeric": "Keep NaN; counts are zero only within calendar overlap with the source",
         "currency_sidecar": "Separate units; do not sum amounts across currency values",
+        "feature_definitions": {
+            "*_has_foreign": "1 if known foreign observed; 0 if no logs in covered window or known main and no known foreign; null if only unknown currency or no source overlap",
+            "*_foreign_fraction": "Observed foreign logs / all logs; 0 does not prove all currencies were main",
+            "*_foreign_fraction_known_currency": "Known foreign logs / logs with valid currency; null when denominator is zero",
+        },
         "scope_note": "Calendar extract overlap is not continuous observation of each customer",
     }

@@ -27,6 +27,7 @@ def window_features(con, source, cutoff, days, config, out):
         numeric.update({
             "main_count": "count(*) FILTER(WHERE currency = 11)",
             "foreign_count": "count(*) FILTER(WHERE currency <> 11)",
+            "known_currency_count": "count(currency)",
             "currency_missing_count": "count(*) FILTER(WHERE currency_missing)",
             "currency_invalid_count": "count(*) FILTER(WHERE currency_invalid)",
             "amount_missing_count": "count(*) FILTER(WHERE amount_missing)",
@@ -40,6 +41,7 @@ def window_features(con, source, cutoff, days, config, out):
             "main_amount_abs_sum": "sum(abs(amount)) FILTER(WHERE currency = 11)",
             "main_amount_signed_log_mean": "avg(sign(amount) * ln(1 + abs(amount))) FILTER(WHERE currency = 11)",
             "foreign_fraction": "count(*) FILTER(WHERE currency <> 11)::DOUBLE / count(*)",
+            "foreign_fraction_known_currency": "count(*) FILTER(WHERE currency <> 11)::DOUBLE / nullif(count(currency), 0)",
         })
         zero_when_covered.update(k for k in numeric if k.endswith("_count"))
         for cat in CATEGORIES:
@@ -76,8 +78,10 @@ def window_features(con, source, cutoff, days, config, out):
                   f"AS {prefix}log1p_event_count")
     if source == "trx":
         select += [f"ln(1 + a.main_amount_abs_sum) AS {prefix}log1p_main_amount_abs_sum",
-                   f"CASE WHEN ({overlap}) > 0 THEN cast(coalesce(a.foreign_count, 0) > 0 AS TINYINT) END "
-                   f"AS {prefix}has_foreign"]
+                   f"CASE WHEN ({overlap}) <= 0 THEN NULL "
+                   f"WHEN coalesce(a.event_count, 0) = 0 THEN 0 "
+                   f"WHEN a.foreign_count > 0 THEN 1 "
+                   f"WHEN a.main_count > 0 THEN 0 ELSE NULL END::TINYINT AS {prefix}has_foreign"]
     query = f"SELECT {', '.join(select)} FROM clients c LEFT JOIN aggregate_window a USING(client_id)"
     con.execute(f"CREATE OR REPLACE TEMP TABLE window_result AS {query}")
     if source == "trx":

@@ -1,7 +1,10 @@
 # Chuẩn bị dữ liệu propensity any-product
 
-Quy trình để đọc và chạy từng bước nằm tại
-[`notebooks/02_data_preparation.ipynb`](../notebooks/02_data_preparation.ipynb).
+Quy trình hiện tại để đọc và chạy từng bước nằm tại
+[`notebooks/03_data_processing.ipynb`](../notebooks/03_data_processing.ipynb),
+viết ngày 10/11/2026, có bảng mục tiêu/cách làm/đầu ra cho 12 bước.
+Notebook [02_data_preparation.ipynb](../notebooks/02_data_preparation.ipynb) giữ quy
+trình chuẩn bị trước đó; cả hai dùng cùng helper cho nhãn và feature.
 Notebook có đầy đủ mã xử lí và SQL, chia riêng cấu hình, nhãn, từng nguồn log,
 feature theo tháng và hoàn tất. Các cell định nghĩa đồng bộ với helper trong
 `src/propensity_data/`; package `mbd_mini_eda` tiếp tục
@@ -20,15 +23,26 @@ python -m venv .venv
 Copy-Item configs/propensity_data.json configs/propensity_data.local.json
 ```
 
+Với notebook 03, thay lệnh copy cấu hình bằng:
+
+```powershell
+Copy-Item configs/propensity_processing.json configs/propensity_processing.local.json
+```
+
+Notebook 03 ưu tiên file `.local.json` này; mặc định output riêng là
+`outputs/propensity_processing_v3/`. Không cần chạy notebook 02 trước notebook 03.
+
 Sửa `data_root` và `output_dir` trong bản `.local.json`. Đường dẫn tương đối tính từ
 file JSON. Cấu hình mặc định dùng DuckDB 6 GB, hai luồng; đây là giới hạn cho engine,
 không phải cam kết tổng RAM tiến trình. Cần dung lượng đĩa cho bản chuẩn hóa, spill,
 audit và features; chưa đo dung lượng hoặc thời gian trên raw. Không nạp toàn bộ
 log thành pandas DataFrame. Tắt embedding mặc định để giảm chi phí baseline.
 
-Mở `notebooks/02_data_preparation.ipynb`, chọn kernel đã cài dependency rồi thực hiện
+Mở `notebooks/03_data_processing.ipynb`, chọn kernel đã cài dependency rồi thực hiện
 cell theo thứ tự. Mục 1–4 định nghĩa quy tắc và helper; từ mục 5 bắt đầu đọc raw và
 ghi output. Nhãn, trx, geo, dialog và tạo feature có bước riêng để xem kiểm kê.
+Mục 9–10 kiểm tra ma trận và xuất supervised/unlabelled; mục 11 định nghĩa reader
+chỉ mở dữ liệu sau manifest ready; mục 12 đối soát và hoàn tất.
 Hàm `iter_supervised_batches` chỉ trả dòng có nhãn hợp lệ cho bước mô hình, không
 xóa các dòng chưa có nhãn khỏi quần thể scoring.
 
@@ -71,6 +85,14 @@ Không tự xóa kết quả lỗi, vì còn cần truy vết nguyên nhân.
   tỷ lệ thiếu và tỷ lệ category phổ biến nhất. Tần suất từng mã event type/subtype
   xuất ở sidecar.
 - Không dùng `fold`, `trans_count`, `diff_trans_date` nguồn làm predictor.
+
+**Sửa trong mã ngày 10/11/2026, chưa chạy:** `has_foreign` giữ null khi có log nhưng
+không có currency hợp lệ. Ngoài phạm vi nguồn giữ null; không có log trong cửa sổ
+có phạm vi nguồn cho cờ 0; đã thấy ngoại tệ cho 1; thấy mã chính và không thấy ngoại
+tệ cho 0. Vẫn đếm riêng currency thiếu/invalid.
+`foreign_fraction` là số log ngoại tệ quan sát được / toàn log;
+`foreign_fraction_known_currency` là số log ngoại tệ / số log có mã hợp lệ, null nếu
+mẫu số 0. Không âm thầm đổi mẫu số của feature cũ.
 
 ## Nhãn và quần thể
 
@@ -150,6 +172,20 @@ Chỉ nhận kết quả khi `manifest.status=ready`; output lỗi có thể đ�
 Pipeline kiểm tra inventory cuối vẫn khớp đầu, số khách không giảm khi join và schema
 nhất quán giữa các tháng. Dữ liệu chi tiết sinh ra nằm trong `outputs/`, đã bị Git
 ignore. `work.duckdb` là sản phẩm của lần chạy, **không có resume tự động**.
+
+Notebook 03 bổ sung các sản phẩm sau sau khi tạo features:
+
+| Đường dẫn | Nội dung |
+| --- | --- |
+| `model_input/supervised/month=YYYY-MM/part.parquet` | Chỉ dòng biết y_any; khóa, whitelist predictor và y_any |
+| `model_input/unlabelled/month=YYYY-MM/part.parquet` | Dòng chưa xác định nhãn; giữ cho scoring/đối soát |
+| `audit/processing_checks.parquet` | Số dòng scoring/supervised/unlabelled và số dòng mất cả bốn target |
+| `model_input/contract.json` | Whitelist, nhóm ablation, protocol và quy tắc nhãn; không có preprocessing đã fit |
+
+Kiểm tra trước khi xuất: khóa không trùng/null, cutoff đúng partition, eligibility
+khớp trạng thái y_any, OR nhãn nguồn khớp y_any, predictor chỉ có số hữu hạn hoặc
+null, số dòng bằng universe và supervised + unlabelled bằng tổng scoring.
+Notebook chưa được chạy; chưa có bằng chứng runtime cho các kiểm tra này.
 
 Chọn feature bằng whitelist `feature_schema.json.predictors`; không suy ra feature
 bằng cách bỏ riêng `y_any`, vì file còn bốn nhãn nguồn và metadata. Các nhóm ablation

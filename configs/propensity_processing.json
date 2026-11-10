@@ -1,0 +1,16 @@
+{
+  "data_root": "../data/MBD-mini",
+  "output_dir": "../outputs/propensity_processing_v3",
+  "first_month": "2022-02",
+  "last_month": "2023-01",
+  "windows_days": [30, 84],
+  "memory_limit": "6GB",
+  "threads": 2,
+  "label_delay_days": 0,
+  "validation_months": ["2022-09", "2022-10", "2022-11"],
+  "calibration_month": "2022-12",
+  "test_month": "2023-01",
+  "include_dialog_embeddings": false,
+  "embedding_size": 768,
+  "embedding_window_days": 84
+}
