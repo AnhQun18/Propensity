@@ -7,15 +7,36 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import Mock
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from propensity_data.config import PreparationConfig
 from propensity_data.protocol import evaluation_protocol
+from propensity_data.schema import feature_schema, validate_feature_columns
 
 
 MONTHS = [f"2022-{m:02d}" for m in range(2, 13)] + ["2023-01"]
+
+
+class SchemaTests(unittest.TestCase):
+    def test_contract_rejects_unapproved_missing_reordered_and_wrong_dtype(self):
+        config = PreparationConfig(Path('synthetic_raw'), Path('synthetic_prepared'))
+        schema = feature_schema(config)
+        self.assertEqual(len(schema['predictors']), 221)
+        self.assertNotIn('fold', schema['predictors'])
+        self.assertNotIn('trans_count', schema['predictors'])
+        self.assertEqual(schema['dtypes']['trx_all_event_count'], 'BIGINT')
+        description = [(name, schema['dtypes'][name]) for name in schema['columns']]
+        validate_feature_columns(description, schema)
+        changed_type = [(name, 'DOUBLE' if name == 'trx_all_event_count' else dtype)
+                        for name, dtype in description]
+        for invalid in (description + [('fold', 'BIGINT')], description + [('trans_count', 'BIGINT')],
+                        description[:-1], list(reversed(description)), changed_type):
+            with self.subTest(last=invalid[-1]):
+                with self.assertRaisesRegex(ValueError, 'Feature schema mismatch'):
+                    validate_feature_columns(invalid, schema)
 
 
 class ProtocolTests(unittest.TestCase):
@@ -184,6 +205,80 @@ class PreparationTests(unittest.TestCase):
         self.assertEqual(frame.loc["b", "trx_all_foreign_fraction"], 0)  # Observed foreign / all logs.
         self.assertEqual(frame.loc["a", "trx_all_has_foreign"], 1)
         self.assertEqual(frame.loc["c", "trx_all_has_foreign"], 0)  # No logs in covered window.
+
+    def test_aggregate_overflow_fails_before_ready(self):
+        self.trx['amount'][0] = self.trx['amount'][2] = 1e308
+        self.trx['currency'][2] = 11
+        self.write('detail/trx', self.trx)
+        with self.assertRaisesRegex(ValueError, 'Non-finite/invalid predictor'):
+            self.prepare()
+        manifest = json.loads((self.config.output_dir / 'manifest.json').read_text())
+        self.assertEqual(manifest['status'], 'failed')
+
+    def test_existing_contract_upgrade_preserves_features(self):
+        self.prepare()
+        schema_path = self.config.output_dir / 'feature_schema.json'
+        schema = json.loads(schema_path.read_text())
+        legacy = {k: v for k, v in schema.items() if k not in ('schema_version', 'dtypes', 'columns')}
+        schema_path.write_text(json.dumps(legacy))
+        contract_path = self.config.output_dir / 'model_input/contract.json'
+        contract_path.parent.mkdir()
+        contract_path.write_text(json.dumps({
+            'keys': schema['keys'], 'target': schema['target'], 'predictors': schema['predictors'],
+            'protocol': json.loads((self.config.output_dir / 'protocol.json').read_text())}))
+        feature_path = self.config.output_dir / 'features/month=2022-12/part.parquet'
+        before = feature_path.read_bytes()
+        script = Path(__file__).resolve().parents[1] / 'scripts/validate_prepared_data.py'
+        spec = importlib.util.spec_from_file_location('validate_prepared', script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        module.main([str(self.config.output_dir), '--upgrade-contract'])
+        self.assertEqual(json.loads(schema_path.read_text()), schema)
+        self.assertEqual(feature_path.read_bytes(), before)
+        backup = self.config.output_dir / 'contract_before_schema_v2/feature_schema.json'
+        self.assertEqual(json.loads(backup.read_text()), legacy)
+        model_columns = [*schema['keys'], *schema['predictors'], schema['target']]
+        self.assertEqual(list(json.loads(contract_path.read_text())['dtypes']), model_columns)
+        manifest = json.loads((self.config.output_dir / 'manifest.json').read_text())
+        self.assertEqual(manifest['feature_schema_version'], 2)
+
+    def test_notebook_workflows_execute_shared_gate(self):
+        import contextlib
+        import hashlib
+        from datetime import timezone
+        import duckdb
+        import pandas as pd
+        import pyarrow.compute as pc
+        root = Path(__file__).resolve().parents[1]
+        for filename in ('02_data_preparation.ipynb', '03_data_processing.ipynb'):
+            with self.subTest(notebook=filename):
+                output = self.config.output_dir.parent / filename.removesuffix('.ipynb')
+                scope = dict(__name__=__name__, config=replace(self.config, output_dir=output),
+                             Path=Path, datetime=datetime, timezone=timezone,
+                             contextmanager=contextlib.contextmanager, hashlib=hashlib, json=json,
+                             duckdb=duckdb, pd=pd, pq=pq, pc=pc, display=lambda *args: None)
+                notebook = json.loads((root / 'notebooks' / filename).read_text(encoding='utf-8'))
+                for cell in notebook['cells']:
+                    if cell['cell_type'] != 'code' or cell['id'].endswith(('-environment', '-settings')):
+                        continue
+                    exec(compile(''.join(cell['source']), '<' + cell['id'] + '>', 'exec'), scope)
+                    if cell['id'].endswith('-validation-source'):
+                        scope['validate_month'] = Mock(wraps=scope['validate_month'])
+                self.assertEqual(scope['manifest']['status'], 'ready')
+                self.assertEqual(scope['validate_month'].call_count, 12)
+                self.assertEqual(len(scope['manifest']['dataset_checks']), 12)
+                schema = json.loads((output / 'feature_schema.json').read_text())
+                self.assertEqual(schema['schema_version'], 2)
+                batch = next(scope['iter_supervised_batches']('2022-12', batch_size=3))
+                self.assertEqual(batch.num_rows, 2)
+                if filename.startswith('03'):
+                    contract = json.loads((output / 'model_input/contract.json').read_text())
+                    self.assertEqual(list(contract['dtypes']), batch.schema.names)
+                ready = json.loads((output / 'manifest.json').read_text())
+                ready['status'] = 'failed'
+                (output / 'manifest.json').write_text(json.dumps(ready))
+                with self.assertRaisesRegex(RuntimeError, 'ready'):
+                    next(scope['iter_supervised_batches']('2022-12'))
 
 
 if __name__ == "__main__":

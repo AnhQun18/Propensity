@@ -39,7 +39,7 @@ class PreparationNotebookTests(unittest.TestCase):
         self.assertGreaterEqual(linked, 8)
         self.assertEqual(len(identifiers), len(set(identifiers)))
         for name in ("execute-labels", "normalize-trx", "normalize-geo",
-                     "normalize-dialog", "build-months", "supervised-reader", "finish"):
+                     "normalize-dialog", "build-months", "supervised-reader", "finish", "validation-source"):
             self.assertIn(prefix + name, identifiers)
         if prefix == "processing-":
             self.assertIn(prefix + "export-datasets", identifiers)

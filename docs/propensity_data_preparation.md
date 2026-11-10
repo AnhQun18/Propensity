@@ -8,9 +8,10 @@ trình chuẩn bị trước đó; cả hai dùng cùng helper cho nhãn và fea
 Notebook có đầy đủ mã xử lí và SQL, chia riêng cấu hình, nhãn, từng nguồn log,
 feature theo tháng và hoàn tất. Các cell định nghĩa đồng bộ với helper trong
 `src/propensity_data/`; package `mbd_mini_eda` tiếp tục
-phục vụ thống kê mô tả. Pipeline này **chưa được chạy trên dữ liệu thật hoặc chạy
-kiểm thử tại máy hiện tại**, theo yêu cầu ngày 09/11/2026. Các ví dụ bên dưới dành
-cho máy sẽ thực thi sau này. Chưa có training features hoặc kết quả mô hình mới.
+phục vụ thống kê mô tả. **Ngày 10/11/2026, notebook 02 và 03 đã chạy raw thành công**:
+mỗi bộ có 1.202.688 dòng, 12.854 nhãn dương và không thiếu nhãn; manifest ready.
+Đã kiểm thử tổng hợp schema v2/validation dùng chung và kiểm tra lại các file feature
+đã xuất. Chưa huấn luyện mô hình. Xem [kết quả sửa tồn đọng](preprocessing_fixes_20261110.md).
 
 ## Cài đặt và thực thi trên máy khác
 
@@ -35,7 +36,8 @@ Notebook 03 ưu tiên file `.local.json` này; mặc định output riêng là
 Sửa `data_root` và `output_dir` trong bản `.local.json`. Đường dẫn tương đối tính từ
 file JSON. Cấu hình mặc định dùng DuckDB 6 GB, hai luồng; đây là giới hạn cho engine,
 không phải cam kết tổng RAM tiến trình. Cần dung lượng đĩa cho bản chuẩn hóa, spill,
-audit và features; chưa đo dung lượng hoặc thời gian trên raw. Không nạp toàn bộ
+audit và features; lần chạy ngày 10/11 mất khoảng 31 phút/notebook, chưa đo peak RAM.
+Không nạp toàn bộ
 log thành pandas DataFrame. Tắt embedding mặc định để giảm chi phí baseline.
 
 Mở `notebooks/03_data_processing.ipynb`, chọn kernel đã cài dependency rồi thực hiện
@@ -46,8 +48,9 @@ chỉ mở dữ liệu sau manifest ready; mục 12 đối soát và hoàn tất
 Hàm `iter_supervised_batches` chỉ trả dòng có nhãn hợp lệ cho bước mô hình, không
 xóa các dòng chưa có nhãn khỏi quần thể scoring.
 
-Notebook mới chưa thực thi, mọi output trống. Mã helper tương ứng chia theo nhiệm
-vụ trong `src/propensity_data/{schema,storage,quality,features,protocol,config}.py`.
+Notebook nguồn giữ output trống; bản đã chạy và log nằm trong
+`outputs/notebook_execution_20261110_01/`. Mã helper tương ứng chia theo nhiệm
+vụ trong `src/propensity_data/{schema,storage,quality,features,validation,protocol,config}.py`.
 Nếu cần dùng terminal thay cho notebook, các lệnh CLI bên dưới vẫn được hỗ trợ.
 
 ```powershell
@@ -86,7 +89,7 @@ Không tự xóa kết quả lỗi, vì còn cần truy vết nguyên nhân.
   xuất ở sidecar.
 - Không dùng `fold`, `trans_count`, `diff_trans_date` nguồn làm predictor.
 
-**Sửa trong mã ngày 10/11/2026, chưa chạy:** `has_foreign` giữ null khi có log nhưng
+**Đã sửa và kiểm thử ngày 10/11/2026:** `has_foreign` giữ null khi có log nhưng
 không có currency hợp lệ. Ngoài phạm vi nguồn giữ null; không có log trong cửa sổ
 có phạm vi nguồn cho cờ 0; đã thấy ngoại tệ cho 1; thấy mã chính và không thấy ngoại
 tệ cho 0. Vẫn đếm riêng currency thiếu/invalid.
@@ -169,8 +172,10 @@ outputs/propensity_data_v1/
 ```
 
 Chỉ nhận kết quả khi `manifest.status=ready`; output lỗi có thể đã chứa một số tháng.
-Pipeline kiểm tra inventory cuối vẫn khớp đầu, số khách không giảm khi join và schema
-nhất quán giữa các tháng. Dữ liệu chi tiết sinh ra nằm trong `outputs/`, đã bị Git
+CLI và hai notebook dùng chung `validate_month` để kiểm tra dữ liệu đã ghi:
+khóa/quần thể/nhãn nguồn, cột/thứ tự/dtype, predictor hữu hạn hoặc null, count/cửa sổ,
+currency, tỷ trọng và masks. Tổng amount bị tràn thành `inf` làm lần chạy failed.
+Pipeline cũng kiểm tra inventory cuối vẫn khớp đầu. Dữ liệu chi tiết nằm trong `outputs/`, đã bị Git
 ignore. `work.duckdb` là sản phẩm của lần chạy, **không có resume tự động**.
 
 Notebook 03 bổ sung các sản phẩm sau sau khi tạo features:
@@ -185,13 +190,39 @@ Notebook 03 bổ sung các sản phẩm sau sau khi tạo features:
 Kiểm tra trước khi xuất: khóa không trùng/null, cutoff đúng partition, eligibility
 khớp trạng thái y_any, OR nhãn nguồn khớp y_any, predictor chỉ có số hữu hạn hoặc
 null, số dòng bằng universe và supervised + unlabelled bằng tổng scoring.
-Notebook chưa được chạy; chưa có bằng chứng runtime cho các kiểm tra này.
+Đã kiểm tra output thật đủ 12 tháng; không có vi phạm. Các thay đổi mới đã được
+kiểm thử bằng workflow notebook trên dữ liệu tổng hợp, không chạy lại raw.
 
+Schema v2 định nghĩa danh sách cho phép từ cấu hình, không suy ra từ cột đầu vào.
+`feature_schema.json` lưu `schema_version`, `columns`, `dtypes` và `predictors`;
+cột lạ, thiếu cột, sai thứ tự hoặc sai dtype đều bị từ chối.
 Chọn feature bằng whitelist `feature_schema.json.predictors`; không suy ra feature
 bằng cách bỏ riêng `y_any`, vì file còn bốn nhãn nguồn và metadata. Các nhóm ablation
 cho phép so sánh trx → thêm metadata nguồn → thêm geo → thêm dialog trên cùng cohort.
 Sidecar category có thể pivot thêm theo vocabulary học trên train; sidecar currency
 không được gộp sum của các mã thành cùng đơn vị tiền.
+
+Có thể kiểm tra output cũ mà không tạo lại feature, sau khi cài package:
+
+```powershell
+.\.venv\Scripts\python.exe -B -X utf8 scripts/validate_prepared_data.py outputs/propensity_processing_v3
+```
+
+Với output schema cũ, thêm `--upgrade-contract` để kiểm tra toàn bộ rồi cập nhật
+schema/contract/manifest. Metadata cũ được sao lưu vào `contract_before_schema_v2/`;
+kết quả kiểm tra lưu tại `validation_v2.json`. Không ghi lại Parquet hoặc raw.
+Hai bộ output cục bộ ngày 10/11 đã được nâng cấp; không cần chạy lại tùy chọn này.
+
+## Merge vào processed
+
+Mở [`04_merge_processed.ipynb`](../notebooks/04_merge_processed.ipynb) sau khi
+notebook 03 có manifest ready và schema v2. Notebook ghép dọc các partition đã
+nối trx/geo/dialog/nhãn bằng khóa khách–tháng. Không join log raw hoặc sidecar
+nhiều dòng làm nhân bản khách. Ghi theo batch vào `processed/propensity.parquet`,
+kèm `manifest.json`, `feature_schema.json`, `protocol.json`; từ chối ghi đè.
+Giữ dòng chưa có nhãn và cờ eligibility; chỉ chọn whitelist predictor khi fit.
+Toàn bộ `/processed/` được Git ignore. Notebook nguồn giữ output trống; chưa chạy
+merge dữ liệu thật. Kiểm thử tổng hợp đối chiếu toàn bộ giá trị trước/sau merge.
 
 ## Protocol và bước mô hình sau này
 

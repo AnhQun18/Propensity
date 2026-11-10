@@ -15,6 +15,7 @@ include docs/propensity_data_preparation.md
 include notebooks/README.md
 include notebooks/02_data_preparation.ipynb
 include notebooks/03_data_processing.ipynb
+include notebooks/04_merge_processed.ipynb
 include scripts/sync_preparation_notebook.py
 recursive-include tests *.py
 recursive-include deliverables/mbd_mini_eda_fixes *.py

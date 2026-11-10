@@ -4,20 +4,35 @@ Repository chứa package **7 bước thống kê mô tả** và tài liệu ngh
 
 ## Chuẩn bị dữ liệu propensity
 
-Mở [`notebooks/02_data_preparation.ipynb`](notebooks/02_data_preparation.ipynb) để đọc
+Mở [`notebooks/03_data_processing.ipynb`](notebooks/03_data_processing.ipynb) để đọc
 và thực hiện quy trình theo từng cell. Notebook có đầy đủ mã xử lí, từ nhãn đến
 quarantine, feature và xuất dữ liệu. Danh mục ở [notebooks/README.md](notebooks/README.md).
 
 Helper dùng chung và CLI ở [`src/propensity_data/`](src/propensity_data/), cấu hình tại
-[`configs/propensity_data.json`](configs/propensity_data.json). Quy trình tạo một dòng
+[`configs/propensity_processing.json`](configs/propensity_processing.json). Quy trình tạo một dòng
 khách–tháng, nhãn `y_any`, đặc trưng trước cutoff UTC, quarantine và lịch đánh giá;
 giữ khách thiếu nguồn, không cap cực trị hoặc gộp amount khác currency.
 Xem [hướng dẫn chuẩn bị và chạy trên máy khác](docs/propensity_data_preparation.md).
+Sau đó dùng [notebook 04](notebooks/04_merge_processed.ipynb) để ghép các tháng vào
+`processed/propensity.parquet`. Toàn bộ `/processed/` được Git ignore; notebook 04
+giữ output trống và mới được kiểm thử trên dữ liệu tổng hợp.
 
-**Theo yêu cầu ngày 09/11/2026: mới viết code và kiểm thử tổng hợp, chưa thực thi
-notebook, pipeline hoặc chạy kiểm thử trên máy này.** Chưa có kết quả huấn luyện mới.
+**Cập nhật ngày 10/11/2026:** notebook 02 và 03 đã chạy raw thành công, mỗi bộ có
+100.224 khách × 12 tháng = **1.202.688 dòng, 12.854 nhãn dương**. Output notebook 03
+ở `outputs/propensity_processing_v3/`, manifest `ready`; bản thực thi và log ở
+`outputs/notebook_execution_20261110_01/`. Notebook nguồn giữ output trống.
+Schema v2 khóa 221 predictor mặc định theo tên/thứ tự/dtype; CLI và hai notebook
+dùng chung kiểm tra dữ liệu trước `ready`. Đã kiểm thử tổng hợp và kiểm tra lại
+output thật bằng quy tắc mới, không tái tạo features. Chưa có kết quả huấn luyện mới.
 Mã chuẩn bị tách riêng khỏi EDA; output nằm trong `outputs/` và không đưa lên Git.
 Bản PDF sơ bộ cũ đã chuyển vào [kho báo cáo cũ](deliverables/archive/README.md).
+
+**Rà soát trước baseline:** [báo cáo 09/11](docs/propensity_feasibility/baseline_readiness/assessment.md)
+là snapshot lịch sử; [bản xử lí tồn đọng 10/11](docs/preprocessing_fixes_20261110.md)
+ghi trạng thái hiện tại. Cờ currency unknown đã sửa và kiểm thử đạt. Feature src/dst
+hiện chỉ có cardinality/missing. Trainer/evaluator/calibrator chưa được xây dựng.
+Cờ `cold_start` dùng cả ba nguồn chỉ dùng để phân nhóm báo cáo trong baseline
+"chỉ trx". Giữ giả định UTC, nhãn any-product và độ trễ nhãn 0.
 
 Bản rà soát mới hoàn thành **12 yêu cầu EDA**: giữ toàn bộ lịch sử, null theo nguồn,
 duplicate toàn bộ, nhóm độ phủ có chủ đích, biểu đồ tuyến tính, nhãn zoom Y và outlier.

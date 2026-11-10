@@ -1,0 +1,105 @@
+{
+  "reviewed_at": "2026-11-09T10:47:13.056360+00:00",
+  "method": "Static text/AST/config/audit-table review only",
+  "modules_parsed": 13,
+  "notebook_code_cells_parsed": 20,
+  "notebook_linked_cells_in_sync": 8,
+  "notebook_has_executed_cells": false,
+  "unit_tests_executed": false,
+  "raw_data_scanned": false,
+  "preparation_executed": false,
+  "baseline_fitted": false,
+  "notebook_cells_executed": false,
+  "local_document_links_checked": 47,
+  "authored_test_methods": {
+    "tests/test_propensity_data.py": [
+      "test_calendar_and_label_delay",
+      "test_reject_raw_output_overlap",
+      "test_temporal_boundary_missing_sources_currency_and_labels",
+      "test_future_event_values_do_not_change_past_features",
+      "test_missing_target_row_preserves_scoring_customer",
+      "test_duplicate_target_fails_without_touching_raw",
+      "test_nonbinary_label_fails",
+      "test_metadata_only_does_not_require_embeddings"
+    ],
+    "tests/test_preparation_notebook.py": [
+      "test_structure_and_python_text"
+    ]
+  },
+  "config": {
+    "data_root": "../data/MBD-mini",
+    "output_dir": "../outputs/propensity_data_v1",
+    "first_month": "2022-02",
+    "last_month": "2023-01",
+    "windows_days": [
+      30,
+      84
+    ],
+    "memory_limit": "6GB",
+    "threads": 2,
+    "label_delay_days": 0,
+    "validation_months": [
+      "2022-09",
+      "2022-10",
+      "2022-11"
+    ],
+    "calibration_month": "2022-12",
+    "test_month": "2023-01",
+    "include_dialog_embeddings": false,
+    "embedding_size": 768,
+    "embedding_window_days": 84
+  },
+  "installed_dist_metadata": {
+    "catboost": [],
+    "scikit_learn": [],
+    "duckdb": [
+      "duckdb-2.0.0.dist-info"
+    ],
+    "numpy": [
+      "numpy-2.5.4.dist-info"
+    ],
+    "pandas": [
+      "pandas-3.1.0.dist-info"
+    ],
+    "pyarrow": [
+      "pyarrow-26.0.0.dist-info"
+    ]
+  },
+  "existing_preparation_manifests": [],
+  "label_reconciliation": {
+    "rows": 1202688,
+    "positives": 12854,
+    "positive_rate": 0.010687726160068115,
+    "final_train_positive_rate": 0.011394476372924648,
+    "calibration_positive_rate": 0.007573036398467433,
+    "test_positive_rate": 0.006734913793103448,
+    "test_positives": 675,
+    "top1pct_k": 1003,
+    "random_expected_test_hits": 6.755118534482759,
+    "random_expected_recall": 0.010007583014048532,
+    "always_negative_test_accuracy": 0.9932650862068966
+  },
+  "dense_memory_estimate_not_measured": {
+    "default_numeric_predictors": 215,
+    "all_12_months_float64_bytes": 2068623360,
+    "extra_mean_and_last_768_float64_bytes": 14778630144
+  },
+  "source_sha256": {
+    "src/propensity_data/__init__.py": "56ebceb0170da613c60d3032dbbbfecc97efe13f820837228deea0b4ad37813e",
+    "src/propensity_data/__main__.py": "3129adff95e0f38b87ab34cddfc27082c7892bcaec267ff5d40f160fdf55b44a",
+    "src/propensity_data/cli.py": "574558d1dc2a7ef7f26e93701299efe386008324608a9d908602efe76731870c",
+    "src/propensity_data/config.py": "cf23e65d5d05aa0f0f0d20eca910358ad33c2aef35bb90c08a6fd510d46d3903",
+    "src/propensity_data/features.py": "0ab1e8beca4092d61ec3bdc4300382ebea5c7dfa862fd285539a52bcddbfbe5a",
+    "src/propensity_data/pipeline.py": "0d16181575b5d16a847bd51250c051db610a8d6daa1044cfcc05eef0eded9565",
+    "src/propensity_data/protocol.py": "c3e56c33f1213ff5fd6655b6fdb3062b4769bc0f0ffb15fe7bd9a4eb7c1c7e99",
+    "src/propensity_data/quality.py": "6fa1bc973966ab1626af3382bc35698530404e3cb3b790b1f3c219add1c2110e",
+    "src/propensity_data/schema.py": "596b0dc46ccf715437fc81563d9b776b21b5baabdea66a525180492a79d56801",
+    "src/propensity_data/storage.py": "e96949d3c733023b7ea9e3ab9555ec4e0c9e96e8234ed925de46b42bb849a0d4",
+    "scripts/sync_preparation_notebook.py": "155c6aceef3634b747c3f3875bfd14017dbae18f031a63c9e9b3c1e6aee470c4",
+    "tests/test_propensity_data.py": "07673b20cedd0a4724cf13f021c5318fc7bcc66f00e4de8377d96bd6fd8e0e40",
+    "tests/test_preparation_notebook.py": "6c3a2c1fc34eb9b784ff8915ae9a4601257587342efa2e0ee9c8b92eb2aff55f",
+    "notebooks/02_data_preparation.ipynb": "3fe33c284940bcc1b422df74bdc808e81258ce8c889f84055e44887e281c3d84",
+    "configs/propensity_data.json": "857845b19389672b7bea2fb686fc76c9e64c30345f05fc2b4145f0dd878675ab",
+    "pyproject.toml": "d6e2a22117b7480fc6a7f6bcd3cc97b3271493de14fc3d86db4e50bf06c5b1a2"
+  }
+}

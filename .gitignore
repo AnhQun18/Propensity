@@ -8,6 +8,7 @@ __pycache__/
 
 # Generated data containing individual user records.
 *.parquet
+/processed/
 
 # Local credentials and environment configuration.
 .env

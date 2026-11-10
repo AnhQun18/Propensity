@@ -13,6 +13,7 @@ from .features import build_month
 from .quality import normalize_events, prepare_references
 from .schema import SOURCES, feature_schema
 from .storage import files_at, literal, parquet_scan, write_json
+from .validation import validate_month
 
 
 def prepare(config: PreparationConfig) -> Path:
@@ -32,7 +33,7 @@ def prepare(config: PreparationConfig) -> Path:
                 "fingerprint_note": "Paths, sizes and mtimes; not a full byte checksum",
                 "duckdb_version": duckdb.__version__, "models_fitted": False,
                 "raw_modified": False, "amount_capping": False,
-                "negative_sampling": False, "source_audits": {}, "months": []}
+                "negative_sampling": False, "source_audits": {}, "months": [], "dataset_checks": []}
     write_json(out / "manifest.json", manifest)
     write_json(out / "source_inventory.json", inventory)
     con = None
@@ -53,16 +54,15 @@ def prepare(config: PreparationConfig) -> Path:
             con.execute("INSERT INTO source_bounds VALUES (?, ?)",
                         [source, manifest["source_audits"][source]["first_valid_event_utc"]])
             write_json(out / "manifest.json", manifest)
-        feature_columns = None
+        schema = feature_schema(config)
         for month in months:
             print(f"Features {month}", flush=True)
-            summary, columns = build_month(con, month, config, out)
-            if feature_columns is not None and columns != feature_columns:
-                raise ValueError("Feature schema changed across months")
-            feature_columns = columns
+            summary, _ = build_month(con, month, config, out)
+            manifest["dataset_checks"].append(validate_month(con, month, config, out, schema))
             manifest["months"].append(summary)
             write_json(out / "manifest.json", manifest)
-        write_json(out / "feature_schema.json", feature_schema(feature_columns))
+        write_json(out / "feature_schema.json", schema)
+        manifest["feature_schema_version"] = schema["schema_version"]
         # Catch edits/replacements during the run before declaring outputs ready.
         final_inventory = [{"source": key, "path": p.relative_to(config.data_root).as_posix(),
                             "bytes": p.stat().st_size, "mtime_ns": p.stat().st_mtime_ns}

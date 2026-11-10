@@ -73,7 +73,7 @@ def normalize_events(con, name, scan, config, out):
             currency_source IS NOT NULL AND NOT coalesce(({known_currency}), false) AS currency_invalid"""
     elif name == "dialog" and config.include_dialog_embeddings:
         valid = (f"array_length(raw_embedding) = {config.embedding_size} AND "
-                 "array_length(list_filter(raw_embedding, x -> x IS NULL OR NOT isfinite(x))) = 0")
+                 "array_length(list_filter(raw_embedding, lambda x: x IS NULL OR NOT isfinite(x))) = 0")
         additions = f", CASE WHEN {valid} THEN raw_embedding END AS embedding"
     con.execute(f"CREATE TABLE {name} AS SELECT * EXCLUDE(rejection_reason){additions} "
                 f"FROM classified_{name} WHERE rejection_reason IS NULL")
