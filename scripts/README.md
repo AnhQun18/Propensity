@@ -1,5 +1,15 @@
 # Công cụ tác giả
 
+`analyze_data_story.py` bổ sung cohort drift, decile giữ ties, category lift,
+metadata dialog và proxy chất lượng geo từ cache chỉ đọc. `run_data_story_models.py`
+chạy 9 fit bỏ nguồn và 12 fit so cửa sổ với cùng 31 biến, validation 09–11/2022;
+không đọc calibration/test. Run complete được giữ bất biến, run chưa hoàn tất
+có checkpoint model để tiếp tục. Artifact theo ID/model ở outputs, chỉ aggregate
+được công bố trong deliverables/propensity-data-story/analysis.
+`build_data_story.py` tạo bản HTML 19 slide và bản đầy đủ 23 slide cùng phụ lục,
+mapping 26 yêu cầu. `validate_data_story.py` kiểm tra số liệu/contract/coverage;
+`verify_data_story.mjs NODE_MODULES_DIR` kiểm tra giao diện và tương tác cả hai bản.
+
 `run_purchase_ablation.py --config configs/propensity_ablation.json` chạy bốn bộ
 biến (153 biến hành vi gốc, 141 biến bỏ metadata độ phủ theo lịch, 15 biến lịch sử
 mua, 156 biến kết hợp) trên ba fold validation. Cấu hình cố định, lưu model từng

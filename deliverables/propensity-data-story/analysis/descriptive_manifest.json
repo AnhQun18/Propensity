@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "duckdb_version": "2.0.0",
+  "scope": "Train 02–08/2022; cohort drift 02–11/2022; no calibration/test features opened",
+  "timezone": "UTC assumption, not publisher-confirmed",
+  "tie_policy": "Equal feature values share midpoint-rank decile; 0=missing",
+  "geo_sample": "hash(client_id)%100=0 using DuckDB; observed code transitions do not establish location errors",
+  "checks": {
+    "target_cohort_drift": 30,
+    "sparsity_monthly": 10,
+    "feature_deciles": 62,
+    "category_lift": 53,
+    "dialog_metadata": 12,
+    "geo_quality_proxy": 1,
+    "leakage_audit": 1
+  }
+}

@@ -1,0 +1,345 @@
+[
+  {
+    "requirement": "A1",
+    "request": "Phát biểu bài toán và định nghĩa nhãn",
+    "status": "Đã có",
+    "main_slides": [
+      1
+    ],
+    "detailed_slides": [
+      1
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/baseline-final/REPORT.md"
+  },
+  {
+    "requirement": "A2",
+    "request": "Lệch nhãn, quy mô, target đến muộn",
+    "status": "Đã đo; SLA 6 tháng không xác minh",
+    "main_slides": [
+      2
+    ],
+    "detailed_slides": [
+      2
+    ],
+    "appendix_slides": [
+      1
+    ],
+    "evidence": "docs/mbd_inventory/assessment.md; remaining_questions/assessment.md"
+  },
+  {
+    "requirement": "A3",
+    "request": "3–4 câu hỏi dẫn dắt",
+    "status": "Đã có",
+    "main_slides": [
+      2
+    ],
+    "detailed_slides": [
+      3
+    ],
+    "appendix_slides": [
+      2
+    ],
+    "evidence": "Đề cương yêu cầu; coverage_ledger.json"
+  },
+  {
+    "requirement": "B1",
+    "request": "4 nguồn: dòng, ID, cột, vai trò",
+    "status": "Đã đo",
+    "main_slides": [
+      3
+    ],
+    "detailed_slides": [
+      4
+    ],
+    "appendix_slides": [],
+    "evidence": "docs/mbd_inventory/assessment.md; docs/mbd_temporal_coverage/assessment.md"
+  },
+  {
+    "requirement": "B2",
+    "request": "Gantt và vùng trx chưa có target",
+    "status": "Đã đo",
+    "main_slides": [
+      4
+    ],
+    "detailed_slides": [
+      5
+    ],
+    "appendix_slides": [],
+    "evidence": "docs/mbd_mini_eda/tables/descriptive.temporal/source_time_ranges.csv; docs/propensity_feasibility/remaining_questions/assessment.md"
+  },
+  {
+    "requirement": "B3",
+    "request": "UpSet tổ hợp đủ trx+geo+dialog",
+    "status": "Đã đo",
+    "main_slides": [
+      5
+    ],
+    "detailed_slides": [
+      6
+    ],
+    "appendix_slides": [],
+    "evidence": "docs/mbd_mini_eda/tables/descriptive.customers/modality_coverage.csv"
+  },
+  {
+    "requirement": "C.Target1",
+    "request": "Tỷ lệ dương theo tháng và cohort; drift",
+    "status": "Bổ sung cohort cố định qua 10 tháng",
+    "main_slides": [
+      6
+    ],
+    "detailed_slides": [
+      7
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/target_cohort_drift.csv"
+  },
+  {
+    "requirement": "C.Target2",
+    "request": "Số lần mua / heavy tail",
+    "status": "Đo số tháng dương; không có số đơn trong nhãn",
+    "main_slides": [],
+    "detailed_slides": [
+      8
+    ],
+    "appendix_slides": [
+      3
+    ],
+    "evidence": "aggregate_data.json → positive_month_histogram"
+  },
+  {
+    "requirement": "C.Target3",
+    "request": "P(mua T|mua T−1) và đối chứng",
+    "status": "Đã tính đúng consecutive-month",
+    "main_slides": [
+      7
+    ],
+    "detailed_slides": [
+      9
+    ],
+    "appendix_slides": [],
+    "evidence": "Tính lại từ targets; aggregate_data.json → persistence"
+  },
+  {
+    "requirement": "C.Trx1",
+    "request": "Số dòng và ID active theo tháng",
+    "status": "Sửa hai trục về đơn vị thực",
+    "main_slides": [
+      8
+    ],
+    "detailed_slides": [
+      10
+    ],
+    "appendix_slides": [],
+    "evidence": "descriptive.temporal/monthly_activity.csv; docs/mbd_inventory/assessment.md"
+  },
+  {
+    "requirement": "C.Trx2",
+    "request": "Sparsity và khách im lặng lâu",
+    "status": "Bổ sung đường 30/84d theo cutoff",
+    "main_slides": [],
+    "detailed_slides": [
+      11
+    ],
+    "appendix_slides": [
+      4
+    ],
+    "evidence": "deliverables/propensity-data-story/analysis/sparsity_monthly.csv; review/events_per_customer.csv"
+  },
+  {
+    "requirement": "C.Trx3",
+    "request": "R/F/M theo nhóm nhãn",
+    "status": "Bổ sung decile lift cả R/F/M, giữ ties",
+    "main_slides": [
+      9
+    ],
+    "detailed_slides": [
+      12
+    ],
+    "appendix_slides": [
+      7,
+      8
+    ],
+    "evidence": "deliverables/propensity-data-story/analysis/feature_deciles.csv"
+  },
+  {
+    "requirement": "C.Trx4",
+    "request": "Treemap + lift danh mục / loại giao dịch",
+    "status": "Bổ sung lift từng event_type",
+    "main_slides": [
+      10
+    ],
+    "detailed_slides": [
+      13
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/category_lift.csv"
+  },
+  {
+    "requirement": "C.Trx5",
+    "request": "Kiểm tra leakage trước khi có target",
+    "status": "Bổ sung số sự kiện trước nhãn; có giới hạn availability",
+    "main_slides": [],
+    "detailed_slides": [],
+    "appendix_slides": [
+      18
+    ],
+    "evidence": "deliverables/propensity-data-story/analysis/leakage_audit.csv; docs/propensity_feasibility/remaining_questions/assessment.md"
+  },
+  {
+    "requirement": "C.Dialog1",
+    "request": "Độ phủ thời gian và khách",
+    "status": "Có cả dòng, active ID, cấu trúc",
+    "main_slides": [
+      11
+    ],
+    "detailed_slides": [
+      14
+    ],
+    "appendix_slides": [],
+    "evidence": "monthly_activity.csv; descriptive.modalities/dialog_summary.csv"
+  },
+  {
+    "requirement": "C.Dialog2",
+    "request": "Metadata frequency / length / hour và lift",
+    "status": "Bổ sung recency, giờ, weekend; không có độ dài text/duration",
+    "main_slides": [
+      12
+    ],
+    "detailed_slides": [
+      15
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/dialog_metadata.csv"
+  },
+  {
+    "requirement": "C.Dialog3",
+    "request": "Nội dung/embedding nếu đã thử",
+    "status": "Điều kiện chưa phát sinh: chưa thử embedding, ghi rõ giới hạn",
+    "main_slides": [
+      12
+    ],
+    "detailed_slides": [
+      15
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/dialog_metadata.csv"
+  },
+  {
+    "requirement": "C.Geo1",
+    "request": "Độ phủ và mức nhiễu",
+    "status": "Bổ sung quality proxy mẫu hash ID",
+    "main_slides": [],
+    "detailed_slides": [
+      16
+    ],
+    "appendix_slides": [
+      5
+    ],
+    "evidence": "monthly_activity.csv; deliverables/propensity-data-story/analysis/geo_quality_proxy.csv"
+  },
+  {
+    "requirement": "C.Geo2",
+    "request": "Di chuyển / vùng và liên hệ nhãn",
+    "status": "Đo đa dạng/tập trung mã vùng; không có tọa độ thật",
+    "main_slides": [
+      13
+    ],
+    "detailed_slides": [
+      17
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/feature_deciles.csv; source_ablation_summary.csv"
+  },
+  {
+    "requirement": "C.Geo3",
+    "request": "Kết luận bổ trợ hay không đáng kể",
+    "status": "Bổ sung AP loss khi bỏ geo",
+    "main_slides": [
+      13
+    ],
+    "detailed_slides": [
+      17
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/feature_deciles.csv; source_ablation_summary.csv"
+  },
+  {
+    "requirement": "D1",
+    "request": "Importance / lift theo nguồn / ΔAP ablation",
+    "status": "9 fit mới; importance và từng tháng trong phụ lục",
+    "main_slides": [
+      14
+    ],
+    "detailed_slides": [
+      18
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/source_ablation_summary.csv; model_manifest.json"
+  },
+  {
+    "requirement": "D2",
+    "request": "Baseline vs rule sai ở nhóm nào",
+    "status": "Bổ sung B+H 156 biến, đúng model mới nhất",
+    "main_slides": [
+      15
+    ],
+    "detailed_slides": [
+      19
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/error_segments.csv; error_overlap.csv"
+  },
+  {
+    "requirement": "D3",
+    "request": "Snapshot tháng lịch / T bất kỳ / cửa sổ",
+    "status": "12 fit matched-window; T bất kỳ giới hạn bởi nhãn",
+    "main_slides": [
+      16
+    ],
+    "detailed_slides": [
+      20
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/window_sensitivity_summary.csv; model_manifest.json"
+  },
+  {
+    "requirement": "E1",
+    "request": "Heatmap mức phù hợp sáu chiều",
+    "status": "Đã có; đánh giá định tính theo bằng chứng",
+    "main_slides": [
+      17
+    ],
+    "detailed_slides": [
+      21
+    ],
+    "appendix_slides": [],
+    "evidence": "Tổng hợp inventory, coverage, target audit và baseline-final/REPORT.md"
+  },
+  {
+    "requirement": "E2",
+    "request": "Rủi ro → xử lý",
+    "status": "Đã có; không gán target thiếu thành âm",
+    "main_slides": [
+      18
+    ],
+    "detailed_slides": [
+      22
+    ],
+    "appendix_slides": [],
+    "evidence": "docs/propensity_feasibility/remaining_questions/assessment.md; docs/baseline_feature_contract_20261111.md"
+  },
+  {
+    "requirement": "E3",
+    "request": "Mức phù hợp và 2–3 việc tiếp theo",
+    "status": "Cập nhật theo đối chứng mới",
+    "main_slides": [
+      19
+    ],
+    "detailed_slides": [
+      23
+    ],
+    "appendix_slides": [],
+    "evidence": "deliverables/propensity-data-story/analysis/model_manifest.json; deliverables/baseline-final/REPORT.md"
+  }
+]

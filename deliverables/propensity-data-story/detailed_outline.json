@@ -1,0 +1,335 @@
+[
+  {
+    "section": "A · BÀI TOÁN",
+    "title": "Dùng hành vi trước T để xếp hạng người mua tháng T",
+    "meaning": "Ý nghĩa cho mô hình: tạo xác suất mua để chọn 1.003 khách/tháng ở ngân sách 1%.",
+    "method": "Sơ đồ căn chỉnh feature và nhãn; ví dụ cutoff 01/12/2022 → hành vi trước 01/12 → nhãn tháng 12.",
+    "source": "deliverables/baseline-final/REPORT.md",
+    "notes": "Nếu chưa đủ căn cứ xác định 0/1 thì giữ unknown. Snapshot hiện tại không có unknown. Lịch sử target chỉ hợp lệ khi đã khả dụng tại cutoff. Đây là dự đoán mua bất kỳ, chưa chọn sản phẩm và chưa đo uplift chiến dịch.",
+    "appendix": false
+  },
+  {
+    "section": "A2 · THÁCH THỨC",
+    "title": "Một năm nhãn và 1,07% dương giới hạn cách đánh giá",
+    "meaning": "Ý nghĩa cho mô hình: khóa split theo tháng và giả định nhãn khả dụng trước khi đọc metric.",
+    "method": "Số dòng nhãn là khách–tháng; số dòng detail là sự kiện. Khoảng thiếu nhãn đầu kỳ khác độ trễ công bố nhãn.",
+    "source": "docs/mbd_inventory/assessment.md; remaining_questions/assessment.md",
+    "notes": "",
+    "appendix": false
+  },
+  {
+    "section": "A3 · CÂU HỎI DỮ LIỆU",
+    "title": "Bốn câu hỏi nối EDA với quyết định mô hình",
+    "meaning": "Ý nghĩa cho mô hình: mỗi câu hỏi phải có số liệu quan sát và một quyết định tiếp theo.",
+    "method": "Lộ trình đọc: B toàn cảnh → C từng file → D đối chứng → E mức phù hợp.",
+    "source": "Đề cương yêu cầu; coverage_ledger.json",
+    "notes": "",
+    "appendix": false
+  },
+  {
+    "section": "B · TOÀN CẢNH",
+    "title": "Trx và geo chiếm gần toàn bộ 105,28 triệu sự kiện",
+    "meaning": "Ý nghĩa cho mô hình: aggregate từng nguồn theo khách–cutoff rồi mới ghép, tránh nhân dòng.",
+    "method": "¹ Cột vật lý + fold trong partition; embedding tính là một cột. ID tính trên toàn lịch sử mỗi nguồn.",
+    "source": "docs/mbd_inventory/assessment.md; docs/mbd_temporal_coverage/assessment.md",
+    "notes": "Không cộng ptls với detail: hai dạng biểu diễn cùng lịch sử. PTLS/trx thiếu 2.020.020 sự kiện ở 13 khách so với detail; dùng detail làm nguồn chuẩn.",
+    "appendix": false
+  },
+  {
+    "section": "B · THỜI GIAN",
+    "title": "Trx có khoảng 13 tháng lịch sử trước tháng nhãn đầu tiên",
+    "meaning": "Ý nghĩa cho mô hình: dùng giai đoạn chưa có nhãn làm lịch sử; không biến thành mẫu âm.",
+    "method": "Thanh thể hiện min–max timestamp (targets: tháng chứa mon); tô vàng phần trước 02/2022. Tháng biên có thể không trọn.",
+    "source": "docs/mbd_mini_eda/tables/descriptive.temporal/source_time_ranges.csv; docs/propensity_feasibility/remaining_questions/assessment.md",
+    "notes": "Nguồn timestamp chưa có timezone xác minh; protocol nghiên cứu giả định UTC. Không có available_at nên chưa biết nhãn đến chậm thực tế bao lâu.",
+    "appendix": false
+  },
+  {
+    "section": "B · ĐỘ PHỦ",
+    "title": "Bắt buộc đủ ba nguồn sẽ loại gần 65% khách",
+    "meaning": "Ý nghĩa cho mô hình: giữ cả 100.224 khách; thêm cờ có log và giữ NaN đúng nghĩa.",
+    "method": "UpSet đếm ID có ≥1 sự kiện mỗi nguồn trên toàn kỳ; từng cột là một tổ hợp riêng. Không dùng làm cohort tại cutoff quá khứ.",
+    "source": "docs/mbd_mini_eda/tables/descriptive.customers/modality_coverage.csv",
+    "notes": "35,34% có đủ ba nguồn trong toàn lịch sử; không suy ra đủ nguồn mỗi tháng. Tại cutoff 01/12/2022, số có đủ ba nguồn trong quá khứ là 34.135.",
+    "appendix": false
+  },
+  {
+    "section": "C1 · TARGET / CẤU TRÚC → ĐỘNG HỌC",
+    "title": "Tỷ lệ mua biến động cả trong các cohort lịch sử cố định",
+    "meaning": "Ý nghĩa cho mô hình: cần theo dõi drift trong từng nhóm khách, bên cạnh prevalence toàn bộ.",
+    "method": "Cohort chốt tại 01/02/2022: trx chưa có / span <180 / ≥180 ngày; cố định ID qua 02–11/2022. Tỷ lệ = dương / ID cohort.",
+    "source": "deliverables/propensity-data-story/analysis/target_cohort_drift.csv",
+    "notes": "Targets có 100.224 ID/tháng, 4 nhãn 0/1, không unknown; khóa client_id×month duy nhất. Cohort dùng lịch sử trước cutoff đầu tiên, không dùng first/last event tương lai. Cohort lần lượt có 13.221, 5.737, 81.266 ID. Bản toàn kỳ prevalence 02/2022–01/2023 nằm phụ lục.",
+    "appendix": false
+  },
+  {
+    "section": "C2 · TARGET / PHÂN PHỐI",
+    "title": "18,4% người từng dương xuất hiện ở ít nhất hai tháng",
+    "meaning": "Ý nghĩa cho mô hình: lịch sử mua có đuôi phải; vẫn phải tìm khách chưa từng dương trong dữ liệu.",
+    "method": "Mẫu số 10.411 ID có ≥1 tháng y_any=1 trong 02/2022–01/2023. Max 8 tháng; 89.813 ID chưa dương. Đây là số tháng, không phải số đơn.",
+    "source": "aggregate_data.json → positive_month_histogram",
+    "notes": "Phân phối nhị phân tháng chỉ cho biết số tháng dương. Không xác nhận heavy tail theo định nghĩa power law, không đo số lượt mua trong tháng. Các nhãn cuối kỳ chỉ dùng mô tả như EDA đã công bố.",
+    "appendix": false
+  },
+  {
+    "section": "C · TARGET / PERSISTENCE",
+    "title": "Mua tháng trước gắn với xác suất mua cao gấp 6,9 lần",
+    "meaning": "Ý nghĩa cho mô hình: giữ lịch sử mua; hơn 93% người mua validation không mua ở tháng liền trước.",
+    "method": "P(yT=1 | yT−1): gộp 09–11/2022. Nhóm có mua: 180 / 3.013; nhóm còn lại: 2.568 / 297.659.",
+    "source": "Tính lại từ targets; aggregate_data.json → persistence",
+    "notes": "So đúng tháng liền trước, không dùng đã từng mua toàn lịch sử. Tỷ số là liên hệ quan sát; rate không phải recall. Rule ở top 1% có thể chọn thêm khách không mua T−1 khi số người mua trước ít hơn K.",
+    "appendix": false
+  },
+  {
+    "section": "C4 · TRX / CẤU TRÚC & ĐỘNG HỌC",
+    "title": "Trx active tăng từ 69 nghìn lên khoảng 78 nghìn ID/tháng",
+    "meaning": "Ý nghĩa cho mô hình: dùng frequency/rate và cửa sổ lịch để tách cường độ khỏi độ dài tháng.",
+    "method": "14 cột + fold; 38.764.930 sự kiện, 98.721 ID. Cột = dòng/tháng (triệu); đường = ID có ≥1 trx/tháng (nghìn).",
+    "source": "descriptive.temporal/monthly_activity.csv; docs/mbd_inventory/assessment.md",
+    "notes": "",
+    "appendix": false
+  },
+  {
+    "section": "C5 · TRX / PHÂN PHỐI & IM LẶNG",
+    "title": "Khách im lặng 84 ngày vẫn có người mua trong tháng kế tiếp",
+    "meaning": "Ý nghĩa cho mô hình: giữ khách im lặng; thêm recency và cờ không log thay vì loại khỏi scoring.",
+    "method": "Mẫu số 100.224 ID/cutoff; không log trong [T−30d,T) hoặc [T−84d,T). Toàn kỳ: median 164, P99 2.234, max 1.020.773 trx/ID.",
+    "source": "deliverables/propensity-data-story/analysis/sparsity_monthly.csv; review/events_per_customer.csv",
+    "notes": "Đường này dùng snapshot quá khứ ở từng cutoff, không dùng ngày cuối tương lai của khách. Cửa sổ 84 ngày khác 3 tháng lịch. Không có sự kiện không tự chứng minh mất log. Tỷ lệ mua của nhóm im lặng được lưu trong CSV.",
+    "appendix": false
+  },
+  {
+    "section": "C6 · TRX / LIÊN HỆ NHÃN",
+    "title": "Nhóm frequency cao nhất có lift mua khoảng 2,74 lần",
+    "meaning": "Ý nghĩa cho mô hình: R/F/M có tín hiệu khác nhau; dùng cả count, recency và amount tách currency.",
+    "method": "Train 02–08/2022; lift = tỷ lệ mua nhóm / 1,2361%. Decile theo midpoint rank của giá trị; ties cùng nhóm nên không đủ 10 cột.",
+    "source": "deliverables/propensity-data-story/analysis/feature_deciles.csv",
+    "notes": "D10 frequency gồm 42–45.908 trx/30d; 68.836 mẫu, 2.329 dương, prevalence 3,3834%. R và M có biểu đồ riêng ở phụ lục. M là tổng |amount| mã 11; chưa biết tiền tệ thật. Các decile chỉ mô tả trên train.",
+    "appendix": false
+  },
+  {
+    "section": "C7 · TRX / DANH MỤC & NHÃN",
+    "title": "Có giao dịch mã 40 gắn với lift mua 2,21 lần trên train",
+    "meaning": "Ý nghĩa cho mô hình: giữ thống kê theo mã; kiểm tra giá trị tăng thêm ngoài tổng frequency.",
+    "method": "Diện tích = tỷ trọng số trx trong cửa sổ 30d của train. Lift = P(y=1|có mã)/P(y=1). Các nhóm mã có thể chồng khách–tháng.",
+    "source": "deliverables/propensity-data-story/analysis/category_lift.csv",
+    "notes": "53 event_type có mặt trong cửa sổ train, khác 55 mã toàn lịch sử. Mã 40: 192.493 mẫu có mã, 5.253 dương, tỷ lệ 2,7289%; nhóm không có mã 0,6716%. Đây là liên hệ đơn biến chưa kiểm soát cường độ giao dịch. Không gán tên nghiệp vụ cho mã ẩn danh.",
+    "appendix": false
+  },
+  {
+    "section": "C8 · DIALOG / CẤU TRÚC & ĐỘ PHỦ",
+    "title": "Dialog chỉ có ở 46,2% khách và đổi nhịp mạnh đầu 2022",
+    "meaning": "Ý nghĩa cho mô hình: giữ cờ không dialog và phân tích thời gian; không coi vắng hỗ trợ là lỗi dữ liệu.",
+    "method": "3 cột + fold: ID, timestamp, embedding 768D. Bắt đầu 10/02/2021; 217.205 dòng / 46.320 ID. Median 3 sự kiện/ID có log toàn kỳ.",
+    "source": "monthly_activity.csv; descriptive.modalities/dialog_summary.csv",
+    "notes": "Không có text, thời lượng hay độ dài hội thoại trong schema. Mọi embedding có chiều 768 theo audit; số chiều cố định không phải độ dài văn bản. Không báo kết quả nội dung chưa chạy. Giờ/ngày trong tuần có thể suy từ timestamp với giả định UTC.",
+    "appendix": false
+  },
+  {
+    "section": "C9 · DIALOG / METADATA & NHÃN",
+    "title": "Tần suất và recency dialog phân tách nhóm nhãn trên train",
+    "meaning": "Ý nghĩa cho mô hình: count và recency là mốc; kiểm tra giờ tương tác khi đã kiểm soát tần suất.",
+    "method": "Lift so với prevalence train 1,2361%; 30 ngày trước cutoff; nhóm có chồng lấn. Schema không có text/duration/độ dài hội thoại; embedding chưa thử.",
+    "source": "deliverables/propensity-data-story/analysis/dialog_metadata.csv",
+    "notes": "Giờ timestamp đang giả định UTC. Nhóm 00–06 không đủ để kết luận giờ là tín hiệu độc lập: đó có thể là proxy của số hội thoại hoặc hành vi hỗ trợ. CSV cũng có nhóm cuối tuần và nhóm đối chứng trong số khách có hội thoại. Nội dung/embedding chưa thử; không đưa thành một slide kết quả.",
+    "appendix": false
+  },
+  {
+    "section": "C10 · GEO / CẤU TRÚC, THỜI GIAN & NHIỄU",
+    "title": "Geo chỉ có từ 11/12/2021, phủ 72,4% ID toàn lịch sử",
+    "meaning": "Ý nghĩa cho mô hình: đánh dấu nguồn đến muộn; chất lượng vị trí vật lý vẫn cần xác minh riêng.",
+    "method": "5 cột + fold; 66.295.724 dòng / 72.573 ID. Audit toàn kỳ không có null; mẫu mã vị trí và chuyển mã xem phụ lục chất lượng.",
+    "source": "monthly_activity.csv; deliverables/propensity-data-story/analysis/geo_quality_proxy.csv",
+    "notes": "Mã geohash_4/5/6 đã ẩn danh. Không suy khoảng cách hoặc vận tốc từ mã. Kiểm tra timestamp trùng nhưng khác mã và đổi mã trong 60 giây chỉ là proxy, không xác nhận lỗi GPS hoặc hành vi di chuyển thực.",
+    "appendix": false
+  },
+  {
+    "section": "C11 · GEO / VÙNG VÀ GIÁ TRỊ BỔ TRỢ",
+    "title": "Bỏ geo làm AP giảm 0,0003 trên validation",
+    "meaning": "Ý nghĩa cho mô hình: dùng geo như nguồn bổ trợ theo ablation; chưa suy được quãng đường thực.",
+    "method": "Chart: lift theo nunique geohash_6 trên train. Tiêu đề: AP full − AP bỏ geo, trung bình 09–11/2022, giữ cùng nền lịch sử mua.",
+    "source": "deliverables/propensity-data-story/analysis/feature_deciles.csv; source_ablation_summary.csv",
+    "notes": "Các đặc trưng vùng gồm số mã khác nhau và tỷ trọng mã phổ biến nhất. Dấu/độ lớn của AP loss phụ thuộc cấu hình cố định và các nguồn còn lại; không phải kiểm định nhân quả. Mẫu số D0 là missing, count 0 vẫn là nhóm hợp lệ. So sánh concentration nằm phụ lục.",
+    "appendix": false
+  },
+  {
+    "section": "D1 · ABLATION THEO NGUỒN",
+    "title": "Trx và dialog bổ sung AP khoảng 0,0083; geo khoảng 0,0003",
+    "meaning": "Ý nghĩa cho mô hình: ưu tiên nguồn theo ΔAP và độ ổn định từng tháng, cùng một nền H.",
+    "method": "Full 156 biến đã lưu; mỗi lần bỏ toàn bộ biến của một nguồn, giữ 15 biến lịch sử mua, cùng split/cohort/seed/config. AP macro 09–11/2022.",
+    "source": "deliverables/propensity-data-story/analysis/source_ablation_summary.csv; model_manifest.json",
+    "notes": "Depth 4, 200 cây, learning rate 0,04, L2 5. Chín model mới = ba nguồn × ba fold. Full model được tái dùng sau kiểm tra hash artifact. Đây là so sánh khám phá trên validation đã được dùng phát triển, chưa mở test. Các đóng góp có điều kiện và không cộng thành tổng AP.",
+    "appendix": false
+  },
+  {
+    "section": "D2 · LỖI CỦA BASELINE MỚI NHẤT",
+    "title": "Khách chưa có dialog là điểm yếu của B+H ở ngân sách 1%",
+    "meaning": "Ý nghĩa cho mô hình: kiểm tra ranking riêng khách thiếu dialog, bên cạnh khách quay lại và khách chưa dương.",
+    "method": "Gộp TP / dương của ba tháng 09–11/2022. Mỗi phương pháp chọn 1.003 ID/tháng trên toàn cohort; các hàng 1–2 và 3–4 là hai cách chia riêng.",
+    "source": "deliverables/propensity-data-story/analysis/error_segments.csv; error_overlap.csv",
+    "notes": "Dùng đúng dự đoán B+H 156 biến, thay chẩn đoán cũ 153 biến. Nhóm lịch sử và nguồn chỉ dùng quá khứ trước cutoff. Chưa có dialog nghĩa không có log dialog trước T, không khẳng định lỗi thu thập. Nhóm chưa từng dương và đã từng dương, cùng geo coverage, có trong CSV và phụ lục dương giả.",
+    "appendix": false
+  },
+  {
+    "section": "D3 · SNAPSHOT & CỬA SỔ",
+    "title": "Với cùng 31 biến, cửa sổ tất cả quá khứ đạt AP cao nhất",
+    "meaning": "Ý nghĩa cho mô hình: thay độ dài cửa sổ phải so cùng cutoff và bộ biến; mốc T bất kỳ cần nhãn tương thích.",
+    "method": "12 fit mới: 4 cửa sổ × 3 fold, cùng 16 thống kê hành vi + 15 biến H, 100.224 ID/tháng, config cố định. AP trung bình 09–11/2022.",
+    "source": "deliverables/propensity-data-story/analysis/window_sensitivity_summary.csv; model_manifest.json",
+    "notes": "Recent là tháng lịch 28–31 ngày; 30/84/all đều dừng trước đầu tháng nhãn. Nghiên cứu này đổi cửa sổ, chưa đổi ngày dự đoán. Labels sản phẩm chỉ có tháng nên không thể xác minh y trong 30 ngày sau một ngày T bất kỳ; bảng khả thi cutoff ngày ở phụ lục chỉ mô tả feature, không tạo nhãn giả.",
+    "appendix": false
+  },
+  {
+    "section": "E · MỨC ĐỘ PHÙ HỢP",
+    "title": "Dữ liệu phù hợp để nghiên cứu xếp hạng, còn điều kiện vận hành",
+    "meaning": "Ý nghĩa cho mô hình: tiếp tục baseline có kiểm soát; chưa dùng validation làm cam kết chất lượng triển khai.",
+    "method": "Heatmap là đánh giá định tính theo bằng chứng bên phải; xanh = thuận lợi, vàng = có điều kiện, đỏ = cần xử lý.",
+    "source": "Tổng hợp inventory, coverage, target audit và baseline-final/REPORT.md",
+    "notes": "Đây không phải điểm số thống kê hoặc ngưỡng chuẩn bên ngoài. Một năm nhãn chưa đo được ổn định nhiều năm; test độc lập chưa mở. Rà soát mới bổ sung source ablation 9 fit và matched-window 12 fit; bảng định tính không phải điểm chuẩn bên ngoài.",
+    "appendix": false
+  },
+  {
+    "section": "E · RỦI RO & CÁCH XỬ LÝ",
+    "title": "Khóa khả dụng nhãn và cutoff trước khi tối ưu thêm mô hình",
+    "meaning": "Ý nghĩa cho mô hình: protocol đúng thời điểm là điều kiện để metric có giá trị sử dụng.",
+    "method": "Bảng ánh xạ rủi ro audit sang quy tắc xử lý. Không có bằng chứng “target null sáu tháng đầu” trong bảng nhãn.",
+    "source": "docs/propensity_feasibility/remaining_questions/assessment.md; docs/baseline_feature_contract_20261111.md",
+    "notes": "Baseline nghiên cứu đang giả định label delay=0 và UTC. Độ trễ dương cần dựng lại lịch train/calibration và feature target quá khứ. Ngoại lai amount là cờ mô tả, không tự xóa/cap; thống kê toàn kỳ không dùng làm ngưỡng cho quá khứ.",
+    "appendix": false
+  },
+  {
+    "section": "E3 · KẾT LUẬN",
+    "title": "Dữ liệu đủ để nghiên cứu; ưu tiên nguồn và cửa sổ theo đối chứng",
+    "meaning": "Ý nghĩa cho mô hình: khóa protocol → xác nhận cấu hình → đánh giá test độc lập và theo dõi drift.",
+    "method": "Kết quả là offline validation; chưa đo uplift chiến dịch, doanh thu hay ROI. Test 01/2023 chưa mở.",
+    "source": "deliverables/propensity-data-story/analysis/model_manifest.json; deliverables/baseline-final/REPORT.md",
+    "notes": "",
+    "appendix": false
+  },
+  {
+    "section": "PHỤ LỤC · C · TARGET / PHÂN PHỐI & THỜI GIAN",
+    "title": "Tỷ lệ mua giảm từ đỉnh 1,69% xuống 0,67%",
+    "meaning": "Ý nghĩa cho mô hình: dùng validation cuốn chiếu; theo dõi prevalence và calibration từng tháng.",
+    "method": "Tỷ lệ = số khách có ≥1 target dương / 100.224 mỗi tháng. Các tháng 12/2022–01/2023 chỉ mô tả nhãn.",
+    "source": "docs/propensity_feasibility/any_product/monthly.csv",
+    "notes": "Đỉnh 04/2022; tháng đầu 02/2022 có 1.041 khách mua. Một năm nhãn chưa đủ chứng minh mùa vụ. Không đọc dự đoán test để chọn phương án; thống kê nhãn cuối kỳ đã có trong EDA công bố.",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · R · Recency",
+    "title": "Lift theo r · recency bổ sung góc nhìn ngoài frequency",
+    "meaning": "Ý nghĩa cho mô hình: đọc cùng missing và kích thước nhóm; không dùng lift đơn biến thay ablation.",
+    "method": "Train 02–08/2022; giữ ties cùng nhóm, D0=missing. R là ngày từ trx cuối, M là tổng |amount| currency 11; geo là share mã phổ biến nhất.",
+    "source": "deliverables/propensity-data-story/analysis/feature_deciles.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · M · Monetary",
+    "title": "Lift theo m · monetary bổ sung góc nhìn ngoài frequency",
+    "meaning": "Ý nghĩa cho mô hình: đọc cùng missing và kích thước nhóm; không dùng lift đơn biến thay ablation.",
+    "method": "Train 02–08/2022; giữ ties cùng nhóm, D0=missing. R là ngày từ trx cuối, M là tổng |amount| currency 11; geo là share mã phổ biến nhất.",
+    "source": "deliverables/propensity-data-story/analysis/feature_deciles.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · Geo · mức tập trung vùng",
+    "title": "Lift theo geo · mức tập trung vùng bổ sung góc nhìn ngoài frequency",
+    "meaning": "Ý nghĩa cho mô hình: đọc cùng missing và kích thước nhóm; không dùng lift đơn biến thay ablation.",
+    "method": "Train 02–08/2022; giữ ties cùng nhóm, D0=missing. R là ngày từ trx cuối, M là tổng |amount| currency 11; geo là share mã phổ biến nhất.",
+    "source": "deliverables/propensity-data-story/analysis/feature_deciles.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · C · TRX / LIÊN HỆ NHÃN",
+    "title": "Trên 20 giao dịch trong 30 ngày gắn với tỷ lệ mua 2,50%",
+    "meaning": "Ý nghĩa cho mô hình: dùng R/F/M cùng nhau; giữ riêng nhóm không có log hoặc không xác định.",
+    "method": "Train 02–08/2022; feature 30 ngày trước cutoff. Cột M là tổng trị tuyệt đối amount currency 11, đơn vị nguồn ẩn danh.",
+    "source": "aggregate_data.json → rfm (DuckDB trên feature train đã chuẩn hóa)",
+    "notes": "Ngưỡng nhóm là mô tả cố định, không tối ưu target. Pooled train có 701.568 dòng và 8.672 dương. Không cộng currency khác nhau. Không suy hiệu ứng nhân quả hay hiệu quả ngoài mẫu từ chart này.",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · GEO / NHIỄU",
+    "title": "Chuyển mã trong 60 giây là dấu hiệu kiểm tra, chưa phải lỗi vị trí",
+    "meaning": "Ý nghĩa cho mô hình: giữ cờ và kiểm tra độ bền đặc trưng, không tự xóa sự kiện theo proxy.",
+    "method": "Chỉ events trước 01/09/2022. Cặp trong mỗi ID xếp theo timestamp, source_file, source_row; không diễn giải mã thành tọa độ.",
+    "source": "deliverables/propensity-data-story/analysis/geo_quality_proxy.csv; descriptive.quality/duplicates.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · ABLATION / TỪNG THÁNG",
+    "title": "Đóng góp nguồn cần được đọc cùng biến động từng tháng",
+    "meaning": "Ý nghĩa cho mô hình: nếu dấu chênh thay đổi, cần thêm mốc thời gian trước khi bỏ nguồn.",
+    "method": "ΔAP = AP full − AP reduced, số dương ủng hộ giữ nguồn trong cấu hình này; ba tháng không phải ba thế giới độc lập.",
+    "source": "deliverables/propensity-data-story/analysis/source_ablation_monthly.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · IMPORTANCE / CHẨN ĐOÁN",
+    "title": "Importance và ablation trả lời hai câu hỏi khác nhau",
+    "meaning": "Ý nghĩa cho mô hình: dùng importance để hiểu model đã fit; dùng ΔAP để đo giá trị giữ nguồn.",
+    "method": "CatBoost PredictionValuesChange của full B+H, cộng theo prefix nguồn và trung bình ba model fold; tổng 100%.",
+    "source": "deliverables/propensity-data-story/analysis/importance_by_source.csv",
+    "notes": "Đây là model importance có điều kiện, không phải phân rã nhân quả; nhóm tương quan có thể chia sẻ/tước importance. PURCHASE là lịch sử target khả dụng, không phải target cùng tháng.",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · LỖI / GIAO DANH SÁCH",
+    "title": "Hai cách chọn khách có cả phần bổ sung và phần cùng bỏ sót",
+    "meaning": "Ý nghĩa cho mô hình: khách ngoài top-K là phần dư địa lớn; cải thiện rank phải giữ cùng ngân sách.",
+    "method": "True positive trong giao/hiệu hai danh sách top 1%; cộng 09–11/2022. Khách có thể lặp, không phải ID unique.",
+    "source": "deliverables/propensity-data-story/analysis/error_overlap.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · LỖI / DƯƠNG GIẢ THEO NHÓM",
+    "title": "Phần lớn lựa chọn top 1% vẫn là dương giả ở các nhóm khách",
+    "meaning": "Ý nghĩa cho mô hình: tăng Recall@K cần cân bằng với chi phí dương giả; báo precision riêng theo nhóm.",
+    "method": "B+H 156 biến, top 1% chung, gộp ba tháng. FP = được chọn − TP; các hàng về lịch sử mua / nguồn là các cách phân nhóm có chồng lấn.",
+    "source": "deliverables/propensity-data-story/analysis/error_segments.csv",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · SNAPSHOT / KIỂM SOÁT BIẾN",
+    "title": "So cửa sổ giữ nguyên 31 predictor và ba cutoff validation",
+    "meaning": "Ý nghĩa cho mô hình: kết quả thuộc bộ biến nhỏ cố định; không so trực tiếp thành tác dụng cửa sổ của full 156 biến.",
+    "method": "16 biến hành vi chung: has_event, log count, active days, recency mỗi nguồn + 2 trx + 2 geo; cộng 15 H.",
+    "source": "deliverables/propensity-data-story/analysis/window_sensitivity_monthly.csv; model_manifest.json",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · SNAPSHOT / T BẤT KỲ",
+    "title": "Có thể tạo feature tại T bất kỳ, nhưng nhãn sản phẩm mới là giới hạn",
+    "meaning": "Ý nghĩa cho mô hình: phải chốt horizon và availability; không gán một nhãn tháng cho nhiều horizon khác nhau.",
+    "method": "301 cutoff 06/03–31/12/2022 trong 384 ngày chung; bộ lọc đủ ba nguồn chỉ mô tả, không áp vào model toàn cohort.",
+    "source": "docs/mbd_temporal_coverage/assessment.md",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · TRX / KIỂM TRA LEAKAGE",
+    "title": "Giao dịch trước nhãn đầu tiên là lịch sử, không tạo nhãn âm",
+    "meaning": "Ý nghĩa cho mô hình: cần kiểm soát sự kiện và availability từng dòng, kể cả trước thời kỳ có nhãn.",
+    "method": "Đếm từ cache chuẩn hóa chỉ đọc; phạm vi audit đến trước 01/09/2022. Chưa có available_at thực tế để xác minh SLA của nhãn.",
+    "source": "deliverables/propensity-data-story/analysis/leakage_audit.csv; docs/propensity_feasibility/remaining_questions/assessment.md",
+    "notes": "",
+    "appendix": true
+  },
+  {
+    "section": "PHỤ LỤC · APPENDIX A7 · CÁCH TÍNH",
+    "title": "Các chỉ số dùng mẫu số khác nhau và cần đọc đúng phạm vi",
+    "meaning": "Ý nghĩa cho mô hình: không so metric khác cohort, khác ngân sách hoặc khác giả định nhãn.",
+    "method": "B+H 156 biến: CatBoost depth 4, 200 cây, learning rate 0,04, L2 5; không resampling/class weight.",
+    "source": "deliverables/baseline-final/REPORT.md; docs/propensity_baseline_design.md",
+    "notes": "",
+    "appendix": true
+  }
+]

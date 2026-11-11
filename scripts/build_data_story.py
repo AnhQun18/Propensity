@@ -53,8 +53,8 @@ def bars(labels, values, unit='%', maximum=None, colors=None, note=None):
     step=min(58,270/len(values)); start=28
     for i,(label,value) in enumerate(zip(labels,values)):
         y=start+i*step
-        precision=2 if unit=='%' else 4 if unit=='' else 0
-        b+=tx(0,y+23,label,21)+rect(385,y,620,28,'--surface-2')+rect(385,y,620*value/maximum,28,colors[i] if colors else '--accent')+tx(1030,y+23,fmt(value,precision)+('%' if unit=='%' else ''),22,weight=650)
+        precision=2 if unit in ('%','×') else 4 if unit=='' else 0
+        b+=tx(0,y+23,label,21)+rect(385,y,620,28,'--surface-2')+rect(385,y,620*value/maximum,28,colors[i] if colors else '--accent')+tx(1030,y+23,fmt(value,precision)+(unit if unit in ('%','×') else ''),22,weight=650)
     b+=line(385,310,1005,310)+tx(385,338,'0',16,'--text-3')+tx(1005,338,fmt(maximum,2 if unit=='' else 0 if unit!='%' else 1)+unit,16,'--text-3','end')
     if note:b+=tx(0,335,note,17,'--text-2')
     return svg(b,'So sánh '+', '.join(labels))
@@ -417,6 +417,9 @@ add('APPENDIX A7 · CÁCH TÍNH','Các chỉ số dùng mẫu số khác nhau v�
     'B+H 156 biến: CatBoost depth 4, 200 cây, learning rate 0,04, L2 5; không resampling/class weight.',
     'deliverables/baseline-final/REPORT.md; docs/propensity_baseline_design.md',appendix=True)
 
+from data_story_revision import revise_deck
+main_slides,detailed_slides,appendix_slides,coverage=revise_deck(slides,locals())
+
 CSS='''
 :root{--bg:#f7f9fb;--surface:#fff;--surface-2:#eaf0f5;--text-1:#102b46;--text-2:#496174;--text-3:#667d8e;--accent:#087e8b;--accent-2:#5477ad;--accent-3:#a06d4a;--accent-ink:#fff;--border:#dce5ec;--border-strong:#a7bac8;--good:#21734e;--good-soft:#e2f1e9;--warn:#976312;--warn-soft:#fff1d6;--bad:#a7463e;--bad-soft:#f8e6e2;--font-sans:'Segoe UI',Arial,sans-serif;--radius:10px;--shadow:none}
 body{background:var(--surface-2)}.slide{padding:35px 54px 32px;justify-content:flex-start;transition:opacity .12s;transform:none;background:var(--bg)}
@@ -424,35 +427,49 @@ body{background:var(--surface-2)}.slide{padding:35px 54px 32px;justify-content:f
 .kicker{font-size:14px;letter-spacing:.13em;color:var(--accent);font-weight:750;margin:0 0 12px;text-transform:uppercase}
 h2{font-size:34px;line-height:1.18;letter-spacing:-.025em;margin:0;max-width:1150px;font-weight:720}
 .chart{position:absolute;left:54px;right:54px;top:157px;height:350px}.chart svg{width:100%;height:100%;overflow:visible}.chart svg text{font-family:var(--font-sans);font-variant-numeric:tabular-nums}
-.meaning{position:absolute;left:54px;right:54px;top:530px;padding:14px 18px;background:var(--surface-2);border-left:4px solid var(--accent);font-size:21px;font-weight:600;line-height:1.35;margin:0}
-.method{position:absolute;left:54px;right:54px;top:598px;font-size:15px;color:var(--text-2);line-height:1.4;margin:0}
+.meaning{position:absolute;left:54px;right:54px;top:526px;padding:12px 18px;background:var(--surface-2);border-left:4px solid var(--accent);font-size:20px;font-weight:600;line-height:1.25;margin:0}
+.method{position:absolute;left:54px;right:54px;top:610px;font-size:14px;color:var(--text-2);line-height:1.4;margin:0}
 .source{position:absolute;left:54px;right:120px;bottom:24px;font-size:11px;line-height:1.35;color:var(--text-3);margin:0;overflow-wrap:anywhere}.page{position:absolute;right:54px;bottom:23px;font-size:14px;color:var(--text-3)}
 .table-wrap{height:100%;display:flex;align-items:center}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:20px;line-height:1.35}th{text-align:left;font-size:15px;color:var(--text-3);font-weight:650;letter-spacing:.02em;padding:10px 16px;border-bottom:2px solid var(--accent)}td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle}td:first-child{font-weight:650}tbody tr:nth-child(2n){background:var(--surface)}
-.deck-nav{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:50;opacity:.2;transition:opacity .2s}.deck-nav:hover,.deck-nav:focus-within{opacity:1}.deck-nav button{background:var(--surface);color:var(--text-1);border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px}
+.deck-nav{position:fixed;top:6px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:50;opacity:.25;transition:opacity .2s;max-width:96vw;flex-wrap:wrap;justify-content:center}.deck-nav:hover,.deck-nav:focus-within{opacity:1}.deck-nav button,.deck-nav a{background:var(--surface);color:var(--text-1);border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px;line-height:1.2}.deck-nav .mode-link{background:var(--accent);color:var(--accent-ink);font-weight:650}
 .progress-bar{height:3px!important}.notes{display:none}.hint-bar{display:none!important}
 @media print{.deck-nav{display:none!important}.slide{break-after:page}.chart{height:350px}}
 '''
-
-parts=[]
-for i,s in enumerate(slides,1):
-    number=f'{i:02d} / 19' if not s['appendix'] else f'A{i-19:02d} / 07'
-    parts.append(f'''<section class="slide{' is-active' if i==1 else ''}" data-title="{esc(s['title'])}" data-section="{esc(s['section'])}">
-    <p class="kicker">MBD-MINI / {esc(s['section'])}</p><h2>{esc(s['title'])}</h2>
-    <div class="chart">{s['chart']}</div><p class="meaning">{esc(s['meaning'])}</p>
-    <p class="method">{esc(s['method'])}</p><p class="source">Nguồn: {esc(s['source'])} · cập nhật 11/11/2026</p>
-    <span class="page">{number}</span><div class="notes">{esc(s['notes'] or s['method'])}</div></section>''')
 
 template=(SKILL/'templates/full-decks/tech-sharing/index.html').read_text(encoding='utf-8') if SKILL.exists() else '<!doctype html>'
 assert 'tpl-tech-sharing' in template or not SKILL.exists()
 basecss=(ASSETS/'base.css').read_text(encoding='utf-8')
 runtime=(ASSETS/'runtime.js').read_text(encoding='utf-8').replace('</script', '<\\/script')
-page=f'''<!doctype html>
+
+def render_deck(narrative,appendices,filename,other,other_label):
+    allslides=[*narrative,*appendices];parts=[]
+    for i,s in enumerate(allslides,1):
+        number=f'{i:02d} / {len(narrative)}' if i<=len(narrative) else f'A{i-len(narrative):02d} / {len(appendices):02d}'
+        parts.append(f'''<section class="slide{' is-active' if i==1 else ''}" data-title="{esc(s['title'])}" data-section="{esc(s['section'])}">
+        <p class="kicker">MBD-MINI / {esc(s['section'])}</p><h2>{esc(s['title'])}</h2>
+        <div class="chart">{s['chart']}</div><p class="meaning">{esc(s['meaning'])}</p>
+        <p class="method">{esc(s['method'])}</p><p class="source">Nguồn: {esc(s['source'])} · cập nhật 11/11/2026</p>
+        <span class="page">{number}</span><div class="notes">{esc(s['notes'] or s['method'])}</div></section>''')
+    page=f'''<!doctype html>
 <!-- Adapted from html-ppt tech-sharing + chart/table/flow/gantt templates. html-ppt MIT © 2026 lewis. -->
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="MBD-mini: 19 slide chính và 7 phụ lục về tính phù hợp dữ liệu propensity."><title>MBD-mini · Dữ liệu có đủ tín hiệu cho propensity?</title>
-<style>{basecss}\n{CSS}</style></head><body class="tpl-tech-sharing"><main class="deck" data-w="1280" data-h="720">{''.join(parts)}</main>
-<nav class="deck-nav" aria-label="Điều hướng"><button onclick="location.hash='#/1'">Đầu</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'ArrowLeft'}}))">←</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'ArrowRight'}}))">→</button><button onclick="location.hash='#/20'">Phụ lục</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'o'}}))">Mục lục (O)</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'s'}}))">Trình chiếu (S)</button></nav>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="MBD-mini: {len(narrative)} slide chính và {len(appendices)} phụ lục về tính phù hợp dữ liệu propensity."><title>MBD-mini · {len(narrative)} slide · Dữ liệu có đủ tín hiệu cho propensity?</title>
+<style>{basecss}\n{CSS}</style></head><body class="tpl-tech-sharing" data-main-count="{len(narrative)}"><main class="deck" data-w="1280" data-h="720">{''.join(parts)}</main>
+<nav class="deck-nav" aria-label="Điều hướng"><a class="mode-link" href="{other}">{other_label}</a><button onclick="location.hash='#/1'">Đầu</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'ArrowLeft'}}))">←</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'ArrowRight'}}))">→</button><button onclick="location.hash='#/{len(narrative)+1}'">Phụ lục</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'o'}}))">Mục lục (O)</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{{key:'s'}}))">Trình chiếu (S)</button></nav>
 <script>{runtime}</script></body></html>'''
-(OUT/'index.html').write_text(page,encoding='utf-8',newline='\n')
+    (OUT/filename).write_text(page,encoding='utf-8',newline='\n')
+    return [{k:v for k,v in s.items() if k!='chart'} for s in allslides]
+
+summary_outline=render_deck(main_slides,appendix_slides,'index.html','detailed.html','Bản đầy đủ · 23 slide')
+full_titles={s['title'] for s in detailed_slides}
+detailed_outline=render_deck(detailed_slides,[s for s in appendix_slides if s['title'] not in full_titles],'detailed.html','index.html','Bản tóm tắt · 19 slide')
 (OUT/'aggregate_data.json').write_text(json.dumps(aggregate,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
-(OUT/'outline.json').write_text(json.dumps([{k:v for k,v in s.items() if k!='chart'} for s in slides],ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
-print(json.dumps({'main_slides':sum(not s['appendix'] for s in slides),'appendix':sum(s['appendix'] for s in slides),'persistence_ratio':ratio,'trx_months':len(trx),'output':str(OUT/'index.html')},ensure_ascii=False))
+for name,value in [('outline.json',summary_outline),('detailed_outline.json',detailed_outline),('coverage_ledger.json',coverage)]:
+    (OUT/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+md=['# Đối chiếu đề cương với slide và bằng chứng','',
+    'Bản chính giữ 19 slide; bản chi tiết có 23 slide theo A3 + B3 + C11 + D3 + E3. Số phụ lục dưới đây tính từ A1 của bản chính.',
+    '', '| Mục | Yêu cầu | Chính | Chi tiết | Phụ lục | Kết quả rà soát |', '|---|---|---|---|---|---|']
+for v in coverage:
+    show=lambda k: ', '.join(map(str,v[k])) or '—'
+    md.append(f"| {v['requirement']} | {v['request']} | {show('main_slides')} | {show('detailed_slides')} | {show('appendix_slides')} | {v['status']} |")
+(OUT/'coverage_ledger.md').write_text('\n'.join(md)+'\n',encoding='utf-8',newline='\n')
+print(json.dumps({'main_slides':len(main_slides),'appendix':len(appendix_slides),'detailed_slides':len(detailed_slides),'covered_requirements':len(coverage),'output':str(OUT/'index.html')},ensure_ascii=False))
