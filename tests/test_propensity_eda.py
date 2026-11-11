@@ -6,10 +6,11 @@ import unittest
 from pathlib import Path
 
 import duckdb
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from propensity_eda import EDA
+from propensity_eda import EDA, log_iqr_summary
 
 
 class EDAQualityTest(unittest.TestCase):
@@ -62,6 +63,55 @@ class EDAQualityTest(unittest.TestCase):
         self.eda.tables["overview"].loc[self.eda.tables["overview"].table == "targets","rows"] = 4
         with self.assertRaisesRegex(ValueError,"Conflicting labels"):
             self.eda.quality()
+
+
+class LogIQRTest(unittest.TestCase):
+    def setUp(self): self.db=duckdb.connect()
+    def tearDown(self): self.db.close()
+
+    def test_both_tails_exact_transform_and_currency_isolation(self):
+        values=np.r_[np.exp(np.random.default_rng(42).normal(10,1,1000)),0.,1e9,-5.,np.nan,np.inf]
+        frame=pd.DataFrame({"currency":[11]*len(values)+[3]*100,"amount":np.r_[values,np.linspace(1,100,100)]})
+        self.db.register("data",frame)
+        result=log_iqr_summary(self.db,"data","amount",group="currency",include_ln=True).set_index("group_value")
+        r=result.loc[11]
+        transformed=np.log1p(values[np.isfinite(values)&(values>=0)])
+        q1,q3=np.quantile(transformed,[.25,.75]);lo,hi=q1-1.5*(q3-q1),q3+1.5*(q3-q1)
+        self.assertEqual(r.log_valid_n,len(transformed))
+        self.assertAlmostEqual(r.log_q1,q1)
+        self.assertAlmostEqual(r.iqr_upper,hi)
+        self.assertEqual(r.log_below_n,int((transformed<lo).sum()))
+        self.assertEqual(r.log_above_n,int((transformed>hi).sum()))
+        self.assertGreater(r.log_below_n,0);self.assertGreater(r.log_above_n,0)
+        self.assertEqual(r.iqr_n,r.log_below_n+r.log_above_n)
+        self.assertEqual(r.negative_n,1);self.assertEqual(r.zero_n,1)
+        self.assertEqual(r.ln_valid_n,len(transformed)-1)
+        self.assertAlmostEqual(r.iqr_upper_input_units,np.expm1(hi))
+
+    def test_small_unknown_and_zero_iqr_groups_have_no_primary_label(self):
+        frame=pd.DataFrame({"currency":[11]*5+[3]*100+[None]*50,
+                            "amount":list(range(5))+[1.]*99+[1e8]+list(range(50))})
+        self.db.register("data",frame)
+        result=log_iqr_summary(self.db,"data","amount",group="currency")
+        self.assertFalse(result.iqr_applicable.any())
+        self.assertTrue(result.iqr_n.isna().all())
+
+    def test_quantiles_are_computed_after_log_not_before(self):
+        values=np.array([1.,2.,8.,32.])
+        self.db.register("data",pd.DataFrame({"x":values}))
+        r=log_iqr_summary(self.db,"data","x",min_n=1).iloc[0]
+        self.assertAlmostEqual(r.log_q1,np.quantile(np.log1p(values),.25))
+        self.assertNotAlmostEqual(r.log_q1,np.log1p(np.quantile(values,.25)),places=5)
+
+    def test_signed_values_and_no_valid_log_domain(self):
+        self.db.register("data",pd.DataFrame({"x":np.linspace(-100,100,101)}))
+        signed=log_iqr_summary(self.db,"data","x",transform="signed_log1p").iloc[0]
+        self.assertTrue(signed.iqr_applicable)
+        self.assertAlmostEqual(signed.log_median,0.)
+        self.db.register("negative",pd.DataFrame({"x":-np.arange(1.,51.)}))
+        no_domain=log_iqr_summary(self.db,"negative","x",include_ln=True).iloc[0]
+        self.assertEqual(no_domain.log_valid_n,0)
+        self.assertFalse(no_domain.iqr_applicable)
 
 
 if __name__ == "__main__":

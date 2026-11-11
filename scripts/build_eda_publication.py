@@ -9,6 +9,7 @@ import html
 import json
 import math
 import sys
+from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "deliverables/eda"
@@ -27,12 +28,14 @@ def vn(x, digits=0):
 
 
 manifest = json.loads((OUT / "manifest.json").read_text(encoding="utf-8"))
+SOURCE_DATE=datetime.fromisoformat(manifest["created_utc"]).strftime("%d/%m/%Y")
 overview = {r["table"]: r for r in read("overview")}
 monthly = read("target_monthly")
 stats = read("feature_statistics_train")
 assoc = read("feature_target_associations")
 currency = next(r for r in read("amount_by_currency") if float(r["currency"]) == 11)
 outlier = next(r for r in read("amount_outliers_by_currency") if float(r["currency"]) == 11)
+assert outlier["analysis_scale"] == "log1p", "Re-execute notebook with log-IQR before publishing"
 stat_by_name = {r["feature"]: r for r in stats}
 n, positive = sum(float(r["rows"]) for r in monthly), sum(float(r["positive_n"]) for r in monthly)
 rate = 100 * positive / n
@@ -91,7 +94,7 @@ def page(title, content, source, notes, cover=False):
 page("EDA MBD-mini",
      '<p class="date">11/11/2026</p><h1>EDA MBD-mini</h1><p class="cover-lead">Chất lượng dữ liệu và định hướng đặc trưng<br>cho bài toán propensity</p>'
      '<div class="metrics cover-metrics"><div><strong>100.224</strong><span>khách hàng</span></div><div><strong>1.202.688</strong><span>dòng khách-tháng</span></div><div><strong>221</strong><span>đặc trưng được phân tích</span></div></div>',
-     "Dữ liệu MBD-mini. Kết quả EDA thực thi ngày 10/11/2026.",
+     f"Dữ liệu MBD-mini. Kết quả EDA cập nhật ngày {SOURCE_DATE}.",
      "Mục tiêu là dự đoán khách mua ít nhất một trong bốn sản phẩm trong tháng đích. Bài trình bày tóm tắt bảy bước EDA, tập trung vào các phát hiện có ý nghĩa cho xử lý dữ liệu và thiết kế đặc trưng. Nguồn: overview.csv, manifest.json và notebook eda.ipynb.",True)
 sources=[("Giao dịch",float(overview["trx"]["rows"])),("Vị trí",float(overview["geo"]["rows"])),("Hội thoại",float(overview["dialog"]["rows"]))]
 rows="".join(f'<tr><td>{label}</td><td class="number">{vn(count)}</td><td>sự kiện</td></tr>' for label,count in sources)
@@ -107,9 +110,9 @@ page("Thiếu nguồn cần được giữ đúng nghĩa",f'<div class="metrics 
 page("Không phát hiện dòng trùng hoàn toàn",'<div class="finding"><strong>0</strong><div><h3>Dòng trùng hoàn toàn trong raw</h3><p>Khóa khách-tháng của nhãn cũng không trùng.</p></div></div><div class="finding"><strong>1</strong><div><h3>Cặp giao dịch cùng khách và timestamp</h3><p>Khác thuộc tính, giữ lại để tránh xóa nhầm.</p></div></div><div class="finding"><strong class="smaller">2.020.020</strong><div><h3>Sự kiện thiếu trong PTLS/trx so với detail/trx</h3><p>Dùng detail làm nguồn lịch sử giao dịch đầy đủ.</p></div></div>',
      "Nguồn: duplicates.csv và detail_sequence_reconciliation.csv. Quét toàn bộ raw.",
      "Full-row duplicate được quét chính xác, không dùng hash gần đúng để kết luận. Cùng khách và timestamp chỉ là ứng viên kiểm tra. PTLS/trx có 36.744.910 sự kiện so với 38.764.930 ở detail/trx. Không cộng hai biểu diễn và không tự động loại các giao dịch đồng thời.")
-page("Amount có đuôi dài",'<p class="lead">Currency mã 11, '+vn(float(currency["valid_n"]))+' giao dịch</p><div class="metrics outlier-metrics"><div><strong>'+vn(float(outlier["iqr_pct"]),3)+'%</strong><span>được IQR gắn cờ</span><small>'+vn(float(outlier["iqr_n"]))+' dòng</small></div><div><strong>'+vn(float(outlier["zscore_pct"]),5)+'%</strong><span>được |Z-score| &gt; 3 gắn cờ</span><small>'+vn(float(outlier["zscore_n"]))+' dòng</small></div></div><p class="takeaway">Giữ giá trị gốc, rà soát theo currency và ngữ cảnh</p><p class="muted">Trung vị '+vn(float(currency["median"]),3)+' đơn vị dữ liệu. Cân nhắc log1p/signed-log.<br>Không gắn tên tiền thật hoặc cộng amount khác currency.</p>',
-     "Nguồn: amount_by_currency.csv và amount_outliers_by_currency.csv. Toàn bộ trx, currency=11.",
-     "IQR dùng ranh giới Q1-1,5*IQR và Q3+1,5*IQR. Z-score dùng độ lệch tuyệt đối trên ba lần độ lệch chuẩn. Amount có đuôi rất dài khiến hai cách gắn cờ cho kết quả khác nhau mạnh. Giá trị tối đa khoảng 1,37 nghìn tỷ đơn vị dữ liệu. Gắn cờ không xác nhận dữ liệu sai và chưa phải quyết định xóa hoặc cap.")
+page("Ngoại lai cần tính trên thang log",'<p class="lead">Currency mã 11, '+vn(float(currency["valid_n"]))+' giao dịch</p><div class="metrics outlier-metrics"><div><strong>'+vn(float(outlier["raw_iqr_pct"]),4)+'%</strong><span>IQR thang gốc, chỉ đối chiếu</span><small>'+vn(float(outlier["raw_iqr_n"]))+' dòng</small></div><div><strong>'+vn(float(outlier["iqr_pct"]),4)+'%</strong><span>IQR trên log1p, kết quả chính</span><small>'+vn(float(outlier["iqr_n"]))+' dòng</small></div></div><p class="takeaway">Log-IQR xét cả hai đuôi, không chỉ giao dịch lớn</p><p class="muted">Đuôi thấp '+vn(float(outlier["log_below_n"]))+' dòng, đuôi cao '+vn(float(outlier["log_above_n"]))+' dòng.<br>Đối chiếu ln(amount): '+vn(float(outlier["ln_iqr_pct"]),4)+'%. Giữ raw, không tự động xóa/cap.</p>',
+     "Nguồn: amount_outliers_by_currency.csv. Tính log trước quartile, theo từng currency.",
+     "Đính chính ngày 11/11/2026 theo rà soát log-IQR ngày 09/11/2026. Biến đổi từng giá trị DOUBLE sang log1p rồi mới tính quartile và hàng rào 1,5*IQR. Với mã 11: "+vn(float(outlier["iqr_n"]))+" dòng ngoài hàng rào, gồm "+vn(float(outlier["log_below_n"]))+" thấp và "+vn(float(outlier["log_above_n"]))+" cao. ln(amount) là phân tích độ nhạy, raw chỉ đối chiếu. Không kết luận ngoại lai cho nhóm dưới 30 giá trị, currency thiếu hoặc IQR log bằng 0. Ngưỡng toàn kỳ chỉ phục vụ EDA, không dùng nguyên cho mô hình quá khứ. Gắn cờ chưa chứng minh lỗi.")
 page("Độ đa dạng giao dịch liên hệ với nhãn",bar_svg([(label,float(r["pearson_target"])) for label,r in zip(top_labels,top3)],.10,"",4)+'<p class="takeaway">Liên hệ đơn biến còn thấp, cần kiểm chứng bằng validation</p><p class="muted"><b>'+vn(pair_count)+'</b> cặp đặc trưng có |r| ≥ 0,90 trong mẫu 30.000 dòng train.<br>Rà soát dư thừa giữa cửa sổ thời gian, số đếm và biến biến đổi.</p>',
      "Pearson với target: toàn train. Ma trận nhiều biến: mẫu hash 30.000 dòng, seed 42.",
      "Các biến trong biểu đồ lần lượt là trx_30d_event_subtype_nunique, trx_30d_event_type_nunique và trx_30d_dst_type12_nunique. Tương quan không phải nhân quả hoặc feature importance của mô hình. Ma trận nhiều biến dùng pairwise-complete, cỡ mẫu từng cặp được giữ trong CSV. Nguồn: feature_target_associations.csv, high_correlation_pairs.csv.")
@@ -157,7 +160,7 @@ import_css='body{display:block;width:1280px;height:auto;overflow:visible}.slide,
 (SLIDES/"canva_import.html").write_text(head.replace('</style>','\n'+import_css+'</style>')+'<body class="tpl-weekly-report">'+"\n".join(sections)+'</body></html>',encoding="utf-8")
 outline={"title":"EDA MBD-mini","language":"vi","slides":pages,"source_manifest_created_utc":manifest["created_utc"],"design":{"template":"html-ppt/weekly-report","theme":"corporate-clean adapted navy/teal","canvas":[1280,720]},"notes":"Values derived from the executed EDA CSVs. HTML contains editable text and SVG charts."}
 (SLIDES/"outline.json").write_text(json.dumps(outline,ensure_ascii=False,indent=2),encoding="utf-8")
-brief="# EDA MBD-mini - Báo cáo tóm tắt\n\nBản biên tập ngày 11/11/2026, từ kết quả thực thi 10/11/2026.\n\n"
+brief="# EDA MBD-mini - Báo cáo tóm tắt\n\nĐính chính log-IQR ngày 11/11/2026 theo rà soát 09/11/2026; notebook đã được thực thi lại.\n\n"
 for p in pages:
     brief+=f"## {p['index']}. {p['title']}\n\n{p['notes']}\n\n{p['source']}\n\n"
 (OUT/"executive_summary.md").write_text(brief.rstrip()+"\n",encoding="utf-8")
@@ -188,7 +191,7 @@ def build_pdf():
     def rule(y):
         c.setStrokeColor(light);c.setLineWidth(.7);c.line(M,y,W-M,y)
     def footer(num):
-        rule(48);txt(M,31,"EDA thực thi 10/11/2026. Bản biên tập 11/11/2026.",8,color=muted)
+        rule(48);txt(M,31,"EDA MBD-mini. Đính chính log-IQR ngày 11/11/2026.",8,color=muted)
         txt(W-M-19,31,f"{num}/3",8,color=muted)
     def start(title,num):
         c.setFillColor(teal);c.rect(M,H-40,34,3,fill=1,stroke=0)
@@ -222,7 +225,7 @@ def build_pdf():
         txt(M,yy,label,10.5);txt(M+230,yy,vn(count),11,"Arial-Bold");txt(M+365,yy,"sự kiện",10,color=muted);rule(yy-9);yy-=31
     yy=para("<b>Phạm vi:</b> raw toàn lịch sử ở 8 bảng. Thống kê đặc trưng và liên hệ nhãn chỉ dùng "
             "<b>701.568 dòng train 02-08/2022</b>. Detail là sự kiện, PTLS là chuỗi tương ứng và không cộng hai dạng.",yy-7)
-    para("Nguồn: overview.csv, target_monthly.csv, manifest.json. Báo cáo kỹ thuật kèm 12 biểu đồ và 56 bảng CSV.",yy-14,8.5,12,muted)
+    para(f"Nguồn: overview.csv, target_monthly.csv, manifest.json. Báo cáo kỹ thuật kèm 12 biểu đồ và {len(manifest['tables'])} bảng CSV.",yy-14,8.5,12,muted)
     footer(1);c.showPage()
     # Page 2: missingness, duplicates and tail flags.
     start("Chất lượng dữ liệu và ngoại lai",2)
@@ -240,12 +243,12 @@ def build_pdf():
             "<b>diff_trans_date</b> thiếu 120.786 dòng (10,043%), đều có trans_count=0. Đây là thiếu thuộc tính phụ trợ, không phải mất nhãn.",yy-2,10.2,14.6)
     yy-=31;txt(M,yy,"Amount theo currency mã 11",14,"Arial-Bold");yy-=27
     for label,value in [("Số giao dịch",vn(currency["valid_n"])),("Trung vị (đơn vị dữ liệu)",vn(currency["median"],3)),
-                        ("IQR gắn cờ",vn(outlier["iqr_n"])+" dòng / "+vn(outlier["iqr_pct"],3)+"%"),
-                        ("|Z-score| > 3 gắn cờ",vn(outlier["zscore_n"])+" dòng / "+vn(outlier["zscore_pct"],5)+"%")]:
+                        ("IQR gốc (đối chiếu)",vn(outlier["raw_iqr_n"])+" dòng / "+vn(outlier["raw_iqr_pct"],4)+"%"),
+                        ("Log1p-IQR (kết quả chính)",vn(outlier["iqr_n"])+" dòng / "+vn(outlier["iqr_pct"],4)+"%")]:
         txt(M,yy,label,10);txt(M+237,yy,value,10.5,"Arial-Bold");rule(yy-9);yy-=30
-    yy=para("Đuôi dài làm hai phương pháp cho kết quả rất khác nhau. <b>Giữ nguyên dữ liệu gốc</b>, "
-            "rà soát theo ngữ cảnh và cân nhắc log1p/signed-log. Không quy đổi hoặc cộng amount khác currency. "
-            "Chưa gán tên tiền tệ thật cho mã 11.",yy-1,10.2,14.6)
+    yy=para("<b>Tính log trước quartile, xét cả hai đuôi:</b> "+vn(outlier["log_below_n"])+" dòng thấp và "+vn(outlier["log_above_n"])+" dòng cao. "
+            "ln(amount) cho "+vn(outlier["ln_iqr_pct"],4)+"% ngoài hàng rào. <b>Giữ raw, không tự động xóa/cap.</b> "
+            "Không kết luận cho IQR log=0, nhóm dưới 30 giá trị hoặc currency thiếu. Không gộp amount khác currency.",yy-1,10.2,14.6)
     yy=para("<b>Đối soát biểu diễn:</b> PTLS/trx ít hơn detail/trx <b>2.020.020 sự kiện</b>. Có một cặp giao dịch cùng khách/timestamp "
             "nhưng khác thuộc tính, được giữ lại. Dùng detail làm lịch sử giao dịch đầy đủ.",yy-14,10.2,14.6)
     para("Nguồn: feature_statistics_train.csv, missing_diff_context.csv, duplicates.csv, amount_outliers_by_currency.csv, detail_sequence_reconciliation.csv.",yy-12,8.2,11.5,muted)

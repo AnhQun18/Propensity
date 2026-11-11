@@ -10,7 +10,7 @@
 - Số dòng raw trùng toàn bộ: 0; xung đột nhãn sau DISTINCT: 0. Ứng viên cùng khách–timestamp phải so thuộc tính trước khi kết luận.
 - Các liên hệ mạnh nhất theo |Pearson| trong train: `trx_30d_event_subtype_nunique` (r=0.0916); `trx_30d_event_type_nunique` (r=0.0904); `trx_30d_dst_type12_nunique` (r=0.0892); `trx_84d_event_subtype_nunique` (r=0.0890); `trx_84d_event_type_nunique` (r=0.0879). Đây là ứng viên feature, không phải bằng chứng nhân quả hay kết quả chọn mô hình.
 - Có 259 cặp |r|≥0,90 trong mẫu train. Các cửa sổ/count/log-count có thể dư thừa; chỉ bỏ dựa trên validation và ý nghĩa biến.
-- Amount và số đếm có đuôi dài; xem thống kê skewness và tỷ lệ outlier theo biến/currency. Giữ giá trị gốc, cân nhắc log1p hoặc signed-log trước mô hình tuyến tính. IQR/Z-score chỉ gắn cờ, không xác nhận lỗi.
+- Ngoại lai dùng **IQR trên log1p** làm kết quả chính, tính cả hai đuôi theo currency. Currency 11: **584,139 dòng (1.5085%)**; thang gốc và ln chỉ là đối chiếu độ nhạy. Biến đã log không log lần hai; binary/biến hằng, IQR log bằng 0, nhóm ít hơn 30 giá trị và currency thiếu không kết luận ngoại lai. Giữ raw; gắn cờ không xác nhận lỗi.
 
 ### Giới hạn diễn giải
 
@@ -91,12 +91,13 @@ Số–phân loại trên cùng mẫu hash train n=30,000; giữ tỷ lệ lớp
 Toàn bộ train, 5 nhóm xếp theo giá trị hữu hạn. Giá trị bằng nhau có thể chia nhiều nhóm: đọc min/max trong bảng; liên hệ chưa kiểm soát tháng/khách.
 
 ## 6. Ngoại lai
+- [amount_iqr_scale_comparison_currency11](tables/amount_iqr_scale_comparison_currency11.csv): 3 dòng
 - [amount_outliers_by_currency](tables/amount_outliers_by_currency.csv): 14 dòng
 - [feature_outliers_train](tables/feature_outliers_train.csv): 221 dòng
 
 ![outlier_boxplots](figures/outlier_boxplots.png)
 
-Boxplot trên mẫu hash train n=30,000; số lượng gắn cờ IQR/Z-score trong CSV được tính trên toàn bộ train. Không tự động xóa/cap.
+Trên: thang gốc đối chiếu; dưới: log1p dùng cho log-IQR. Mẫu hash train n=30,000; CSV tính ngưỡng/số đếm trên toàn train. Nếu IQR log bằng 0, điểm ngoài râu chỉ để xem phân phối, không dùng phân loại ngoại lai.
 
 ## 7. Feature Engineering
 - [feature_engineering_plan](tables/feature_engineering_plan.csv): 12 dòng

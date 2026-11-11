@@ -1,12 +1,12 @@
 # EDA MBD-mini - Báo cáo tóm tắt
 
-Bản biên tập ngày 11/11/2026, từ kết quả thực thi 10/11/2026.
+Đính chính log-IQR ngày 11/11/2026 theo rà soát 09/11/2026; notebook đã được thực thi lại.
 
 ## 1. EDA MBD-mini
 
 Mục tiêu là dự đoán khách mua ít nhất một trong bốn sản phẩm trong tháng đích. Bài trình bày tóm tắt bảy bước EDA, tập trung vào các phát hiện có ý nghĩa cho xử lý dữ liệu và thiết kế đặc trưng. Nguồn: overview.csv, manifest.json và notebook eda.ipynb.
 
-Dữ liệu MBD-mini. Kết quả EDA thực thi ngày 10/11/2026.
+Dữ liệu MBD-mini. Kết quả EDA cập nhật ngày 11/11/2026.
 
 ## 2. Phạm vi và cấu trúc dữ liệu
 
@@ -32,11 +32,11 @@ Full-row duplicate được quét chính xác, không dùng hash gần đúng đ
 
 Nguồn: duplicates.csv và detail_sequence_reconciliation.csv. Quét toàn bộ raw.
 
-## 6. Amount có đuôi dài
+## 6. Ngoại lai cần tính trên thang log
 
-IQR dùng ranh giới Q1-1,5*IQR và Q3+1,5*IQR. Z-score dùng độ lệch tuyệt đối trên ba lần độ lệch chuẩn. Amount có đuôi rất dài khiến hai cách gắn cờ cho kết quả khác nhau mạnh. Giá trị tối đa khoảng 1,37 nghìn tỷ đơn vị dữ liệu. Gắn cờ không xác nhận dữ liệu sai và chưa phải quyết định xóa hoặc cap.
+Đính chính ngày 11/11/2026 theo rà soát log-IQR ngày 09/11/2026. Biến đổi từng giá trị DOUBLE sang log1p rồi mới tính quartile và hàng rào 1,5*IQR. Với mã 11: 584.139 dòng ngoài hàng rào, gồm 486.868 thấp và 97.271 cao. ln(amount) là phân tích độ nhạy, raw chỉ đối chiếu. Không kết luận ngoại lai cho nhóm dưới 30 giá trị, currency thiếu hoặc IQR log bằng 0. Ngưỡng toàn kỳ chỉ phục vụ EDA, không dùng nguyên cho mô hình quá khứ. Gắn cờ chưa chứng minh lỗi.
 
-Nguồn: amount_by_currency.csv và amount_outliers_by_currency.csv. Toàn bộ trx, currency=11.
+Nguồn: amount_outliers_by_currency.csv. Tính log trước quartile, theo từng currency.
 
 ## 7. Độ đa dạng giao dịch liên hệ với nhãn
 

@@ -2,21 +2,42 @@
   "status": "verified",
   "publication_date": "2026-11-11",
   "pdf_pages": 3,
-  "pdf_pages_visually_reviewed": [1, 2, 3],
+  "pdf_pages_visually_reviewed": [
+    1,
+    2,
+    3
+  ],
   "slide_count": 9,
-  "canvas": [1280, 720],
+  "canvas": [
+    1280,
+    720
+  ],
   "local_slide_overflow_findings": 0,
   "html_keyboard_navigation_verified": true,
-  "canva_design_id": "DAHaiiwL6V0",
+  "canva_design_id": "DAHakZ5XH-g",
   "canva_page_count_verified": 9,
   "canva_text_read_back": true,
   "canva_presenter_notes_verified": 9,
-  "canva_page_thumbnails_visually_reviewed": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "canva_page_thumbnails_visually_reviewed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
   "eda_code_cells_executed": 9,
   "eda_execution_errors": 0,
-  "eda_tables": 56,
+  "eda_tables": 57,
   "eda_figures": 12,
-  "quality_unit_tests_passed": 2,
+  "quality_unit_tests_passed": 6,
   "input_metadata_unchanged": true,
-  "chart_editing_note": "Charts were imported into Canva from SVG. Source CSVs are not live-linked to the Canva design."
+  "chart_editing_note": "Charts were imported into Canva from SVG. Source CSVs are not live-linked to the Canva design.",
+  "log_iqr_matches_prior_audit": true,
+  "currency11_log_iqr_n": 584139,
+  "currency11_log_low_n": 486868,
+  "currency11_log_high_n": 97271
 }

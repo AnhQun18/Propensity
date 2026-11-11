@@ -97,14 +97,18 @@ eda.show_figures("multivariate")
 ''')
 md("""## 6. Phát hiện ngoại lai
 
-IQR: ngoài [Q1−1,5×IQR; Q3+1,5×IQR]; Z-score: |x−mean| > 3×std.
-Áp dụng trên toàn bộ train cho đặc trưng số, toàn bộ log trx theo từng currency cho amount.
-Nếu IQR=0 hoặc std=0, đánh dấu giới hạn thay vì kết luận lỗi. Với số đếm zero-inflated, IQR=0 có thể gắn cờ cả hành vi bình thường.
-Giữ nguyên outlier; danh sách gắn cờ không phải lệnh xóa.
+**Kết quả chính: IQR trên `log1p(x)`**, tính cả hai đuôi. Biến đổi từng giá trị DOUBLE trước
+khi tính Q1/Q3, rồi xét ngoài [Q1−1,5×IQR; Q3+1,5×IQR] trên thang log.
+Amount tính riêng từng currency trên toàn log; đặc trưng số tính trên toàn train.
+Xuất thêm `ln(amount)` để phân tích độ nhạy và thang gốc để đối chiếu. Z-score phụ trợ cũng tính trên thang biến đổi.
+Biến đã log không log lần hai; biến có âm dùng signed-log1p. Binary/biến hằng, IQR log=0,
+nhóm dưới 30 giá trị hoặc currency thiếu không được kết luận ngoại lai.
+Ngưỡng toàn kỳ của raw chỉ là EDA, không áp trực tiếp vào mô hình quá khứ. Giữ nguyên raw, không tự động xóa/cap.
 """)
 code('''feature_outliers, amount_outliers = eda.outliers()
 display(feature_outliers.sort_values("iqr_pct", ascending=False).head(40))
 display(amount_outliers)
+display(eda.tables["amount_iqr_scale_comparison_currency11"])
 eda.show_figures("outliers")
 ''')
 md("""## 7. Kết luận và chuẩn bị Feature Engineering

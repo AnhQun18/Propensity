@@ -9,5 +9,5 @@ Constant/all-missing predictors,Review for removal,Bảng feature_statistics_tra
 Highly correlated pairs,Review redundancy,Bảng high_correlation_pairs + cỡ mẫu; chọn theo validation và độ ổn định thời gian
 New behavioral features,Candidate engineering,"Recency/frequency/active-day rate, share từng loại, xu hướng 30d/84d, flags coverage/missing; tất cả event_time < cutoff"
 Dialog embedding / geo content,Optional grouped ablation,"Hiện dùng metadata; nếu thêm pooling/entropy/content phải fit trên train, đối chứng và kiểm tra RAM"
-Outliers,Retain + investigate,Không xóa/cap chỉ dựa IQR/Z; nếu cap dùng threshold fit train và so validation
+Outliers,log1p-IQR primary; retain + investigate,Tính cả hai đuôi theo currency; thang gốc/ln đối chiếu. IQR=0/nhóm nhỏ/currency thiếu không phân loại. Ngưỡng mô hình chỉ fit train
 Evaluation,Time split + group-aware uncertainty,"Train 02–08, validation 09–11, calibration 12, test khóa 01/2023; bootstrap theo khách khi ước lượng bất định"

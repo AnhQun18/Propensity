@@ -1,0 +1,4 @@
+﻿scale,valid_n,below_n,above_n,outside_n,outside_pct
+raw (comparison only),38724240,,,5521385.0,14.258213976568682
+ln(amount) (sensitivity),38724240,516970.0,97222.0,614192.0,1.5860659886417396
+log1p(amount) (PRIMARY),38724240,486868.0,97271.0,584139.0,1.5084582679995786
