@@ -50,8 +50,20 @@ def validate():
     assert expected.issubset(observed),expected-observed
     for name in ("feature_outliers_train","amount_outliers_by_currency"):
         t=tables[name]
-        assert (t.iqr_n.between(0,t.valid_n)).all()
-        assert (t.zscore_n.between(0,t.valid_n)).all()
+        classified=t[t.iqr_applicable]
+        assert (classified.iqr_n.between(0,classified.log_valid_n)).all()
+        z=t[t.zscore_n.notna()]
+        assert (z.zscore_n.between(0,z.log_valid_n)).all()
+        assert t.loc[~t.iqr_applicable,"iqr_n"].isna().all()
+        assert (classified.iqr_n==classified.log_below_n+classified.log_above_n).all()
+    main=tables["amount_outliers_by_currency"].query("currency == 11").iloc[0]
+    prior=pd.read_csv(ROOT/"docs/propensity_feasibility/tail_review/amount_log_iqr_by_currency.csv")
+    previous=prior[prior.currency_group.astype(str)=="11"].iloc[0]
+    assert main.analysis_scale=="log1p"
+    assert int(main.log_below_n)==int(previous.log1p_below)
+    assert int(main.log_above_n)==int(previous.log1p_above)
+    assert int(main.iqr_n)==int(previous.log1p_outside)
+    assert int(main.ln_iqr_n)==int(previous.ln_outside)
     parser=ReportParser()
     parser.feed((OUT/"report.html").read_text(encoding="utf-8"))
     assert parser.sections==[f"step{i}" for i in range(1,8)]
@@ -65,7 +77,8 @@ def validate():
     assert notebook_images==len(manifest["figures"])
     result={"status":"ready","code_cells_executed":len(code),"errors":0,"tables":len(tables),
             "figures":len(parser.images),"predictors":n,"input_metadata_unchanged":True,
-            "all_7_report_sections":True,"self_contained_images":True,"notebook_images":notebook_images}
+            "all_7_report_sections":True,"self_contained_images":True,"notebook_images":notebook_images,
+            "log_iqr_matches_prior_audit":True,"currency11_log_iqr_n":int(main.iqr_n)}
     (ROOT/"outputs/eda_execution/validation.json").write_text(json.dumps(result,indent=2),encoding="utf-8")
     print(json.dumps(result,indent=2))
     return result

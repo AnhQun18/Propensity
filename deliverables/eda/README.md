@@ -1,16 +1,30 @@
 # Báo cáo EDA 7 bước
 
+## Đính chính ngoại lai ngày 11/11/2026
+
+Kết quả chính dùng **IQR trên log1p**, biến đổi từng giá trị trước khi tính quartile,
+đếm cả hai đuôi, tách riêng currency. `ln(amount)` dùng phân tích độ nhạy, IQR thang
+gốc chỉ đối chiếu. Cách này khôi phục kết quả đã ghi trong
+[rà soát ngày 09/11](../../docs/propensity_feasibility/tail_review/assessment.md).
+Với currency 11: raw 5.521.385 dòng (14,2582%), ln 614.192 dòng (1,5861%),
+log1p **584.139 dòng (1,5085%)**, gồm 486.868 thấp và 97.271 cao.
+
+Biến đã log không log lần hai, biến có âm dùng signed-log1p. Không kết luận
+ngoại lai cho binary/biến hằng, IQR log bằng 0, nhóm ít hơn 30 giá trị hoặc currency
+thiếu. Các ngưỡng raw toàn kỳ chỉ phục vụ EDA; ngưỡng cho mô hình phải fit trên train.
+Giữ raw, không tự động xóa/cap từ các cờ mô tả này.
+
 ## Bản báo cáo và trình bày ngày 11/11/2026
 
 - [Báo cáo PDF tóm tắt 3 trang](executive_report.pdf): phát hiện chính, chất lượng dữ liệu,
   ngoại lai và hướng xử lý đặc trưng.
-- [Bài trình bày Canva 9 trang](https://www.canva.com/d/fzrKYASPTN_2Tif): tiếng Việt,
+- [Bài trình bày Canva 9 trang](https://www.canva.com/d/421OH9fKUzOsWPK): tiếng Việt,
   tỷ lệ 16:9, có ghi chú thuyết trình và nguồn từng trang.
 - [Bản trình bày HTML](presentation/index.html): mở offline, dùng phím trái/phải để chuyển
   trang, `F` để toàn màn hình, `S` để mở presenter view.
 - [Nội dung tóm tắt](executive_summary.md), [dàn trang và ghi chú](presentation/outline.json).
 
-Số liệu giữ đúng kết quả thực thi 10/11/2026. Bản tóm tắt không bổ sung kết quả mô hình.
+Số liệu ngoại lai đã tính lại bằng log-IQR. Bản tóm tắt không bổ sung kết quả mô hình.
 Canva được tạo bằng plugin từ [HTML nguồn](presentation/canva_import.html). Chữ và bảng
 được giữ trong thiết kế; biểu đồ nhập từ SVG. Để thay dữ liệu biểu đồ, sửa CSV/source và
 tạo lại bản HTML thay vì giả định đây là chart liên kết trực tiếp với CSV.

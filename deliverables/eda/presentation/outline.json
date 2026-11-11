@@ -6,7 +6,7 @@
       "index": 1,
       "title": "EDA MBD-mini",
       "content": "<p class=\"date\">11/11/2026</p><h1>EDA MBD-mini</h1><p class=\"cover-lead\">Chất lượng dữ liệu và định hướng đặc trưng<br>cho bài toán propensity</p><div class=\"metrics cover-metrics\"><div><strong>100.224</strong><span>khách hàng</span></div><div><strong>1.202.688</strong><span>dòng khách-tháng</span></div><div><strong>221</strong><span>đặc trưng được phân tích</span></div></div>",
-      "source": "Dữ liệu MBD-mini. Kết quả EDA thực thi ngày 10/11/2026.",
+      "source": "Dữ liệu MBD-mini. Kết quả EDA cập nhật ngày 11/11/2026.",
       "notes": "Mục tiêu là dự đoán khách mua ít nhất một trong bốn sản phẩm trong tháng đích. Bài trình bày tóm tắt bảy bước EDA, tập trung vào các phát hiện có ý nghĩa cho xử lý dữ liệu và thiết kế đặc trưng. Nguồn: overview.csv, manifest.json và notebook eda.ipynb.",
       "cover": true
     },
@@ -44,10 +44,10 @@
     },
     {
       "index": 6,
-      "title": "Amount có đuôi dài",
-      "content": "<p class=\"lead\">Currency mã 11, 38.724.240 giao dịch</p><div class=\"metrics outlier-metrics\"><div><strong>14,258%</strong><span>được IQR gắn cờ</span><small>5.521.385 dòng</small></div><div><strong>0,00834%</strong><span>được |Z-score| &gt; 3 gắn cờ</span><small>3.228 dòng</small></div></div><p class=\"takeaway\">Giữ giá trị gốc, rà soát theo currency và ngữ cảnh</p><p class=\"muted\">Trung vị 18.025,023 đơn vị dữ liệu. Cân nhắc log1p/signed-log.<br>Không gắn tên tiền thật hoặc cộng amount khác currency.</p>",
-      "source": "Nguồn: amount_by_currency.csv và amount_outliers_by_currency.csv. Toàn bộ trx, currency=11.",
-      "notes": "IQR dùng ranh giới Q1-1,5*IQR và Q3+1,5*IQR. Z-score dùng độ lệch tuyệt đối trên ba lần độ lệch chuẩn. Amount có đuôi rất dài khiến hai cách gắn cờ cho kết quả khác nhau mạnh. Giá trị tối đa khoảng 1,37 nghìn tỷ đơn vị dữ liệu. Gắn cờ không xác nhận dữ liệu sai và chưa phải quyết định xóa hoặc cap.",
+      "title": "Ngoại lai cần tính trên thang log",
+      "content": "<p class=\"lead\">Currency mã 11, 38.724.240 giao dịch</p><div class=\"metrics outlier-metrics\"><div><strong>14,2582%</strong><span>IQR thang gốc, chỉ đối chiếu</span><small>5.521.385 dòng</small></div><div><strong>1,5085%</strong><span>IQR trên log1p, kết quả chính</span><small>584.139 dòng</small></div></div><p class=\"takeaway\">Log-IQR xét cả hai đuôi, không chỉ giao dịch lớn</p><p class=\"muted\">Đuôi thấp 486.868 dòng, đuôi cao 97.271 dòng.<br>Đối chiếu ln(amount): 1,5861%. Giữ raw, không tự động xóa/cap.</p>",
+      "source": "Nguồn: amount_outliers_by_currency.csv. Tính log trước quartile, theo từng currency.",
+      "notes": "Đính chính ngày 11/11/2026 theo rà soát log-IQR ngày 09/11/2026. Biến đổi từng giá trị DOUBLE sang log1p rồi mới tính quartile và hàng rào 1,5*IQR. Với mã 11: 584.139 dòng ngoài hàng rào, gồm 486.868 thấp và 97.271 cao. ln(amount) là phân tích độ nhạy, raw chỉ đối chiếu. Không kết luận ngoại lai cho nhóm dưới 30 giá trị, currency thiếu hoặc IQR log bằng 0. Ngưỡng toàn kỳ chỉ phục vụ EDA, không dùng nguyên cho mô hình quá khứ. Gắn cờ chưa chứng minh lỗi.",
       "cover": false
     },
     {
@@ -75,7 +75,7 @@
       "cover": false
     }
   ],
-  "source_manifest_created_utc": "2026-11-10T12:54:08.855454+00:00",
+  "source_manifest_created_utc": "2026-11-11T01:16:51.073625+00:00",
   "design": {
     "template": "html-ppt/weekly-report",
     "theme": "corporate-clean adapted navy/teal",

@@ -1,6 +1,6 @@
 """Reproducible seven-step EDA; raw and prepared inputs are strictly read-only."""
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import base64
 import hashlib
 import html
@@ -23,6 +23,76 @@ def qi(name):
 
 def qs(value):
     return "'" + str(value).replace("'", "''") + "'"
+
+
+def log_iqr_summary(db, view, column, *, group=None, transform="log1p", min_n=30, include_ln=False):
+    """Exact Tukey fences after transformation, with both tails and raw comparison.
+
+    Transform each DOUBLE value BEFORE computing interpolated quantiles. This is
+    not equivalent to transforming the interpolated raw quartiles. No rows change.
+    Small groups, missing currency and zero transformed IQR have no primary flags.
+    """
+    c=qi(column)
+    transforms={"log1p": "CASE WHEN x>=0 THEN ln(1.0+x) END",
+                "signed_log1p": "sign(x)*ln(1.0+abs(x))", "already_log_feature": "x"}
+    if transform not in transforms: raise ValueError(transform)
+    g=qi(group) if group else "0"
+    db.execute(f"CREATE OR REPLACE TEMP VIEW outlier_values AS SELECT *, {transforms[transform]} AS z FROM (SELECT {g} AS group_value,cast({c} AS DOUBLE) x FROM {qi(view)} WHERE isfinite({c}))")
+    ln_stats=",count(*) FILTER(WHERE x>0) ln_valid_n,quantile_cont(CASE WHEN x>0 THEN ln(x) END,[.25,.5,.75]) ln_q" if include_ln else ""
+    summary=db.execute(f"SELECT group_value,count(*) valid_n,count(z) log_valid_n,count(*) FILTER(WHERE x<0) negative_n,count(*) FILTER(WHERE x=0) zero_n,quantile_cont(x,[.25,.5,.75]) raw_q,avg(x) raw_mean,stddev_samp(x) raw_std,quantile_cont(z,[.25,.5,.75]) log_q,avg(z) log_mean,stddev_samp(z) log_std {ln_stats} FROM outlier_values GROUP BY group_value ORDER BY valid_n DESC").fetchdf()
+    rows=[]
+    for r in summary.itertuples():
+        if pd.isna(r.group_value): where="group_value IS NULL"
+        elif isinstance(r.group_value,str): where="group_value="+qs(r.group_value)
+        else: where="group_value="+str(r.group_value)
+        q1,med,q3=map(float,r.raw_q)
+        raw_lo,raw_hi=q1-1.5*(q3-q1),q3+1.5*(q3-q1)
+        lq=np.asarray(r.log_q,dtype=float) if r.log_valid_n else np.full(3,np.nan)
+        lq1,lmed,lq3=map(float,lq) if lq.ndim==1 and lq.size==3 else (np.nan,)*3
+        lo,hi=lq1-1.5*(lq3-lq1),lq3+1.5*(lq3-lq1)
+        raw_z=f"abs(x-({r.raw_mean}))>{3*r.raw_std}" if pd.notna(r.raw_std) and r.raw_std>0 else "FALSE"
+        log_z=f"abs(z-({r.log_mean}))>{3*r.log_std}" if pd.notna(r.log_std) and r.log_std>0 else "FALSE"
+        status="ok"
+        if group and pd.isna(r.group_value): status="unknown_currency; descriptive only"
+        elif r.log_valid_n<min_n: status="insufficient_transformed_n"
+        elif not np.isfinite(lo) or not np.isfinite(hi): status="no_valid_transform"
+        elif lq3==lq1: status="zero_log_iqr; no primary classification"
+        conditions=[f"count(*) FILTER(WHERE x<{raw_lo} OR x>{raw_hi}) raw_iqr_n",f"count(*) FILTER(WHERE {raw_z}) raw_zscore_n"]
+        if np.isfinite(lo) and np.isfinite(hi):
+            conditions += [f"count(*) FILTER(WHERE z<{lo}) log_below_n",f"count(*) FILTER(WHERE z>{hi}) log_above_n",f"count(*) FILTER(WHERE {log_z}) log_zscore_n"]
+        else:conditions += ["0 log_below_n","0 log_above_n","0 log_zscore_n"]
+        if include_ln:
+            lnq1,_,lnq3=map(float,r.ln_q) if r.ln_valid_n else (np.nan,)*3
+            lnlo,lnhi=lnq1-1.5*(lnq3-lnq1),lnq3+1.5*(lnq3-lnq1)
+            if np.isfinite(lnlo) and np.isfinite(lnhi):
+                conditions += [f"count(*) FILTER(WHERE x>0 AND ln(CASE WHEN x>0 THEN x END)<{lnlo}) ln_below_n",f"count(*) FILTER(WHERE x>0 AND ln(CASE WHEN x>0 THEN x END)>{lnhi}) ln_above_n"]
+            else:conditions += ["0 ln_below_n","0 ln_above_n"]
+        counts=db.execute(f"SELECT {','.join(conditions)} FROM outlier_values WHERE {where}").fetchdf().iloc[0]
+        classified=status=="ok"
+        def inverse(v):
+            with np.errstate(over="ignore",invalid="ignore"):
+                return float(np.sign(v)*np.expm1(abs(v)) if transform=="signed_log1p" else np.expm1(v) if transform=="log1p" else v)
+        out={"group_value":r.group_value,"valid_n":int(r.valid_n),"log_valid_n":int(r.log_valid_n),"negative_n":int(r.negative_n),"zero_n":int(r.zero_n),
+             "analysis_scale":transform,"analysis_status":status,"iqr_applicable":classified,
+             "log_q1":lq1,"log_median":lmed,"log_q3":lq3,"iqr_lower":lo,"iqr_upper":hi,
+             "iqr_lower_input_units":inverse(lo),"iqr_upper_input_units":inverse(hi),
+             "log_below_n":int(counts.log_below_n),"log_above_n":int(counts.log_above_n),
+             "iqr_n":int(counts.log_below_n+counts.log_above_n) if classified else np.nan,
+             "iqr_pct":100*(counts.log_below_n+counts.log_above_n)/r.log_valid_n if classified else np.nan,
+             "zscore_n":int(counts.log_zscore_n) if classified and pd.notna(r.log_std) and r.log_std>0 else np.nan,
+             "zscore_pct":100*counts.log_zscore_n/r.log_valid_n if classified and pd.notna(r.log_std) and r.log_std>0 else np.nan,
+             "zscore_defined":classified and pd.notna(r.log_std) and r.log_std>0,
+             "raw_q1":q1,"raw_median":med,"raw_q3":q3,"raw_iqr_lower":raw_lo,"raw_iqr_upper":raw_hi,
+             "raw_iqr_n":int(counts.raw_iqr_n),"raw_iqr_pct":100*counts.raw_iqr_n/r.valid_n,
+             "raw_zscore_n":int(counts.raw_zscore_n),"raw_zscore_pct":100*counts.raw_zscore_n/r.valid_n,
+             "action":"retain; log-IQR is descriptive, not an error label"}
+        if include_ln:
+            out.update({"ln_valid_n":int(r.ln_valid_n),"ln_iqr_lower":lnlo,"ln_iqr_upper":lnhi,
+                        "ln_below_n":int(counts.ln_below_n),"ln_above_n":int(counts.ln_above_n),
+                        "ln_iqr_n":int(counts.ln_below_n+counts.ln_above_n) if r.ln_valid_n>=min_n and lnq3>lnq1 else np.nan,
+                        "ln_iqr_pct":100*(counts.ln_below_n+counts.ln_above_n)/r.ln_valid_n if r.ln_valid_n>=min_n and lnq3>lnq1 else np.nan})
+        rows.append(out)
+    return pd.DataFrame(rows)
 
 
 class EDA:
@@ -397,32 +467,33 @@ class EDA:
         stats=self.tables["feature_statistics_train"]
         for r in stats.itertuples():
             if not r.valid_n: continue
-            lo,hi=r.q1-1.5*(r.q3-r.q1),r.q3+1.5*(r.q3-r.q1)
-            c=qi(r.feature)
-            z=f"abs({c}-{float(r.mean)})>{3*float(r.std)}" if pd.notna(r.std) and r.std>0 else "FALSE"
-            counts=self.query(f"SELECT count(*) FILTER (WHERE isfinite({c}) AND ({c}<{lo} OR {c}>{hi})) iqr_n,count(*) FILTER (WHERE isfinite({c}) AND ({z})) zscore_n FROM train").iloc[0]
-            rows.append({"feature":r.feature,"valid_n":r.valid_n,"iqr_lower":lo,"iqr_upper":hi,"iqr_zero":r.q1==r.q3,
-                         "iqr_n":int(counts.iqr_n),"iqr_pct":100*counts.iqr_n/r.valid_n,"zscore_n":int(counts.zscore_n),"zscore_pct":100*counts.zscore_n/r.valid_n,
-                         "zscore_defined":pd.notna(r.std) and r.std>0,"action":"retain; investigate semantics"})
+            if r.constant_observed or (r.min>=0 and r.max<=1):
+                rows.append({"feature":r.feature,"valid_n":r.valid_n,"log_valid_n":0,"analysis_scale":"not_applicable",
+                             "analysis_status":"constant_or_bounded_0_1; no tail classification","iqr_applicable":False,
+                             "iqr_n":np.nan,"iqr_pct":np.nan,"zscore_n":np.nan,"zscore_pct":np.nan,"action":"retain; review variable role"})
+                continue
+            transform="already_log_feature" if "_log1p_" in r.feature or "_signed_log_" in r.feature else "signed_log1p" if r.min<0 else "log1p"
+            result=log_iqr_summary(self.db,"train",r.feature,transform=transform).iloc[0].to_dict()
+            result.pop("group_value"); result["feature"]=r.feature
+            rows.append(result)
         feature=self.table("feature_outliers_train",pd.DataFrame(rows))
-        currency=self.tables["amount_by_currency"].copy()
-        self.db.register("currency_summary",currency)
-        amounts=self.query("""SELECT t.currency, count(*) valid_n, any_value(s.q1) q1,any_value(s.q3) q3,
-            any_value(s.q1-1.5*(s.q3-s.q1)) iqr_lower,any_value(s.q3+1.5*(s.q3-s.q1)) iqr_upper,
-            count(*) FILTER(WHERE t.amount<s.q1-1.5*(s.q3-s.q1) OR t.amount>s.q3+1.5*(s.q3-s.q1)) iqr_n,
-            count(*) FILTER(WHERE s.std>0 AND abs(t.amount-s.mean)>3*s.std) zscore_n,
-            any_value(s.std>0) zscore_defined FROM trx t JOIN currency_summary s ON t.currency IS NOT DISTINCT FROM s.currency
-            WHERE isfinite(t.amount) GROUP BY t.currency ORDER BY valid_n DESC""")
-        amounts["iqr_pct"]=100*amounts.iqr_n/amounts.valid_n
-        amounts["zscore_pct"]=100*amounts.zscore_n/amounts.valid_n
-        amounts["action"]="retain original; currency-specific investigation"
+        amounts=log_iqr_summary(self.db,"trx","amount",group="currency",include_ln=True).rename(columns={"group_value":"currency"})
         self.table("amount_outliers_by_currency",amounts)
+        main=amounts.loc[amounts.currency==11].iloc[0]
+        comparison=pd.DataFrame([
+            {"scale":"raw (comparison only)","valid_n":main.valid_n,"below_n":None,"above_n":None,"outside_n":main.raw_iqr_n,"outside_pct":main.raw_iqr_pct},
+            {"scale":"ln(amount) (sensitivity)","valid_n":main.ln_valid_n,"below_n":main.ln_below_n,"above_n":main.ln_above_n,"outside_n":main.ln_iqr_n,"outside_pct":main.ln_iqr_pct},
+            {"scale":"log1p(amount) (PRIMARY)","valid_n":main.log_valid_n,"below_n":main.log_below_n,"above_n":main.log_above_n,"outside_n":main.iqr_n,"outside_pct":main.iqr_pct},
+        ])
+        self.table("amount_iqr_scale_comparison_currency11",comparison)
         sample=self.load_sample()
         cols=["trx_30d_event_count","geo_30d_event_count","dialog_30d_event_count"]
-        fig,axes=plt.subplots(1,3,figsize=(13,4))
-        for ax,col in zip(axes,cols):
-            ax.boxplot(sample[col].dropna(),showfliers=True,flierprops={"markersize":2,"alpha":.2});ax.set_title(col,fontsize=8)
-        self.figure("outlier_boxplots",fig,f"Boxplot trên mẫu hash train n={len(sample):,}; số lượng gắn cờ IQR/Z-score trong CSV được tính trên toàn bộ train. Không tự động xóa/cap.","outliers")
+        fig,axes=plt.subplots(2,3,figsize=(13,7))
+        for i,col in enumerate(cols):
+            for j,values in enumerate((sample[col].dropna(),np.log1p(sample[col].dropna()))):
+                ax=axes[j,i];ax.boxplot(values,showfliers=True,flierprops={"markersize":2,"alpha":.2});ax.set_title(col+(" (raw comparison)" if j==0 else " (log1p PRIMARY)"),fontsize=7)
+        self.figure("outlier_boxplots",fig,f"Trên: thang gốc đối chiếu; dưới: log1p dùng cho log-IQR. Mẫu hash train n={len(sample):,}; CSV tính ngưỡng/số đếm trên toàn train. Nếu IQR log bằng 0, điểm ngoài râu chỉ để xem phân phối, không dùng phân loại ngoại lai.","outliers")
+        self.validation["outlier_primary_method"]="IQR after log1p, both tails, currency-specific"
         return feature,amounts
 
     def conclude(self):
@@ -448,8 +519,10 @@ class EDA:
             "Đây là ứng viên feature, không phải bằng chứng nhân quả hay kết quả chọn mô hình.\n"
             f"- Có {len(self.tables['high_correlation_pairs']):,} cặp |r|≥0,90 trong mẫu train. "
             "Các cửa sổ/count/log-count có thể dư thừa; chỉ bỏ dựa trên validation và ý nghĩa biến.\n"
-            "- Amount và số đếm có đuôi dài; xem thống kê skewness và tỷ lệ outlier theo biến/currency. "
-            "Giữ giá trị gốc, cân nhắc log1p hoặc signed-log trước mô hình tuyến tính. IQR/Z-score chỉ gắn cờ, không xác nhận lỗi.\n\n"
+            f"- Ngoại lai dùng **IQR trên log1p** làm kết quả chính, tính cả hai đuôi theo currency. "
+            f"Currency 11: **{int(self.tables['amount_outliers_by_currency'].loc[lambda x:x.currency==11,'iqr_n'].iloc[0]):,} dòng "
+            f"({self.tables['amount_outliers_by_currency'].loc[lambda x:x.currency==11,'iqr_pct'].iloc[0]:.4f}%)**; "
+            "thang gốc và ln chỉ là đối chiếu độ nhạy. Biến đã log không log lần hai; binary/biến hằng, IQR log bằng 0, nhóm ít hơn 30 giá trị và currency thiếu không kết luận ngoại lai. Giữ raw; gắn cờ không xác nhận lỗi.\n\n"
             "### Giới hạn diễn giải\n\n"
             "Khách xuất hiện lặp qua tháng nên các quan sát không độc lập; chưa tính p-value hoặc suy ra hiệu quả chiến dịch. "
             "Correlation pairwise có thể dùng tập dòng khác nhau; số lượng cặp được xuất riêng. "
@@ -468,7 +541,7 @@ class EDA:
             ["Highly correlated pairs", "Review redundancy", "Bảng high_correlation_pairs + cỡ mẫu; chọn theo validation và độ ổn định thời gian"],
             ["New behavioral features", "Candidate engineering", "Recency/frequency/active-day rate, share từng loại, xu hướng 30d/84d, flags coverage/missing; tất cả event_time < cutoff"],
             ["Dialog embedding / geo content", "Optional grouped ablation", "Hiện dùng metadata; nếu thêm pooling/entropy/content phải fit trên train, đối chứng và kiểm tra RAM"],
-            ["Outliers", "Retain + investigate", "Không xóa/cap chỉ dựa IQR/Z; nếu cap dùng threshold fit train và so validation"],
+            ["Outliers", "log1p-IQR primary; retain + investigate", "Tính cả hai đuôi theo currency; thang gốc/ln đối chiếu. IQR=0/nhóm nhỏ/currency thiếu không phân loại. Ngưỡng mô hình chỉ fit train"],
             ["Evaluation", "Time split + group-aware uncertainty", "Train 02–08, validation 09–11, calibration 12, test khóa 01/2023; bootstrap theo khách khi ước lượng bất định"],
         ],columns=["columns_or_group","recommendation","reason_or_implementation"])
         return self.conclusions,self.table("feature_engineering_plan",actions)
@@ -493,9 +566,10 @@ class EDA:
                   ("3. Thiếu và trùng lặp",["missing_values","nested_element_quality","dialog_vector_lengths","detail_sequence_reconciliation","duplicates","missing_diff_context","label_conflicts"]),
                   ("4. Đơn biến",["target_monthly","target_counts","source_coverage"]),
                   ("5. Hai biến và đa biến",["feature_target_associations","high_correlation_pairs","feature_band_target_rates"]),
-                  ("6. Ngoại lai",["amount_outliers_by_currency","feature_outliers_train"]),
+                  ("6. Ngoại lai",["amount_iqr_scale_comparison_currency11","amount_outliers_by_currency","feature_outliers_train"]),
                   ("7. Feature Engineering",["feature_engineering_plan"]) ]
-        body=["<h1>EDA MBD-mini — 7 bước</h1>","<p>Ngày 10/11/2026 · Báo cáo tính lại từ raw và output notebook 03.</p>",f"<p>{html.escape(self.scope_note)}</p>",
+        report_date=datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7))).strftime("%d/%m/%Y")
+        body=["<h1>EDA MBD-mini — 7 bước</h1>",f"<p>Ngày {report_date} · Báo cáo tính lại từ raw và output notebook 03. Ngoại lai dùng log-IQR.</p>",f"<p>{html.escape(self.scope_note)}</p>",
               "<p>Biểu đồ được nhúng trực tiếp trong file HTML. Bảng dài có thanh cuộn; CSV trong thư mục tables giữ dữ liệu đầy đủ. Không thay đổi raw hoặc output tiền xử lý.</p>",
               "<nav>"+" · ".join(f'<a href="#step{i}">Bước {i}</a>' for i in range(1,8))+"</nav>"]
         md=["# EDA MBD-mini — 7 bước\n",self.scope_note,"\n"+self.conclusions]
@@ -507,7 +581,7 @@ class EDA:
                 body.append("<p>detail là sự kiện, ptls là chuỗi tương ứng; không cộng hai dạng. Numeric storage có thể là categorical code. Head/tail được sắp xếp, ID được hash, mảng chỉ hiển thị độ dài.</p>")
             if i==3:body.append(f"<p>{html.escape(self.missing_note)}</p>")
             if i==5:body.append("<p>Liên hệ Pearson với target dùng toàn bộ train. Spearman/ma trận nhiều biến dùng mẫu hash cố định tối đa 30.000 dòng, pairwise-complete, min 100 cặp cho ma trận. Không suy ra nhân quả. Bảng band chia theo thứ tự giá trị; ties có thể rơi nhiều band.</p>")
-            if i==6:body.append("<p>IQR ngoài Q1−1,5×IQR / Q3+1,5×IQR; Z-score |x−mean| &gt; 3×std. Denominator là số giá trị hữu hạn. IQR=0 và std=0 được đánh dấu. Giữ nguyên các giá trị gắn cờ.</p>")
+            if i==6:body.append("<p><strong>Kết quả chính: IQR trên log1p, tính cả hai đuôi.</strong> Biến đổi từng giá trị DOUBLE trước khi tính quartile, không lấy log của quartile gốc. Amount tách từng currency. Ngưỡng log được quy đổi về đơn vị đầu vào để đọc; denominator là log_valid_n. Thang gốc/ln chỉ đối chiếu, Z-score cũng trên thang biến đổi. Biến đã log không log lần hai; biến có âm dùng signed-log1p. Không phân loại binary/biến hằng, IQR log bằng 0, nhóm dưới 30 giá trị hay currency thiếu. Mọi ngưỡng raw toàn kỳ chỉ phục vụ EDA, không dùng trực tiếp cho train quá khứ. Không xóa/cap dữ liệu.</p>")
             if i==7:
                 # Keep this renderer dependency-free, escape all data before simple Markdown conversion.
                 for line in self.conclusions.splitlines():

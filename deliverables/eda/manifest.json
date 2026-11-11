@@ -1,7 +1,7 @@
 {
   "status": "ready",
-  "created_utc": "2026-11-10T12:54:08.855454+00:00",
-  "duration_seconds": 318.24,
+  "created_utc": "2026-11-11T01:16:51.073625+00:00",
+  "duration_seconds": 450.31,
   "versions": {
     "duckdb": "2.0.0",
     "pandas": "3.1.0",
@@ -23,6 +23,7 @@
   "validation": {
     "target_conflicting_keys": 0,
     "label_exact_duplicates_removed_in_temp_view": 0,
+    "outlier_primary_method": "IQR after log1p, both tails, currency-specific",
     "raw_prepared_target_mismatches": 0,
     "raw_prepared_join_rows": 1202688,
     "features_rows": 1202688,
@@ -90,6 +91,7 @@
     "feature_band_target_rates",
     "feature_outliers_train",
     "amount_outliers_by_currency",
+    "amount_iqr_scale_comparison_currency11",
     "feature_engineering_plan"
   ],
   "figures": {
@@ -138,7 +140,7 @@
       "group": "multivariate"
     },
     "outlier_boxplots": {
-      "caption": "Boxplot trên mẫu hash train n=30,000; số lượng gắn cờ IQR/Z-score trong CSV được tính trên toàn bộ train. Không tự động xóa/cap.",
+      "caption": "Trên: thang gốc đối chiếu; dưới: log1p dùng cho log-IQR. Mẫu hash train n=30,000; CSV tính ngưỡng/số đếm trên toàn train. Nếu IQR log bằng 0, điểm ngoài râu chỉ để xem phân phối, không dùng phân loại ngoại lai.",
       "group": "outliers"
     }
   }

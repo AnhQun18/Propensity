@@ -1,13 +1,18 @@
 {
-  "design_id": "DAHaiiwL6V0",
-  "title": "EDA MBD-mini - Chất lượng dữ liệu và Feature Engineering - 11.11.2026",
-  "view_url": "https://www.canva.com/d/fzrKYASPTN_2Tif",
+  "design_id": "DAHakZ5XH-g",
+  "title": "EDA MBD-mini - Log-IQR và đối soát hai đuôi - 11.11.2026",
+  "view_url": "https://www.canva.com/d/421OH9fKUzOsWPK",
   "page_count": 9,
-  "page_size": [1280, 720],
+  "page_size": [
+    1280,
+    720
+  ],
   "creation_method": "Canva plugin import of canva_import.html",
   "content_verified": true,
   "speaker_notes_verified": true,
-  "source_run_date": "2026-11-10",
+  "source_run_date": "2026-11-11",
   "publication_date": "2026-11-11",
-  "sharing_permissions_modified": false
+  "sharing_permissions_modified": false,
+  "supersedes_design_id": "DAHaiiwL6V0",
+  "outlier_primary_method": "log1p-IQR, both tails, per currency"
 }
