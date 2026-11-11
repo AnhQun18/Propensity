@@ -1,0 +1,1544 @@
+<!doctype html>
+<!-- Adapted from html-ppt tech-sharing + chart/table/flow/gantt templates. html-ppt MIT © 2026 lewis. -->
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="MBD-mini: 19 slide chính và 7 phụ lục về tính phù hợp dữ liệu propensity."><title>MBD-mini · Dữ liệu có đủ tín hiệu cho propensity?</title>
+<style>/* html-ppt :: base.css — reset + shared tokens + layout primitives */
+/* Default tokens. Themes in assets/themes/*.css override the :root block. */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f7f7f8;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --border: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.16);
+  --text-1: #111216;
+  --text-2: #55596a;
+  --text-3: #8a8f9e;
+  --accent: #3b6cff;
+  /* Text drawn on top of an --accent fill. Every theme in assets/themes/
+   * and every full-deck style.css overrides this with whichever of white /
+   * near-black clears WCAG AA against its own accent — a hardcoded ink
+   * cannot, because accents here range from #ffffff to #000000.
+   * This default is black rather than white on purpose: against the default
+   * --accent #3b6cff, white measures 4.40:1 and black 4.77:1, so only black
+   * clears AA for normal text. Reached by any deck that links no theme. */
+  --accent-ink: #000000;
+  --accent-2: #7a5cff;
+  --accent-3: #ff5c8a;
+  --good: #1aaf6c;
+  --warn: #f5a524;
+  --bad:  #e0445a;
+  --grad: linear-gradient(135deg,#3b6cff,#7a5cff 55%,#ff5c8a);
+  --grad-soft: linear-gradient(135deg,#eef2ff,#f5ecff 55%,#ffeef5);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 26px;
+  --shadow: 0 10px 30px rgba(18,24,40,.08), 0 2px 6px rgba(18,24,40,.04);
+  --shadow-lg: 0 24px 60px rgba(18,24,40,.14), 0 6px 16px rgba(18,24,40,.06);
+  --font-sans: 'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --font-serif: 'Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-mono: 'JetBrains Mono','IBM Plex Mono',SFMono-Regular,Menlo,monospace;
+  --font-display: var(--font-sans);
+  --letter-tight: -.03em;
+  --letter-normal: -.01em;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text-1);
+  font-family:var(--font-sans);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  letter-spacing:var(--letter-normal)}
+
+/* Viewport host: centres the fixed-size design canvas and letterboxes the rest.
+   Every px in a slide therefore means the same thing in the browser, in the
+   presenter preview, in the overview thumbnail and in a headless render. */
+body{width:100vw;height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+img,svg,video{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,pre,samp{font-family:var(--font-mono)}
+
+/* ================= SLIDE SYSTEM ================= */
+/* ================= DESIGN CANVAS =================
+   Slides are authored against a FIXED 1920x1080 canvas and scaled to fit the
+   viewport by runtime.js (--deck-scale). Before this, .deck was 100vw/100vh
+   while type and spacing stayed in absolute px, so a 1512x850 laptop window
+   and a 1920x1080 render produced visibly different pages (issue #20).
+
+   Escape hatches:
+     <body data-fit="fluid">      -> old behaviour, canvas follows the viewport
+     <div class="deck" data-w=".." data-h="..">  -> custom canvas (e.g. 1080x1440 for 3:4)
+*/
+.deck{position:relative;flex:none;
+  width:var(--deck-w,1920px);height:var(--deck-h,1080px);
+  overflow:hidden;background:var(--bg);
+  transform:scale(var(--deck-scale,1));transform-origin:center center}
+
+/* Opt out: fluid canvas, exactly what the deck did before. */
+body[data-fit="fluid"]{display:block}
+body[data-fit="fluid"] .deck{width:100vw;height:100vh;transform:none}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:72px 96px;
+  box-sizing:border-box;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+  transform:translateX(30px);
+  overflow:hidden;
+}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+
+/* single-page standalone (used when a layout file is opened directly) */
+body.single .slide{position:relative;width:100%;height:100%;opacity:1;transform:none;pointer-events:auto}
+body[data-fit="fluid"].single .slide{width:100vw;height:100vh}
+
+/* ================= TYPOGRAPHY ================= */
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.kicker{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+h1.title,.h1{font-family:var(--font-display);font-size:72px;line-height:1.05;font-weight:800;letter-spacing:var(--letter-tight);margin:0 0 18px;color:var(--text-1)}
+h2.title,.h2{font-family:var(--font-display);font-size:54px;line-height:1.1;font-weight:700;letter-spacing:var(--letter-tight);margin:0 0 14px}
+h3,.h3{font-size:32px;line-height:1.2;font-weight:600;letter-spacing:var(--letter-normal);margin:0 0 10px}
+h4,.h4{font-size:22px;line-height:1.3;font-weight:600;margin:0 0 8px}
+.lede{font-size:22px;line-height:1.55;color:var(--text-2);font-weight:300;max-width:62ch}
+.dim{color:var(--text-2)}
+.dim2{color:var(--text-3)}
+.mono{font-family:var(--font-mono)}
+.serif{font-family:var(--font-serif)}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+
+/* ================= LAYOUT PRIMITIVES ================= */
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid{display:grid;gap:24px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.fill{flex:1}
+.sp-t{padding-top:24px}.sp-b{padding-bottom:24px}
+.mt-s{margin-top:8px}.mt-m{margin-top:18px}.mt-l{margin-top:32px}
+.mb-s{margin-bottom:8px}.mb-m{margin-bottom:18px}.mb-l{margin-bottom:32px}
+
+/* ================= CARDS ================= */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card-soft{background:var(--surface-2);border:1px solid var(--border)}
+.card-outline{background:transparent;border:1.5px solid var(--border-strong);box-shadow:none}
+.card-accent{background:var(--surface);border-top:3px solid var(--accent)}
+.card-hover{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500;
+  background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.pill-accent{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 28%,transparent)}
+
+/* ================= BARS / DIVIDERS ================= */
+.divider{height:1px;background:var(--border);width:100%}
+.divider-accent{height:3px;width:72px;background:var(--accent);border-radius:2px}
+
+/* ================= IMAGES (issue #17) =================
+ * Framing primitives shared by every image-* layout. The frame owns the
+ * aspect ratio and the crop; the <img> just fills it. That's what lets you
+ * swap in a photo of any shape without touching the layout.
+ *   <figure class="img-frame"><img src="…" alt=""></figure>
+ *   .img-frame.contain  -> letterbox instead of crop (screenshots, diagrams,
+ *                          logos — anything where cropping loses information)
+ *   --img-ratio         -> aspect ratio of the frame (default 16/10)
+ *   --img-pos           -> object-position, e.g. "top" to protect a headline
+ */
+.img-frame{position:relative;margin:0;overflow:hidden;
+  border-radius:var(--radius);box-shadow:var(--shadow);background:var(--surface-2);
+  aspect-ratio:var(--img-ratio,16/10)}
+.img-frame > img{width:100%;height:100%;object-fit:cover;object-position:var(--img-pos,center)}
+.img-frame.contain{background:var(--bg-soft);box-shadow:none;border:1px solid var(--border)}
+.img-frame.contain > img{object-fit:contain}
+.img-frame.fill{height:100%;aspect-ratio:auto}
+.img-scrim{position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 42%,rgba(8,10,20,.72))}
+.img-cap{margin:10px 2px 0;font-size:14px;line-height:1.5;color:var(--text-3)}
+.img-tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:999px;
+  background:rgba(10,12,20,.55);color:#fff;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;backdrop-filter:blur(6px)}
+
+/* ================= CHROME (header/footer/progress) ================= */
+.deck-header{position:absolute;top:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;z-index:10;pointer-events:none}
+.deck-footer{position:absolute;bottom:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);z-index:10;pointer-events:none}
+.slide-number::before{content:attr(data-current)}
+.slide-number::after{content:" / " attr(data-total)}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar > span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s var(--ease)}
+
+/* ---- custom logo (issue #11) ----
+ * One logo per deck, drawn over the slide area. Two ways in, same CSS:
+ *   1. hand-author it  -> <img class="deck-logo" data-pos="bottom-right" src="…">
+ *   2. declare it once -> <body data-logo="…" data-logo-position="bottom-right">
+ * (1) needs no JS at all; (2) is created by runtime.js. It lives inside .deck
+ * so it scales with the deck. On an exported PDF it is painted per page by the
+ * @media print block below, not by this element — see the note there. */
+.deck-logo{position:absolute;z-index:11;pointer-events:none;
+  height:var(--logo-size,44px);width:auto;max-width:30%;object-fit:contain;
+  opacity:var(--logo-opacity,.9)}
+.deck-logo[data-pos="top-left"]     {top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="top-right"]    {top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-left"]  {bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-right"] {bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo:not([data-pos])          {top:28px;right:40px}
+
+/* ================= PRESENTER / OVERVIEW ================= */
+/* Keep this list in sync with NOTE_SEL in assets/runtime.js — the runtime
+ * reads speaker notes from all of these, so all of them must be hidden
+ * from the audience. */
+.notes,.speaker-notes{display:none!important}
+.notes-overlay{position:fixed;inset:auto 0 0 0;max-height:42vh;background:rgba(20,22,30,.95);color:#e8ebf4;
+  padding:20px 32px;font-size:16px;line-height:1.6;border-top:1px solid rgba(255,255,255,.1);transform:translateY(100%);
+  transition:transform .3s var(--ease);z-index:40;overflow:auto;font-family:var(--font-sans)}
+.notes-overlay.open{transform:translateY(0)}
+.overview{position:fixed;inset:0;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);z-index:50;
+  display:none;padding:40px;overflow:auto}
+.overview.open{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-content:start}
+.overview .thumb{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  aspect-ratio:16/9;overflow:hidden;cursor:pointer;position:relative;color:var(--text-1);padding:16px;
+  font-size:11px;transition:transform .2s var(--ease)}
+.overview .thumb:hover{transform:scale(1.04)}
+.overview .thumb .n{position:absolute;top:8px;left:10px;font-weight:700;font-size:14px;color:var(--text-3)}
+.overview .thumb .t{position:absolute;bottom:10px;left:14px;right:14px;font-weight:600;color:var(--text-1)}
+
+/* ================= PRESENTER VIEW ================= */
+/* Presenter view opens in a separate popup window (S key).
+ * All presenter styles are self-contained in the popup HTML generated by runtime.js.
+ * The audience window (this file) is NOT affected — it stays as normal deck view.
+ * Only the .notes class below is needed to hide speaker notes from audience. */
+
+/* ================= UTILITY ================= */
+.hidden{display:none!important}
+.nowrap{white-space:nowrap}
+.tr{text-align:right}.tc{text-align:center}.tl{text-align:left}
+.uppercase{text-transform:uppercase;letter-spacing:.12em}
+
+/* ================= PRINT ================= */
+@media print{
+  /* Every declaration here is !important on purpose. A template stylesheet
+   * scopes its rules as `.tpl-name .slide`, which is specificity (0,2,0) and
+   * beats a bare `.slide` at (0,1,0) — so without !important a template
+   * silently keeps its screen layout in print. That is how dir-key-nav-minimal
+   * (position:absolute) printed 8 slides onto 1 page and xhs-post printed 9
+   * onto 2: only the opacity/transform declarations on this rule carried
+   * !important, and the ones that decide pagination did not. */
+  body{display:block!important;width:auto!important;height:auto!important;overflow:visible!important}
+  .deck{transform:none!important;width:100%!important;height:auto!important;
+        min-height:0!important;display:block!important}
+  .slide{position:relative!important;inset:auto!important;
+         opacity:1!important;transform:none!important;
+         page-break-after:always;break-after:page;
+         width:100%!important;height:100vh!important;max-height:100vh!important}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .deck-header,.deck-footer,.progress-bar,.notes-overlay,.overview{display:none!important}
+
+  /* Logo in print. The .deck-logo element is position:absolute inside .deck,
+   * and print collapses .deck to height:auto with every slide stacked — so the
+   * element can only anchor ONCE against the whole document and lands on a
+   * single page (or none). Hide it and paint the logo per slide instead: in
+   * print one .slide is exactly one page. runtime.js mirrors the image URL and
+   * placement onto .deck (--logo-print / data-logo-print), so this only kicks
+   * in when the runtime is present; a JS-less deck keeps the element. */
+  .deck[data-logo-print] > .deck-logo{display:none!important}
+  .deck[data-logo-print] .slide:not([data-no-logo])::after{
+    content:"";position:absolute;z-index:11;pointer-events:none;
+    width:30%;height:var(--logo-size,44px);
+    background-image:var(--logo-print);background-repeat:no-repeat;
+    background-size:contain;opacity:var(--logo-opacity,.9)}
+  .deck[data-logo-print="top-left"]     .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left top}
+  .deck[data-logo-print="top-right"]    .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right top}
+  .deck[data-logo-print="bottom-left"]  .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left bottom}
+  .deck[data-logo-print="bottom-right"] .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right bottom}
+}
+
+
+:root{--bg:#f7f9fb;--surface:#fff;--surface-2:#eaf0f5;--text-1:#102b46;--text-2:#496174;--text-3:#667d8e;--accent:#087e8b;--accent-2:#5477ad;--accent-3:#a06d4a;--accent-ink:#fff;--border:#dce5ec;--border-strong:#a7bac8;--good:#21734e;--good-soft:#e2f1e9;--warn:#976312;--warn-soft:#fff1d6;--bad:#a7463e;--bad-soft:#f8e6e2;--font-sans:'Segoe UI',Arial,sans-serif;--radius:10px;--shadow:none}
+body{background:var(--surface-2)}.slide{padding:35px 54px 32px;justify-content:flex-start;transition:opacity .12s;transform:none;background:var(--bg)}
+.slide:before{content:'';position:absolute;top:0;left:0;width:9px;height:100%;background:var(--accent)}
+.kicker{font-size:14px;letter-spacing:.13em;color:var(--accent);font-weight:750;margin:0 0 12px;text-transform:uppercase}
+h2{font-size:34px;line-height:1.18;letter-spacing:-.025em;margin:0;max-width:1150px;font-weight:720}
+.chart{position:absolute;left:54px;right:54px;top:157px;height:350px}.chart svg{width:100%;height:100%;overflow:visible}.chart svg text{font-family:var(--font-sans);font-variant-numeric:tabular-nums}
+.meaning{position:absolute;left:54px;right:54px;top:530px;padding:14px 18px;background:var(--surface-2);border-left:4px solid var(--accent);font-size:21px;font-weight:600;line-height:1.35;margin:0}
+.method{position:absolute;left:54px;right:54px;top:598px;font-size:15px;color:var(--text-2);line-height:1.4;margin:0}
+.source{position:absolute;left:54px;right:120px;bottom:24px;font-size:11px;line-height:1.35;color:var(--text-3);margin:0;overflow-wrap:anywhere}.page{position:absolute;right:54px;bottom:23px;font-size:14px;color:var(--text-3)}
+.table-wrap{height:100%;display:flex;align-items:center}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:20px;line-height:1.35}th{text-align:left;font-size:15px;color:var(--text-3);font-weight:650;letter-spacing:.02em;padding:10px 16px;border-bottom:2px solid var(--accent)}td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle}td:first-child{font-weight:650}tbody tr:nth-child(2n){background:var(--surface)}
+.deck-nav{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:50;opacity:.2;transition:opacity .2s}.deck-nav:hover,.deck-nav:focus-within{opacity:1}.deck-nav button{background:var(--surface);color:var(--text-1);border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px}
+.progress-bar{height:3px!important}.notes{display:none}.hint-bar{display:none!important}
+@media print{.deck-nav{display:none!important}.slide{break-after:page}.chart{height:350px}}
+</style></head><body class="tpl-tech-sharing"><main class="deck" data-w="1280" data-h="720"><section class="slide is-active" data-title="Dùng hành vi trước T để xếp hạng người mua tháng T" data-section="A · BÀI TOÁN">
+    <p class="kicker">MBD-MINI / A · BÀI TOÁN</p><h2>Dùng hành vi trước T để xếp hạng người mua tháng T</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Hành vi đến T−1 → Cutoff: đầu tháng T → Nhãn trong tháng T"><title>Hành vi đến T−1 → Cutoff: đầu tháng T → Nhãn trong tháng T</title><rect x="0" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="0" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="24" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">Hành vi đến T−1</text><text x="24" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Trx · Geo · Dialog</text><text x="24" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">recent + lịch sử cũ</text><text x="359" y="157" font-size="33" fill="var(--accent)" text-anchor="middle" font-weight="400">→</text><rect x="388" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="388" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="412" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">Cutoff: đầu tháng T</text><text x="412" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">1 khách × 1 tháng</text><text x="412" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">chỉ event_time &lt; cutoff</text><text x="747" y="157" font-size="33" fill="var(--accent)" text-anchor="middle" font-weight="400">→</text><rect x="776" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="776" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="800" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">Nhãn trong tháng T</text><text x="800" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">y_any = 1: ≥1 target = 1</text><text x="800" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">y_any = 0: cả 4 target = 0</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: tạo xác suất mua để chọn 1.003 khách/tháng ở ngân sách 1%.</p>
+    <p class="method">Sơ đồ căn chỉnh feature và nhãn; ví dụ cutoff 01/12/2022 → hành vi trước 01/12 → nhãn tháng 12.</p><p class="source">Nguồn: deliverables/baseline-final/REPORT.md · cập nhật 11/11/2026</p>
+    <span class="page">01 / 19</span><div class="notes">Nếu chưa đủ căn cứ xác định 0/1 thì giữ unknown. Snapshot hiện tại không có unknown. Lịch sử target chỉ hợp lệ khi đã khả dụng tại cutoff. Đây là dự đoán mua bất kỳ, chưa chọn sản phẩm và chưa đo uplift chiến dịch.</div></section><section class="slide" data-title="Chỉ 1,07% mẫu dương: cần đo tín hiệu ở đúng thời điểm" data-section="A · THÁCH THỨC &amp; CÂU HỎI">
+    <p class="kicker">MBD-MINI / A · THÁCH THỨC &amp; CÂU HỎI</p><h2>Chỉ 1,07% mẫu dương: cần đo tín hiệu ở đúng thời điểm</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:45%"><col style="width:55%"></colgroup><thead><tr><th>Thách thức đã xác minh</th><th>Câu hỏi dữ liệu dẫn dắt deck</th></tr></thead><tbody><tr><td>100.224 khách · 1,20 triệu khách–tháng</td><td>01 · Dữ liệu có tín hiệu dự đoán ngoài rule không?</td></tr><tr><td>105,28 triệu sự kiện · 98,93% nhãn âm</td><td>02 · Tín hiệu nằm ở trx, dialog hay geo?</td></tr><tr><td>Nguồn bắt đầu khác nhau · lịch sử nhãn 12 tháng</td><td>03 · Chọn cutoff và cửa sổ tích lũy thế nào?</td></tr><tr><td>SLA nhãn chưa rõ · nhiều khách thiếu nguồn</td><td>04 · Rủi ro leakage, drift và loại khách là gì?</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: giữ phân bố thật; đánh giá AP và Recall@K qua thời gian.</p>
+    <p class="method">Tỷ lệ dương = 12.854 / 1.202.688; số sự kiện chỉ cộng ba bảng detail.</p><p class="source">Nguồn: docs/mbd_inventory/assessment.md; docs/propensity_feasibility/any_product/summary.json · cập nhật 11/11/2026</p>
+    <span class="page">02 / 19</span><div class="notes">Không có bằng chứng cho target trễ công bố 6 tháng. Gantt ở slide 4 phân biệt khoảng lịch sử không có target với SLA công bố nhãn.</div></section><section class="slide" data-title="Trx và geo chiếm gần toàn bộ 105,28 triệu sự kiện" data-section="B · TOÀN CẢNH">
+    <p class="kicker">MBD-MINI / B · TOÀN CẢNH</p><h2>Trx và geo chiếm gần toàn bộ 105,28 triệu sự kiện</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:15%"><col style="width:20%"><col style="width:19%"><col style="width:12%"><col style="width:34%"></colgroup><thead><tr><th>Nguồn</th><th>Số dòng</th><th>ID có dữ liệu</th><th>Cột¹</th><th>Vai trò</th></tr></thead><tbody><tr><td>Trx</td><td>38.764.930</td><td>98.721</td><td>14 + 1</td><td>Đầu vào · giao dịch</td></tr><tr><td>Geo</td><td>66.295.724</td><td>72.573</td><td>5 + 1</td><td>Đầu vào · mã vị trí</td></tr><tr><td>Dialog</td><td>217.205</td><td>46.320</td><td>3 + 1</td><td>Đầu vào · metadata, vector 768D</td></tr><tr><td>Targets</td><td>1.202.688</td><td>100.224</td><td>8 + 1</td><td>Nhãn · khách × tháng</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: aggregate từng nguồn theo khách–cutoff rồi mới ghép, tránh nhân dòng.</p>
+    <p class="method">¹ Cột vật lý + fold trong partition; embedding tính là một cột. ID tính trên toàn lịch sử mỗi nguồn.</p><p class="source">Nguồn: docs/mbd_inventory/assessment.md; docs/mbd_temporal_coverage/assessment.md · cập nhật 11/11/2026</p>
+    <span class="page">03 / 19</span><div class="notes">Không cộng ptls với detail: hai dạng biểu diễn cùng lịch sử. PTLS/trx thiếu 2.020.020 sự kiện ở 13 khách so với detail; dùng detail làm nguồn chuẩn.</div></section><section class="slide" data-title="Trx có khoảng 13 tháng lịch sử trước tháng nhãn đầu tiên" data-section="B · THỜI GIAN">
+    <p class="kicker">MBD-MINI / B · THỜI GIAN</p><h2>Trx có khoảng 13 tháng lịch sử trước tháng nhãn đầu tiên</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Gantt phạm vi bốn nguồn"><title>Gantt phạm vi bốn nguồn</title><line x1="170.0" y1="40" x2="170.0" y2="292" stroke="var(--border)" stroke-width="1"/><text x="170.0" y="27" font-size="17" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/2021</text><line x1="391.53846153846155" y1="40" x2="391.53846153846155" y2="292" stroke="var(--border)" stroke-width="1"/><text x="391.53846153846155" y="27" font-size="17" fill="var(--text-2)" text-anchor="middle" font-weight="400">07/2021</text><line x1="613.0769230769231" y1="40" x2="613.0769230769231" y2="292" stroke="var(--border)" stroke-width="1"/><text x="613.0769230769231" y="27" font-size="17" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/2022</text><line x1="834.6153846153845" y1="40" x2="834.6153846153845" y2="292" stroke="var(--border)" stroke-width="1"/><text x="834.6153846153845" y="27" font-size="17" fill="var(--text-2)" text-anchor="middle" font-weight="400">07/2022</text><line x1="1056.1538461538462" y1="40" x2="1056.1538461538462" y2="292" stroke="var(--border)" stroke-width="1"/><text x="1056.1538461538462" y="27" font-size="17" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/2023</text><rect x="170" y="49" width="479.99999999999994" height="245" rx="6" fill="var(--warn-soft)"/><text x="185" y="285" font-size="19" fill="var(--warn)" text-anchor="start" font-weight="650">Có trx, chưa có target tháng: ~13 tháng</text><text x="0" y="81" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">Trx</text><rect x="170.0" y="60" width="886.1538461538461" height="29" rx="6" fill="var(--accent)"/><text x="180.0" y="80" font-size="16" fill="var(--accent-ink)" text-anchor="start" font-weight="400">31/12/2020 → 31/12/2022</text><text x="0" y="132" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">Dialog</text><rect x="219.1076923076923" y="111" width="837.0461538461539" height="29" rx="6" fill="var(--accent-2)"/><text x="229.1076923076923" y="131" font-size="16" fill="var(--accent-ink)" text-anchor="start" font-weight="400">10/02/2021 → 31/12/2022</text><text x="0" y="183" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">Geo</text><rect x="589.0769230769231" y="162" width="467.07692307692304" height="29" rx="6" fill="var(--accent-3)"/><text x="599.0769230769231" y="182" font-size="16" fill="var(--accent-ink)" text-anchor="start" font-weight="400">11/12/2021 → 31/12/2022</text><text x="0" y="234" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">Targets</text><rect x="650.0" y="213" width="443.07692307692304" height="29" rx="6" fill="var(--text-1)"/><text x="660.0" y="233" font-size="16" fill="var(--accent-ink)" text-anchor="start" font-weight="400">02/2022 → 01/2023</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: dùng giai đoạn chưa có nhãn làm lịch sử; không biến thành mẫu âm.</p>
+    <p class="method">Thanh thể hiện min–max timestamp (targets: tháng chứa mon); tô vàng phần trước 02/2022. Tháng biên có thể không trọn.</p><p class="source">Nguồn: docs/mbd_mini_eda/tables/descriptive.temporal/source_time_ranges.csv; docs/propensity_feasibility/remaining_questions/assessment.md · cập nhật 11/11/2026</p>
+    <span class="page">04 / 19</span><div class="notes">Nguồn timestamp chưa có timezone xác minh; protocol nghiên cứu giả định UTC. Không có available_at nên chưa biết nhãn đến chậm thực tế bao lâu.</div></section><section class="slide" data-title="Bắt buộc đủ ba nguồn sẽ loại gần 65% khách" data-section="B · ĐỘ PHỦ">
+    <p class="kicker">MBD-MINI / B · ĐỘ PHỦ</p><h2>Bắt buộc đủ ba nguồn sẽ loại gần 65% khách</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="UpSet: các tổ hợp nguồn không chồng lấn"><title>UpSet: các tổ hợp nguồn không chồng lấn</title><text x="0" y="25" font-size="24" fill="var(--accent)" text-anchor="start" font-weight="700">35.424 khách có đủ ba nguồn trong toàn lịch sử</text><rect x="200" y="42.0" width="63" height="170.0" rx="6" fill="var(--accent-2)"/><text x="231" y="32.0" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">36.223</text><circle cx="231" cy="253" r="7" fill="var(--accent)"/><circle cx="231" cy="289" r="7" fill="var(--accent)"/><circle cx="231" cy="325" r="7" fill="var(--border-strong)"/><line x1="231" y1="253" x2="231" y2="289" stroke="var(--accent)" stroke-width="3"/><rect x="317" y="45.74982745769262" width="63" height="166.25017254230738" rx="6" fill="var(--accent)"/><text x="348" y="35.74982745769262" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">35.424</text><circle cx="348" cy="253" r="7" fill="var(--accent)"/><circle cx="348" cy="289" r="7" fill="var(--accent)"/><circle cx="348" cy="325" r="7" fill="var(--accent)"/><line x1="348" y1="253" x2="348" y2="325" stroke="var(--accent)" stroke-width="3"/><rect x="434" y="134.60055765673744" width="63" height="77.39944234326256" rx="6" fill="var(--accent-2)"/><text x="465" y="124.60055765673744" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">16.492</text><circle cx="465" cy="253" r="7" fill="var(--accent)"/><circle cx="465" cy="289" r="7" fill="var(--border-strong)"/><circle cx="465" cy="325" r="7" fill="var(--border-strong)"/><rect x="551" y="162.3370786516854" width="63" height="49.662921348314605" rx="6" fill="var(--accent-2)"/><text x="582" y="152.3370786516854" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">10.582</text><circle cx="582" cy="253" r="7" fill="var(--accent)"/><circle cx="582" cy="289" r="7" fill="var(--border-strong)"/><circle cx="582" cy="325" r="7" fill="var(--accent)"/><line x1="582" y1="253" x2="582" y2="325" stroke="var(--accent)" stroke-width="3"/><rect x="668" y="208.61623830163157" width="63" height="3.3837616983684398" rx="6" fill="var(--accent-2)"/><text x="699" y="198.61623830163157" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">721</text><circle cx="699" cy="253" r="7" fill="var(--border-strong)"/><circle cx="699" cy="289" r="7" fill="var(--accent)"/><circle cx="699" cy="325" r="7" fill="var(--border-strong)"/><rect x="785" y="209.80360544405488" width="63" height="2.1963945559451177" rx="6" fill="var(--accent-2)"/><text x="816" y="199.80360544405488" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">468</text><circle cx="816" cy="253" r="7" fill="var(--border-strong)"/><circle cx="816" cy="289" r="7" fill="var(--border-strong)"/><circle cx="816" cy="325" r="7" fill="var(--border-strong)"/><rect x="902" y="211.03790409408387" width="63" height="0.9620959059161306" rx="6" fill="var(--accent-2)"/><text x="933" y="201.03790409408387" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">205</text><circle cx="933" cy="253" r="7" fill="var(--border-strong)"/><circle cx="933" cy="289" r="7" fill="var(--accent)"/><circle cx="933" cy="325" r="7" fill="var(--accent)"/><line x1="933" y1="289" x2="933" y2="325" stroke="var(--accent)" stroke-width="3"/><rect x="1019" y="211.48844656709826" width="63" height="0.5115534329017475" rx="6" fill="var(--accent-2)"/><text x="1050" y="201.48844656709826" font-size="17" fill="var(--text-1)" text-anchor="middle" font-weight="400">109</text><circle cx="1050" cy="253" r="7" fill="var(--border-strong)"/><circle cx="1050" cy="289" r="7" fill="var(--border-strong)"/><circle cx="1050" cy="325" r="7" fill="var(--accent)"/><text x="95" y="260" font-size="20" fill="var(--text-2)" text-anchor="end" font-weight="400">Trx</text><text x="95" y="296" font-size="20" fill="var(--text-2)" text-anchor="end" font-weight="400">Geo</text><text x="95" y="332" font-size="20" fill="var(--text-2)" text-anchor="end" font-weight="400">Dialog</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: giữ cả 100.224 khách; thêm cờ có log và giữ NaN đúng nghĩa.</p>
+    <p class="method">UpSet đếm ID có ≥1 sự kiện mỗi nguồn trên toàn kỳ; từng cột là một tổ hợp riêng. Không dùng làm cohort tại cutoff quá khứ.</p><p class="source">Nguồn: docs/mbd_mini_eda/tables/descriptive.customers/modality_coverage.csv · cập nhật 11/11/2026</p>
+    <span class="page">05 / 19</span><div class="notes">35,34% có đủ ba nguồn trong toàn lịch sử; không suy ra đủ nguồn mỗi tháng. Tại cutoff 01/12/2022, số có đủ ba nguồn trong quá khứ là 34.135.</div></section><section class="slide" data-title="Tỷ lệ mua giảm từ đỉnh 1,69% xuống 0,67%" data-section="C · TARGET / PHÂN PHỐI &amp; THỜI GIAN">
+    <p class="kicker">MBD-MINI / C · TARGET / PHÂN PHỐI &amp; THỜI GIAN</p><h2>Tỷ lệ mua giảm từ đỉnh 1,69% xuống 0,67%</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Diễn biến theo tháng: y_any dương (%)"><title>Diễn biến theo tháng: y_any dương (%)</title><line x1="65" y1="285.0" x2="1120" y2="285.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="291.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0,0%</text><line x1="65" y1="223.25" x2="1120" y2="223.25" stroke="var(--border)" stroke-width="1"/><text x="53" y="229.25" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0,5%</text><line x1="65" y1="161.5" x2="1120" y2="161.5" stroke="var(--border)" stroke-width="1"/><text x="53" y="167.5" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">1,0%</text><line x1="65" y1="99.75" x2="1120" y2="99.75" stroke="var(--border)" stroke-width="1"/><text x="53" y="105.75" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">1,5%</text><line x1="65" y1="38.0" x2="1120" y2="38.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="44.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">2,0%</text><polyline points="65.0,156.72383860153258 160.9090909090909,91.90802602171138 256.8181818181818,75.76568486590037 352.72727272727275,149.4536238825032 448.6363636363636,139.9653775542784 544.5454545454545,167.07465277777777 640.4545454545455,145.51045657726692 736.3636363636364,160.1741099936143 832.2727272727273,178.04158684546616 928.1818181818181,178.1648108237548 1024.090909090909,191.4730004789272 1120.0,201.82381465517244" fill="none" stroke="var(--accent)" stroke-width="3.5"/><circle cx="65.0" cy="156.72383860153258" r="4" fill="var(--accent)"/><circle cx="160.9090909090909" cy="91.90802602171138" r="4" fill="var(--accent)"/><circle cx="256.8181818181818" cy="75.76568486590037" r="4" fill="var(--accent)"/><circle cx="352.72727272727275" cy="149.4536238825032" r="4" fill="var(--accent)"/><circle cx="448.6363636363636" cy="139.9653775542784" r="4" fill="var(--accent)"/><circle cx="544.5454545454545" cy="167.07465277777777" r="4" fill="var(--accent)"/><circle cx="640.4545454545455" cy="145.51045657726692" r="4" fill="var(--accent)"/><circle cx="736.3636363636364" cy="160.1741099936143" r="4" fill="var(--accent)"/><circle cx="832.2727272727273" cy="178.04158684546616" r="4" fill="var(--accent)"/><circle cx="928.1818181818181" cy="178.1648108237548" r="4" fill="var(--accent)"/><circle cx="1024.090909090909" cy="191.4730004789272" r="4" fill="var(--accent)"/><circle cx="1120.0" cy="201.82381465517244" r="4" fill="var(--accent)"/><text x="65.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">02/22</text><text x="160.9090909090909" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">03/22</text><text x="256.8181818181818" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">04/22</text><text x="352.72727272727275" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">05/22</text><text x="448.6363636363636" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">06/22</text><text x="544.5454545454545" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">07/22</text><text x="640.4545454545455" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">08/22</text><text x="736.3636363636364" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">09/22</text><text x="832.2727272727273" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">10/22</text><text x="928.1818181818181" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">11/22</text><text x="1024.090909090909" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/22</text><text x="1120.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/23</text><rect x="65" y="332" width="20" height="5" rx="1" fill="var(--accent)"/><text x="96" y="341" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">y_any dương (%)</text><text x="750" y="20" font-size="18" fill="var(--accent)" text-anchor="start" font-weight="650">Mỗi tháng: 100.224 khách</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: dùng validation cuốn chiếu; theo dõi prevalence và calibration từng tháng.</p>
+    <p class="method">Tỷ lệ = số khách có ≥1 target dương / 100.224 mỗi tháng. Các tháng 12/2022–01/2023 chỉ mô tả nhãn.</p><p class="source">Nguồn: docs/propensity_feasibility/any_product/monthly.csv · cập nhật 11/11/2026</p>
+    <span class="page">06 / 19</span><div class="notes">Đỉnh 04/2022; tháng đầu 02/2022 có 1.041 khách mua. Một năm nhãn chưa đủ chứng minh mùa vụ. Không đọc dự đoán test để chọn phương án; thống kê nhãn cuối kỳ đã có trong EDA công bố.</div></section><section class="slide" data-title="Mua tháng trước gắn với xác suất mua cao gấp 6,9 lần" data-section="C · TARGET / PERSISTENCE">
+    <p class="kicker">MBD-MINI / C · TARGET / PERSISTENCE</p><h2>Mua tháng trước gắn với xác suất mua cao gấp 6,9 lần</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh Không mua ở T−1, Có mua ở T−1"><title>So sánh Không mua ở T−1, Có mua ở T−1</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Không mua ở T−1</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="76.41342226219551" height="28" rx="6" fill="var(--accent-2)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,86%</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Có mua ở T−1</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="529.1356502773695" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">5,97%</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">7,0%</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: giữ lịch sử mua; hơn 93% người mua validation không mua ở tháng liền trước.</p>
+    <p class="method">P(yT=1 | yT−1): gộp 09–11/2022. Nhóm có mua: 180 / 3.013; nhóm còn lại: 2.568 / 297.659.</p><p class="source">Nguồn: Tính lại từ targets; aggregate_data.json → persistence · cập nhật 11/11/2026</p>
+    <span class="page">07 / 19</span><div class="notes">So đúng tháng liền trước, không dùng đã từng mua toàn lịch sử. Tỷ số là liên hệ quan sát; rate không phải recall. Rule ở top 1% có thể chọn thêm khách không mua T−1 khi số người mua trước ít hơn K.</div></section><section class="slide" data-title="Trx có lịch sử dài, nhưng mức hoạt động thay đổi theo tháng" data-section="C · TRX / ĐỘNG HỌC">
+    <p class="kicker">MBD-MINI / C · TRX / ĐỘNG HỌC</p><h2>Trx có lịch sử dài, nhưng mức hoạt động thay đổi theo tháng</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Diễn biến theo tháng: Số dòng / 25.000, ID active / 1.000"><title>Diễn biến theo tháng: Số dòng / 25.000, ID active / 1.000</title><line x1="65" y1="285.0" x2="1120" y2="285.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="291.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0</text><line x1="65" y1="223.25" x2="1120" y2="223.25" stroke="var(--border)" stroke-width="1"/><text x="53" y="229.25" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">25</text><line x1="65" y1="161.5" x2="1120" y2="161.5" stroke="var(--border)" stroke-width="1"/><text x="53" y="167.5" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">50</text><line x1="65" y1="99.75" x2="1120" y2="99.75" stroke="var(--border)" stroke-width="1"/><text x="53" y="105.75" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">75</text><line x1="65" y1="38.0" x2="1120" y2="38.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="44.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">100</text><polyline points="65.0,141.3667336 110.86956521739131,141.9729704 156.73913043478262,123.74980440000002 202.6086956521739,128.6552244 248.47826086956522,128.6128392 294.3478260869565,121.32396799999998 340.2173913043478,118.78362240000001 386.0869565217391,125.68993999999998 431.95652173913044,126.38806079999998 477.82608695652175,117.02587159999999 523.695652173913,121.10878160000001 569.5652173913044,110.01284999999999 615.4347826086956,144.31700039999998 661.304347826087,144.3724272 707.1739130434783,124.2182152 753.0434782608696,132.9740688 798.9130434782609,130.0100688 844.7826086956521,125.0149384 890.6521739130435,121.84414999999998 936.5217391304348,124.70006280000001 982.3913043478261,121.00958639999996 1028.2608695652175,110.29146600000001 1074.1304347826087,117.21764240000002 1120.0,109.61626679999998" fill="none" stroke="var(--accent)" stroke-width="3.5"/><circle cx="65.0" cy="141.3667336" r="4" fill="var(--accent)"/><circle cx="110.86956521739131" cy="141.9729704" r="4" fill="var(--accent)"/><circle cx="156.73913043478262" cy="123.74980440000002" r="4" fill="var(--accent)"/><circle cx="202.6086956521739" cy="128.6552244" r="4" fill="var(--accent)"/><circle cx="248.47826086956522" cy="128.6128392" r="4" fill="var(--accent)"/><circle cx="294.3478260869565" cy="121.32396799999998" r="4" fill="var(--accent)"/><circle cx="340.2173913043478" cy="118.78362240000001" r="4" fill="var(--accent)"/><circle cx="386.0869565217391" cy="125.68993999999998" r="4" fill="var(--accent)"/><circle cx="431.95652173913044" cy="126.38806079999998" r="4" fill="var(--accent)"/><circle cx="477.82608695652175" cy="117.02587159999999" r="4" fill="var(--accent)"/><circle cx="523.695652173913" cy="121.10878160000001" r="4" fill="var(--accent)"/><circle cx="569.5652173913044" cy="110.01284999999999" r="4" fill="var(--accent)"/><circle cx="615.4347826086956" cy="144.31700039999998" r="4" fill="var(--accent)"/><circle cx="661.304347826087" cy="144.3724272" r="4" fill="var(--accent)"/><circle cx="707.1739130434783" cy="124.2182152" r="4" fill="var(--accent)"/><circle cx="753.0434782608696" cy="132.9740688" r="4" fill="var(--accent)"/><circle cx="798.9130434782609" cy="130.0100688" r="4" fill="var(--accent)"/><circle cx="844.7826086956521" cy="125.0149384" r="4" fill="var(--accent)"/><circle cx="890.6521739130435" cy="121.84414999999998" r="4" fill="var(--accent)"/><circle cx="936.5217391304348" cy="124.70006280000001" r="4" fill="var(--accent)"/><circle cx="982.3913043478261" cy="121.00958639999996" r="4" fill="var(--accent)"/><circle cx="1028.2608695652175" cy="110.29146600000001" r="4" fill="var(--accent)"/><circle cx="1074.1304347826087" cy="117.21764240000002" r="4" fill="var(--accent)"/><circle cx="1120.0" cy="109.61626679999998" r="4" fill="var(--accent)"/><polyline points="65.0,114.06117999999998 110.86956521739131,114.01425000000003 156.73913043478262,110.51178999999999 202.6086956521739,109.51144 248.47826086956522,108.38264999999998 294.3478260869565,106.58696 340.2173913043478,104.90489000000002 386.0869565217391,104.88759999999999 431.95652173913044,103.61307999999997 477.82608695652175,100.45642000000001 523.695652173913,99.87597000000002 569.5652173913044,97.55911 615.4347826086956,98.99170999999998 661.304347826087,99.15473000000003 707.1739130434783,95.86716000000001 753.0434782608696,95.66215 798.9130434782609,95.69919999999999 844.7826086956521,94.19003000000001 890.6521739130435,92.58453 936.5217391304348,94.51607000000001 982.3913043478261,93.02666000000002 1028.2608695652175,91.12970000000001 1074.1304347826087,91.59405999999998 1120.0,91.15687000000003" fill="none" stroke="var(--accent-2)" stroke-width="3.5"/><circle cx="65.0" cy="114.06117999999998" r="4" fill="var(--accent-2)"/><circle cx="110.86956521739131" cy="114.01425000000003" r="4" fill="var(--accent-2)"/><circle cx="156.73913043478262" cy="110.51178999999999" r="4" fill="var(--accent-2)"/><circle cx="202.6086956521739" cy="109.51144" r="4" fill="var(--accent-2)"/><circle cx="248.47826086956522" cy="108.38264999999998" r="4" fill="var(--accent-2)"/><circle cx="294.3478260869565" cy="106.58696" r="4" fill="var(--accent-2)"/><circle cx="340.2173913043478" cy="104.90489000000002" r="4" fill="var(--accent-2)"/><circle cx="386.0869565217391" cy="104.88759999999999" r="4" fill="var(--accent-2)"/><circle cx="431.95652173913044" cy="103.61307999999997" r="4" fill="var(--accent-2)"/><circle cx="477.82608695652175" cy="100.45642000000001" r="4" fill="var(--accent-2)"/><circle cx="523.695652173913" cy="99.87597000000002" r="4" fill="var(--accent-2)"/><circle cx="569.5652173913044" cy="97.55911" r="4" fill="var(--accent-2)"/><circle cx="615.4347826086956" cy="98.99170999999998" r="4" fill="var(--accent-2)"/><circle cx="661.304347826087" cy="99.15473000000003" r="4" fill="var(--accent-2)"/><circle cx="707.1739130434783" cy="95.86716000000001" r="4" fill="var(--accent-2)"/><circle cx="753.0434782608696" cy="95.66215" r="4" fill="var(--accent-2)"/><circle cx="798.9130434782609" cy="95.69919999999999" r="4" fill="var(--accent-2)"/><circle cx="844.7826086956521" cy="94.19003000000001" r="4" fill="var(--accent-2)"/><circle cx="890.6521739130435" cy="92.58453" r="4" fill="var(--accent-2)"/><circle cx="936.5217391304348" cy="94.51607000000001" r="4" fill="var(--accent-2)"/><circle cx="982.3913043478261" cy="93.02666000000002" r="4" fill="var(--accent-2)"/><circle cx="1028.2608695652175" cy="91.12970000000001" r="4" fill="var(--accent-2)"/><circle cx="1074.1304347826087" cy="91.59405999999998" r="4" fill="var(--accent-2)"/><circle cx="1120.0" cy="91.15687000000003" r="4" fill="var(--accent-2)"/><text x="65.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/21</text><text x="156.73913043478262" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">03/21</text><text x="248.47826086956522" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">05/21</text><text x="340.2173913043478" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">07/21</text><text x="431.95652173913044" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">09/21</text><text x="523.695652173913" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">11/21</text><text x="615.4347826086956" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">01/22</text><text x="707.1739130434783" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">03/22</text><text x="798.9130434782609" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">05/22</text><text x="890.6521739130435" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">07/22</text><text x="982.3913043478261" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">09/22</text><text x="1074.1304347826087" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">11/22</text><text x="1120.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/22</text><rect x="65" y="332" width="20" height="5" rx="1" fill="var(--accent)"/><text x="96" y="341" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">Số dòng / 25.000</text><rect x="425" y="332" width="20" height="5" rx="1" fill="var(--accent-2)"/><text x="456" y="341" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">ID active / 1.000</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: bổ sung rate và recency để tách cường độ giao dịch khỏi độ dài cửa sổ.</p>
+    <p class="method">Hai chuỗi cùng trục đã chia đơn vị để so nhịp; không đọc là cùng số lượng. Active = ID có ≥1 trx trong tháng.</p><p class="source">Nguồn: docs/mbd_mini_eda/tables/descriptive.temporal/monthly_activity.csv · cập nhật 11/11/2026</p>
+    <span class="page">08 / 19</span><div class="notes">Chỉ dùng các tháng 01/2021–12/2022; tháng 12/2020 có khoảng ba giờ dữ liệu. Tổng trx gồm cả tháng biên là 38.764.930. Độ phủ log không chứng minh theo dõi liên tục.</div></section><section class="slide" data-title="Trên 20 giao dịch trong 30 ngày gắn với tỷ lệ mua 2,50%" data-section="C · TRX / LIÊN HỆ NHÃN">
+    <p class="kicker">MBD-MINI / C · TRX / LIÊN HỆ NHÃN</p><h2>Trên 20 giao dịch trong 30 ngày gắn với tỷ lệ mua 2,50%</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Tỷ lệ mua theo các nhóm R · ngày từ trx cuối, F · số trx / 30 ngày, M · |amount|, mã 11"><title>Tỷ lệ mua theo các nhóm R · ngày từ trx cuối, F · số trx / 30 ngày, M · |amount|, mã 11</title><text x="0" y="25" font-size="23" fill="var(--text-1)" text-anchor="start" font-weight="700">R · ngày từ trx cuối</text><text x="0" y="73" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">≤3</text><rect x="160" y="55" width="117.3913043478261" height="24" rx="6" fill="var(--accent)"/><text x="305" y="73" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">1,83%</text><text x="0" y="126" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">(3; 10]</text><rect x="160" y="108" width="52.239380010584895" height="24" rx="6" fill="var(--accent)"/><text x="305" y="126" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,81%</text><text x="0" y="179" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">&gt;10</text><rect x="160" y="161" width="31.15785506205826" height="24" rx="6" fill="var(--accent)"/><text x="305" y="179" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,49%</text><text x="0" y="232" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">Không xác định</text><rect x="160" y="214" width="45.92500595011" height="24" rx="6" fill="var(--accent)"/><text x="305" y="232" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,72%</text><text x="0" y="337" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">Nhãn dương / số mẫu từng nhóm</text><text x="390" y="25" font-size="23" fill="var(--text-1)" text-anchor="start" font-weight="700">F · số trx / 30 ngày</text><text x="390" y="73" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">≤0</text><rect x="550" y="55" width="33.64356006309556" height="24" rx="6" fill="var(--accent)"/><text x="695" y="73" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,72%</text><text x="390" y="126" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">(0; 5]</text><rect x="550" y="108" width="30.376764343972056" height="24" rx="6" fill="var(--accent)"/><text x="695" y="126" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,65%</text><text x="390" y="179" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">(5; 20]</text><rect x="550" y="161" width="52.436571972282" height="24" rx="6" fill="var(--accent)"/><text x="695" y="179" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">1,12%</text><text x="390" y="232" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">&gt;20</text><rect x="550" y="214" width="117.39130434782608" height="24" rx="6" fill="var(--accent)"/><text x="695" y="232" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">2,50%</text><text x="390" y="337" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">Nhãn dương / số mẫu từng nhóm</text><text x="780" y="25" font-size="23" fill="var(--text-1)" text-anchor="start" font-weight="700">M · |amount|, mã 11</text><text x="780" y="73" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">(0; 10k]</text><rect x="940" y="55" width="66.19020829101098" height="24" rx="6" fill="var(--accent)"/><text x="1085" y="73" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,88%</text><text x="780" y="126" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">(10k; 100k]</text><rect x="940" y="108" width="56.02956430507559" height="24" rx="6" fill="var(--accent)"/><text x="1085" y="126" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,75%</text><text x="780" y="179" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">&gt;100k</text><rect x="940" y="161" width="117.3913043478261" height="24" rx="6" fill="var(--accent)"/><text x="1085" y="179" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">1,56%</text><text x="780" y="232" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">Không xác định</text><rect x="940" y="214" width="53.756691276817115" height="24" rx="6" fill="var(--accent)"/><text x="1085" y="232" font-size="18" fill="var(--text-1)" text-anchor="start" font-weight="650">0,72%</text><text x="780" y="337" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">Nhãn dương / số mẫu từng nhóm</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: dùng R/F/M cùng nhau; giữ riêng nhóm không có log hoặc không xác định.</p>
+    <p class="method">Train 02–08/2022; feature 30 ngày trước cutoff. Cột M là tổng trị tuyệt đối amount currency 11, đơn vị nguồn ẩn danh.</p><p class="source">Nguồn: aggregate_data.json → rfm (DuckDB trên feature train đã chuẩn hóa) · cập nhật 11/11/2026</p>
+    <span class="page">09 / 19</span><div class="notes">Ngưỡng nhóm là mô tả cố định, không tối ưu target. Pooled train có 701.568 dòng và 8.672 dương. Không cộng currency khác nhau. Không suy hiệu ứng nhân quả hay hiệu quả ngoài mẫu từ chart này.</div></section><section class="slide" data-title="Nhóm giao dịch đa dạng nhất có tỷ lệ mua 3,03%" data-section="C · TRX / DANH MỤC">
+    <p class="kicker">MBD-MINI / C · TRX / DANH MỤC</p><h2>Nhóm giao dịch đa dạng nhất có tỷ lệ mua 3,03%</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Treemap event_type toàn kỳ và lift theo độ đa dạng trên train"><title>Treemap event_type toàn kỳ và lift theo độ đa dạng trên train</title><rect x="0" y="35" width="497.62362733532603" height="220" rx="6" fill="var(--accent)"/><text x="12" y="86" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="650">Mã 1</text><text x="12" y="120" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="400">43,2%</text><rect x="501.62362733532603" y="35" width="163.40743863074175" height="220" rx="6" fill="var(--accent-2)"/><text x="513.6236273353261" y="86" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="650">Mã 46</text><text x="513.6236273353261" y="120" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="400">14,4%</text><rect x="669.0310659660678" y="35" width="131.38755055149073" height="220" rx="6" fill="var(--accent-3)"/><text x="681.0310659660678" y="86" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="650">Mã 40</text><text x="681.0310659660678" y="120" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="400">11,7%</text><rect x="804.4186165175586" y="35" width="85.50838296367361" height="220" rx="6" fill="var(--text-2)"/><text x="816.4186165175586" y="86" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="650">Mã 49</text><text x="816.4186165175586" y="120" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="400">7,7%</text><rect x="893.9269994812322" y="35" width="58.575028511595406" height="220" rx="6" fill="var(--good)"/><text x="905.9269994812322" y="86" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="650">Mã 11</text><text x="905.9269994812322" y="120" font-size="20" fill="var(--accent-ink)" text-anchor="start" font-weight="400">5,4%</text><rect x="956.5020279928276" y="35" width="199.49797200717245" height="220" rx="6" fill="var(--surface-2)"/><text x="968.5020279928276" y="86" font-size="20" fill="var(--text-1)" text-anchor="start" font-weight="650">Khác</text><text x="968.5020279928276" y="120" font-size="20" fill="var(--text-1)" text-anchor="start" font-weight="400">17,5%</text><text x="0" y="302" font-size="24" fill="var(--accent)" text-anchor="start" font-weight="700">Đa dạng event_type: nhóm 20% cao nhất có tỷ lệ mua 3,03%</text><text x="0" y="337" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Tương đương 2,45× prevalence train; chưa phải lift riêng từng mã giao dịch.</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: dùng count, tỷ trọng và nunique; kiểm tra từng mã bằng ablation theo thời gian.</p>
+    <p class="method">Diện tích = tỷ trọng dòng trx toàn kỳ; dòng lift dùng 5 nhóm bằng số dòng, xếp theo nunique trên train (có thể tách ties).</p><p class="source">Nguồn: transaction_categories_full.csv; deliverables/eda/tables/feature_band_target_rates.csv · cập nhật 11/11/2026</p>
+    <span class="page">10 / 19</span><div class="notes">55 event_type là mã ẩn danh, chưa có tên danh mục nghiệp vụ. Phân phối toàn kỳ chỉ mô tả, vocabulary mô hình cần fit trên train. Chưa có lift đã kiểm chứng theo từng mã.</div></section><section class="slide" data-title="Dialog chỉ phủ 46,2% khách và rất thưa ở từng tháng" data-section="C · DIALOG / CẤU TRÚC &amp; THỜI GIAN">
+    <p class="kicker">MBD-MINI / C · DIALOG / CẤU TRÚC &amp; THỜI GIAN</p><h2>Dialog chỉ phủ 46,2% khách và rất thưa ở từng tháng</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Diễn biến theo tháng: ID active / tháng"><title>Diễn biến theo tháng: ID active / tháng</title><line x1="65" y1="285.0" x2="1120" y2="285.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="291.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0k</text><line x1="65" y1="235.6" x2="1120" y2="235.6" stroke="var(--border)" stroke-width="1"/><text x="53" y="241.6" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">2k</text><line x1="65" y1="186.2" x2="1120" y2="186.2" stroke="var(--border)" stroke-width="1"/><text x="53" y="192.2" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">4k</text><line x1="65" y1="136.8" x2="1120" y2="136.8" stroke="var(--border)" stroke-width="1"/><text x="53" y="142.8" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">6k</text><line x1="65" y1="87.4" x2="1120" y2="87.4" stroke="var(--border)" stroke-width="1"/><text x="53" y="93.4" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">8k</text><line x1="65" y1="38.0" x2="1120" y2="38.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="44.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">10k</text><polyline points="65.0,265.9316 112.95454545454545,177.8761 160.9090909090909,144.4076 208.86363636363637,140.999 256.8181818181818,137.5657 304.77272727272725,139.73930000000001 352.72727272727275,142.80210000000002 400.6818181818182,144.3582 448.6363636363636,129.7852 496.59090909090907,108.41969999999998 544.5454545454545,113.08800000000002 592.5,193.4618 640.4545454545455,219.3474 688.4090909090909,195.5366 736.3636363636364,194.5239 784.3181818181819,186.7187 832.2727272727273,106.36959999999999 880.2272727272727,73.24690000000001 928.1818181818181,76.58139999999997 976.1363636363636,88.95609999999999 1024.090909090909,90.66039999999998 1072.0454545454545,86.06620000000001 1120.0,94.19250000000002" fill="none" stroke="var(--accent)" stroke-width="3.5"/><circle cx="65.0" cy="265.9316" r="4" fill="var(--accent)"/><circle cx="112.95454545454545" cy="177.8761" r="4" fill="var(--accent)"/><circle cx="160.9090909090909" cy="144.4076" r="4" fill="var(--accent)"/><circle cx="208.86363636363637" cy="140.999" r="4" fill="var(--accent)"/><circle cx="256.8181818181818" cy="137.5657" r="4" fill="var(--accent)"/><circle cx="304.77272727272725" cy="139.73930000000001" r="4" fill="var(--accent)"/><circle cx="352.72727272727275" cy="142.80210000000002" r="4" fill="var(--accent)"/><circle cx="400.6818181818182" cy="144.3582" r="4" fill="var(--accent)"/><circle cx="448.6363636363636" cy="129.7852" r="4" fill="var(--accent)"/><circle cx="496.59090909090907" cy="108.41969999999998" r="4" fill="var(--accent)"/><circle cx="544.5454545454545" cy="113.08800000000002" r="4" fill="var(--accent)"/><circle cx="592.5" cy="193.4618" r="4" fill="var(--accent)"/><circle cx="640.4545454545455" cy="219.3474" r="4" fill="var(--accent)"/><circle cx="688.4090909090909" cy="195.5366" r="4" fill="var(--accent)"/><circle cx="736.3636363636364" cy="194.5239" r="4" fill="var(--accent)"/><circle cx="784.3181818181819" cy="186.7187" r="4" fill="var(--accent)"/><circle cx="832.2727272727273" cy="106.36959999999999" r="4" fill="var(--accent)"/><circle cx="880.2272727272727" cy="73.24690000000001" r="4" fill="var(--accent)"/><circle cx="928.1818181818181" cy="76.58139999999997" r="4" fill="var(--accent)"/><circle cx="976.1363636363636" cy="88.95609999999999" r="4" fill="var(--accent)"/><circle cx="1024.090909090909" cy="90.66039999999998" r="4" fill="var(--accent)"/><circle cx="1072.0454545454545" cy="86.06620000000001" r="4" fill="var(--accent)"/><circle cx="1120.0" cy="94.19250000000002" r="4" fill="var(--accent)"/><text x="65.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">02/21</text><text x="160.9090909090909" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">04/21</text><text x="256.8181818181818" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">06/21</text><text x="352.72727272727275" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">08/21</text><text x="448.6363636363636" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">10/21</text><text x="544.5454545454545" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/21</text><text x="640.4545454545455" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">02/22</text><text x="736.3636363636364" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">04/22</text><text x="832.2727272727273" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">06/22</text><text x="928.1818181818181" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">08/22</text><text x="1024.090909090909" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">10/22</text><text x="1120.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/22</text><rect x="65" y="332" width="20" height="5" rx="1" fill="var(--accent)"/><text x="96" y="341" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">ID active / tháng</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: tách “không có hội thoại” khỏi metadata chưa xác định.</p>
+    <p class="method">217.205 sự kiện từ 10/02/2021; 46.320 ID toàn kỳ. Đường thể hiện ID có ≥1 dialog trong mỗi tháng (nghìn ID).</p><p class="source">Nguồn: monthly_activity.csv; descriptive.modalities/dialog_summary.csv · cập nhật 11/11/2026</p>
+    <span class="page">11 / 19</span><div class="notes">Mỗi sự kiện có client_id, event_time, embedding (768 phần tử), thêm fold partition. Không có văn bản, độ dài hội thoại hay duration trong schema; không giả lập các trường này. Median toàn bộ khách = 0 dialog, với khách có log = 3 dialog toàn kỳ.</div></section><section class="slide" data-title="Tần suất dialog có liên hệ với nhãn, embedding chưa được thử" data-section="C · DIALOG / LIÊN HỆ NHÃN">
+    <p class="kicker">MBD-MINI / C · DIALOG / LIÊN HỆ NHÃN</p><h2>Tần suất dialog có liên hệ với nhãn, embedding chưa được thử</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh ≤0 dialog / 30 ngày, (0; 1] dialog / 30 ngày, (1; 2] dialog / 30 ngày, &gt;2 dialog / 30 ngày"><title>So sánh ≤0 dialog / 30 ngày, (0; 1] dialog / 30 ngày, (1; 2] dialog / 30 ngày, &gt;2 dialog / 30 ngày</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">≤0 dialog / 30 ngày</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="72.86291864507238" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,06%</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">(0; 1] dialog / 30 ngày</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="305.495076838204" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">4,42%</text><text x="0" y="167" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">(1; 2] dialog / 30 ngày</text><rect x="385" y="144" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="144" width="353.02754621040515" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="167" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">5,11%</text><text x="0" y="225" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">&gt;2 dialog / 30 ngày</text><rect x="385" y="202" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="202" width="508.1967213114754" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="225" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">7,36%</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">9,0%</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: giữ metadata làm mốc; thử embedding để đo phần tín hiệu bổ sung.</p>
+    <p class="method">Tỷ lệ mua = số dương / khách–tháng từng nhóm; train 02–08/2022, cửa sổ 30 ngày trước cutoff.</p><p class="source">Nguồn: aggregate_data.json → rfm.dialog; deliverables/baseline-final/REPORT.md · cập nhật 11/11/2026</p>
+    <span class="page">12 / 19</span><div class="notes">Baseline hiện có count, active days và recency; chưa có kết quả nội dung/PCA/embedding. Cần fit PCA trên train của từng fold và so metadata với metadata + embedding trên cùng cohort.</div></section><section class="slide" data-title="Geo đến cuối 2021; lượng log lớn chưa bảo đảm tín hiệu mạnh" data-section="C · GEO / ĐỘ PHỦ &amp; CHẤT LƯỢNG">
+    <p class="kicker">MBD-MINI / C · GEO / ĐỘ PHỦ &amp; CHẤT LƯỢNG</p><h2>Geo đến cuối 2021; lượng log lớn chưa bảo đảm tín hiệu mạnh</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Diễn biến theo tháng: ID active / tháng"><title>Diễn biến theo tháng: ID active / tháng</title><line x1="65" y1="285.0" x2="1120" y2="285.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="291.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0k</text><line x1="65" y1="223.25" x2="1120" y2="223.25" stroke="var(--border)" stroke-width="1"/><text x="53" y="229.25" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">20k</text><line x1="65" y1="161.5" x2="1120" y2="161.5" stroke="var(--border)" stroke-width="1"/><text x="53" y="167.5" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">40k</text><line x1="65" y1="99.75" x2="1120" y2="99.75" stroke="var(--border)" stroke-width="1"/><text x="53" y="105.75" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">60k</text><line x1="65" y1="38.0" x2="1120" y2="38.0" stroke="var(--border)" stroke-width="1"/><text x="53" y="44.0" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">80k</text><polyline points="65.0,134.68506250000002 152.91666666666669,100.35515000000001 240.83333333333334,99.8889375 328.75,111.08421249999998 416.6666666666667,103.60628750000001 504.5833333333333,102.757225 592.5,104.7918875 680.4166666666666,101.06527499999999 768.3333333333334,108.9847125 856.25,114.0976125 944.1666666666666,104.69617499999998 1032.0833333333335,105.37233750000001 1120.0,110.78472500000001" fill="none" stroke="var(--accent-3)" stroke-width="3.5"/><circle cx="65.0" cy="134.68506250000002" r="4" fill="var(--accent-3)"/><circle cx="152.91666666666669" cy="100.35515000000001" r="4" fill="var(--accent-3)"/><circle cx="240.83333333333334" cy="99.8889375" r="4" fill="var(--accent-3)"/><circle cx="328.75" cy="111.08421249999998" r="4" fill="var(--accent-3)"/><circle cx="416.6666666666667" cy="103.60628750000001" r="4" fill="var(--accent-3)"/><circle cx="504.5833333333333" cy="102.757225" r="4" fill="var(--accent-3)"/><circle cx="592.5" cy="104.7918875" r="4" fill="var(--accent-3)"/><circle cx="680.4166666666666" cy="101.06527499999999" r="4" fill="var(--accent-3)"/><circle cx="768.3333333333334" cy="108.9847125" r="4" fill="var(--accent-3)"/><circle cx="856.25" cy="114.0976125" r="4" fill="var(--accent-3)"/><circle cx="944.1666666666666" cy="104.69617499999998" r="4" fill="var(--accent-3)"/><circle cx="1032.0833333333335" cy="105.37233750000001" r="4" fill="var(--accent-3)"/><circle cx="1120.0" cy="110.78472500000001" r="4" fill="var(--accent-3)"/><text x="65.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/21</text><text x="240.83333333333334" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">02/22</text><text x="416.6666666666667" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">04/22</text><text x="592.5" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">06/22</text><text x="768.3333333333334" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">08/22</text><text x="944.1666666666666" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">10/22</text><text x="1120.0" y="310" font-size="15" fill="var(--text-2)" text-anchor="middle" font-weight="400">12/22</text><rect x="65" y="332" width="20" height="5" rx="1" fill="var(--accent-3)"/><text x="96" y="341" font-size="17" fill="var(--text-2)" text-anchor="start" font-weight="400">ID active / tháng</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: coi geo là nguồn bổ trợ cần ablation; không suy quãng đường từ mã số.</p>
+    <p class="method">66.295.724 dòng, 72.573 ID; bắt đầu 11/12/2021. Chart đếm ID có log từng tháng; tháng đầu chỉ có một phần lịch.</p><p class="source">Nguồn: monthly_activity.csv; descriptive.modalities/geo_summary.csv; feature_target_associations.csv · cập nhật 11/11/2026</p>
+    <span class="page">13 / 19</span><div class="notes">Không có null trong cột geo theo audit; điều đó không chứng minh không có nhiễu đo vị trí. Mean số geohash_6 trong 30 ngày: y0=10,65 và y1=13,37; r=0,0168. Mã geohash đã ẩn danh, chưa giải mã thành địa lý; unique code phản ánh đa dạng vùng, không phải khoảng cách.</div></section><section class="slide" data-title="Hành vi bổ sung tín hiệu cho lịch sử mua: AP đạt 0,0455" data-section="D · TỔNG HỢP TÍN HIỆU">
+    <p class="kicker">MBD-MINI / D · TỔNG HỢP TÍN HIỆU</p><h2>Hành vi bổ sung tín hiệu cho lịch sử mua: AP đạt 0,0455</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh Rule mua T−1, Lịch sử mua (15 biến), Hành vi (141 biến), Hành vi + mua (156)"><title>So sánh Rule mua T−1, Lịch sử mua (15 biến), Hành vi (141 biến), Hành vi + mua (156)</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Rule mua T−1</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="128.66932646155857" height="28" rx="6" fill="var(--text-3)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,0125</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Lịch sử mua (15 biến)</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="226.00583285102266" height="28" rx="6" fill="var(--accent-2)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,0219</text><text x="0" y="167" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Hành vi (141 biến)</text><rect x="385" y="144" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="144" width="426.8087580617426" height="28" rx="6" fill="var(--accent-3)"/><text x="1030" y="167" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,0413</text><text x="0" y="225" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Hành vi + mua (156)</text><rect x="385" y="202" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="202" width="470.0514440908172" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="225" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,0455</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">0,06</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: ưu tiên B+H; giá trị tăng thêm riêng trx/geo/dialog vẫn chưa được đo.</p>
+    <p class="method">AP (Average Precision), trung bình đều 3 tháng validation 09–11/2022; cùng khách, split, cấu hình CatBoost.</p><p class="source">Nguồn: deliverables/baseline-final/summary.csv; REPORT.md · cập nhật 11/11/2026</p>
+    <span class="page">14 / 19</span><div class="notes">AP là phiên bản báo cáo diện tích PR theo bước precision–recall, không gọi nhầm là tích phân hình thang. Recall@1% của B+H = 9,74%, H = 6,44%, B = 8,89%. Chênh B+H−H = +3,30 đpt, bootstrap 95% [+2,12;+4,28]. Không có ablation bỏ từng nguồn, không suy từ feature importance thành đóng góp độc lập.</div></section><section class="slide" data-title="Baseline tìm thêm người mua mới, nhưng vẫn bỏ sót nhóm rule bắt được" data-section="D · PHÂN TÍCH LỖI">
+    <p class="kicker">MBD-MINI / D · PHÂN TÍCH LỖI</p><h2>Baseline tìm thêm người mua mới, nhưng vẫn bỏ sót nhóm rule bắt được</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh Cả baseline và rule bắt đúng, Chỉ baseline bắt đúng, Chỉ rule bắt đúng"><title>So sánh Cả baseline và rule bắt đúng, Chỉ baseline bắt đúng, Chỉ rule bắt đúng</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Cả baseline và rule bắt đúng</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="85.25" height="28" rx="6" fill="var(--accent-2)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">33</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Chỉ baseline bắt đúng</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="529.5833333333334" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">205</text><text x="0" y="167" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Chỉ rule bắt đúng</text><rect x="385" y="144" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="144" width="351.3333333333333" height="28" rx="6" fill="var(--warn)"/><text x="1030" y="167" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">136</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">240 khách–tháng</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: thêm lịch sử mua và kiểm tra riêng khách quay lại / chưa từng ghi nhận mua.</p>
+    <p class="method">Đếm true positive trong giao/hiệu hai danh sách top 1%; cộng 09–11/2022, mỗi danh sách 1.003 khách/tháng.</p><p class="source">Nguồn: docs/baseline_diagnostics_20261110/overlap_top1.csv · cập nhật 11/11/2026</p>
+    <span class="page">15 / 19</span><div class="notes">Chẩn đoán này thuộc baseline hành vi gốc 153 biến ngày 10/11, không phải B+H 156 biến. Khách có thể lặp qua tháng. Tổng true positives baseline=238, rule=169; không phải số khách unique. B+H mới chưa có phân tích lỗi tương đương, cần tái chạy diagnostics trước kết luận về nhóm sai còn lại.</div></section><section class="slide" data-title="Snapshot tháng lịch đã có bằng chứng; cutoff bất kỳ vẫn là thí nghiệm" data-section="D · SNAPSHOT">
+    <p class="kicker">MBD-MINI / D · SNAPSHOT</p><h2>Snapshot tháng lịch đã có bằng chứng; cutoff bất kỳ vẫn là thí nghiệm</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:34%"><col style="width:28%"><col style="width:38%"></colgroup><thead><tr><th>Thiết kế</th><th>Đã đo</th><th>Kết quả / giới hạn</th></tr></thead><tbody><tr><td>Tháng lịch T−1 → nhãn tháng T</td><td>Có · baseline 09–11/2022</td><td>75 biến recent: Recall@1% 7,55%</td></tr><tr><td>Tháng gần nhất + lịch sử cũ</td><td>Có · cùng protocol</td><td>153 biến: 8,70% (+1,15 đpt)</td></tr><tr><td>30/84 ngày trước đầu tháng</td><td>Có feature và EDA</td><td>Chưa so metric cửa sổ cùng model</td></tr><tr><td>Cutoff T bất kỳ, nhãn 30 ngày tới</td><td>Chưa có nhãn sản phẩm theo ngày</td><td>Không gán y tháng cho rolling 30 ngày</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: giữ tháng lịch làm mốc; thử cửa sổ mới trên cùng cutoff trước khi đổi bài toán.</p>
+    <p class="method">So recent vs history thuộc run hành vi gốc, cấu hình cố định; các cửa sổ chưa chạy được ghi đúng trạng thái.</p><p class="source">Nguồn: BASELINE_REPORT.md; docs/mbd_temporal_coverage/assessment.md · cập nhật 11/11/2026</p>
+    <span class="page">16 / 19</span><div class="notes">30 ngày khác tháng lịch 28–31 ngày; 84 ngày khác 3 tháng. Older và recent không chồng nhau. Không lấy median all trừ median recent. Các cutoff ngày chồng lấn không phải tập test độc lập.</div></section><section class="slide" data-title="Dữ liệu phù hợp để nghiên cứu xếp hạng, còn điều kiện vận hành" data-section="E · MỨC ĐỘ PHÙ HỢP">
+    <p class="kicker">MBD-MINI / E · MỨC ĐỘ PHÙ HỢP</p><h2>Dữ liệu phù hợp để nghiên cứu xếp hạng, còn điều kiện vận hành</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="Heatmap đánh giá mức phù hợp theo sáu tiêu chí"><title>Heatmap đánh giá mức phù hợp theo sáu tiêu chí</title><text x="0" y="29" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Quy mô</text><rect x="245" y="3" width="230" height="40" rx="6" fill="var(--good-soft)"/><text x="360" y="30" font-size="20" fill="var(--good)" text-anchor="middle" font-weight="650">Tốt</text><text x="510" y="29" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">100.224 khách; 1,20M mẫu tháng</text><text x="0" y="82" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Lịch sử</text><rect x="245" y="56" width="230" height="40" rx="6" fill="var(--warn-soft)"/><text x="360" y="83" font-size="20" fill="var(--warn)" text-anchor="middle" font-weight="650">Có điều kiện</text><text x="510" y="82" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">2 năm trx; chỉ 12 tháng nhãn</text><text x="0" y="135" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Lệch nhãn</text><rect x="245" y="109" width="230" height="40" rx="6" fill="var(--bad-soft)"/><text x="360" y="136" font-size="20" fill="var(--bad)" text-anchor="middle" font-weight="650">Khó</text><text x="510" y="135" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">1,07% dương; cần AP / Recall@K</text><text x="0" y="188" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Độ phủ nguồn</text><rect x="245" y="162" width="230" height="40" rx="6" fill="var(--warn-soft)"/><text x="360" y="189" font-size="20" fill="var(--warn)" text-anchor="middle" font-weight="650">Có điều kiện</text><text x="510" y="188" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">35,34% có đủ ba nguồn toàn kỳ</text><text x="0" y="241" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Leakage / khả dụng</text><rect x="245" y="215" width="230" height="40" rx="6" fill="var(--bad-soft)"/><text x="360" y="242" font-size="20" fill="var(--bad)" text-anchor="middle" font-weight="650">Cần khóa</text><text x="510" y="241" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">SLA nhãn và timezone chưa xác minh</text><text x="0" y="294" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="650">Tín hiệu quan sát</text><rect x="245" y="268" width="230" height="40" rx="6" fill="var(--good-soft)"/><text x="360" y="295" font-size="20" fill="var(--good)" text-anchor="middle" font-weight="650">Tốt</text><text x="510" y="294" font-size="21" fill="var(--text-2)" text-anchor="start" font-weight="400">B+H vượt H trên validation</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: tiếp tục baseline có kiểm soát; chưa dùng validation làm cam kết chất lượng triển khai.</p>
+    <p class="method">Heatmap là đánh giá định tính theo bằng chứng bên phải; xanh = thuận lợi, vàng = có điều kiện, đỏ = cần xử lý.</p><p class="source">Nguồn: Tổng hợp inventory, coverage, target audit và baseline-final/REPORT.md · cập nhật 11/11/2026</p>
+    <span class="page">17 / 19</span><div class="notes">Đây không phải điểm số thống kê hoặc ngưỡng chuẩn bên ngoài. Một năm nhãn chưa đo được ổn định nhiều năm; test độc lập chưa mở.</div></section><section class="slide" data-title="Khóa khả dụng nhãn và cutoff trước khi tối ưu thêm mô hình" data-section="E · RỦI RO &amp; CÁCH XỬ LÝ">
+    <p class="kicker">MBD-MINI / E · RỦI RO &amp; CÁCH XỬ LÝ</p><h2>Khóa khả dụng nhãn và cutoff trước khi tối ưu thêm mô hình</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:44%"><col style="width:56%"></colgroup><thead><tr><th>Rủi ro quan sát</th><th>Cách xử lý cụ thể</th></tr></thead><tbody><tr><td>Trước 02/2022 không có nhãn; chưa biết SLA</td><td>Giữ làm lịch sử; unknown không thành 0; xác nhận available_at</td></tr><tr><td>Geo/dialog đến muộn, nhiều khách không có log</td><td>Giữ cohort; cờ có nguồn; count 0 khác mean/recency NaN</td></tr><tr><td>Nhãn lệch và prevalence thay đổi</td><td>AP, Recall@K theo tháng; calibration theo nhãn đã khả dụng</td></tr><tr><td>Cột phụ nhãn chưa tái tạo được công thức</td><td>Loại trans_count, diff_trans_date khỏi predictor</td></tr><tr><td>Biên thời gian / encoder có thể nhìn tương lai</td><td>event_time < cutoff; fit vocabulary/PCA chỉ trên train</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: protocol đúng thời điểm là điều kiện để metric có giá trị sử dụng.</p>
+    <p class="method">Bảng ánh xạ rủi ro audit sang quy tắc xử lý. Không có bằng chứng “target null sáu tháng đầu” trong bảng nhãn.</p><p class="source">Nguồn: docs/propensity_feasibility/remaining_questions/assessment.md; docs/baseline_feature_contract_20261111.md · cập nhật 11/11/2026</p>
+    <span class="page">18 / 19</span><div class="notes">Baseline nghiên cứu đang giả định label delay=0 và UTC. Độ trễ dương cần dựng lại lịch train/calibration và feature target quá khứ. Ngoại lai amount là cờ mô tả, không tự xóa/cap; thống kê toàn kỳ không dùng làm ngưỡng cho quá khứ.</div></section><section class="slide" data-title="Đủ tín hiệu để tiếp tục: khóa protocol, đo từng nguồn, rồi mở test" data-section="E · KẾT LUẬN &amp; HƯỚNG ĐI">
+    <p class="kicker">MBD-MINI / E · KẾT LUẬN &amp; HƯỚNG ĐI</p><h2>Đủ tín hiệu để tiếp tục: khóa protocol, đo từng nguồn, rồi mở test</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="01 · Khóa thời điểm → 02 · Đo phần tăng thêm → 03 · Kiểm chứng độc lập"><title>01 · Khóa thời điểm → 02 · Đo phần tăng thêm → 03 · Kiểm chứng độc lập</title><rect x="0" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="0" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="24" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">01 · Khóa thời điểm</text><text x="24" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Xác nhận SLA nhãn / timezone</text><text x="24" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Chốt model và calibration</text><text x="359" y="157" font-size="33" fill="var(--accent)" text-anchor="middle" font-weight="400">→</text><rect x="388" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="388" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="412" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">02 · Đo phần tăng thêm</text><text x="412" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">H + trx / dialog / geo</text><text x="412" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Cửa sổ mới; embedding sau</text><text x="747" y="157" font-size="33" fill="var(--accent)" text-anchor="middle" font-weight="400">→</text><rect x="776" y="55" width="330" height="185" rx="6" fill="var(--surface-2)"/><rect x="776" y="55" width="7" height="185" rx="6" fill="var(--accent)"/><text x="800" y="100" font-size="25" fill="var(--text-1)" text-anchor="start" font-weight="700">03 · Kiểm chứng độc lập</text><text x="800" y="143" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Test 01/2023 sau khi khóa</text><text x="800" y="174" font-size="20" fill="var(--text-2)" text-anchor="start" font-weight="400">Theo dõi AP, Recall@K, drift</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: B+H là mốc hiện tại — Recall@1% 9,74%; dữ liệu phù hợp có điều kiện.</p>
+    <p class="method">Kết luận dựa trên validation 09–11/2022. Test 01/2023 chưa được đánh giá; thứ tự việc tiếp theo là đề xuất.</p><p class="source">Nguồn: deliverables/baseline-final/REPORT.md · cập nhật 11/11/2026</p>
+    <span class="page">19 / 19</span><div class="notes">Bằng chứng cải thiện offline chưa đo tác động tiếp cận, số mua tăng thêm hoặc ROI. Nếu thực tế SLA khác giả định, backtest lại lịch trước khi dùng kết quả cho vận hành.</div></section><section class="slide" data-title="81,6% người từng mua chỉ dương ở một tháng quan sát" data-section="APPENDIX A1 · TARGET / ĐUÔI PHÂN PHỐI">
+    <p class="kicker">MBD-MINI / APPENDIX A1 · TARGET / ĐUÔI PHÂN PHỐI</p><h2>81,6% người từng mua chỉ dương ở một tháng quan sát</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh Không dương tháng nào, Dương 1 tháng, Dương 2 tháng, Dương ≥3 tháng"><title>So sánh Không dương tháng nào, Dương 1 tháng, Dương 2 tháng, Dương ≥3 tháng</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Không dương tháng nào</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="556.8406" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">89.813</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Dương 1 tháng</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="52.6752" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">8.496</text><text x="0" y="167" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Dương 2 tháng</text><rect x="385" y="144" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="144" width="9.5046" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="167" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1.533</text><text x="0" y="225" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Dương ≥3 tháng</text><rect x="385" y="202" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="202" width="2.3684" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="225" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">382</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">100.000 ID</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: lịch sử mua có đuôi phải, nhưng còn nhiều khách mua lần đầu được ghi nhận.</p>
+    <p class="method">Số tháng y_any=1 theo ID trong 02/2022–01/2023; không phải số lần mua hàng. 10.411 ID từng dương; 8.496 chỉ một tháng.</p><p class="source">Nguồn: aggregate_data.json → positive_month_histogram · cập nhật 11/11/2026</p>
+    <span class="page">A01 / 07</span><div class="notes">Targets chỉ có nhãn nhị phân theo tháng nên không đo được số đơn hoặc số lần mua trong một tháng. Max số tháng dương=8; không khẳng định phân phối power law.</div></section><section class="slide" data-title="Cohort thiếu hành vi không đồng nghĩa xác suất mua bằng 0" data-section="APPENDIX A2 · TARGET / COHORT">
+    <p class="kicker">MBD-MINI / APPENDIX A2 · TARGET / COHORT</p><h2>Cohort thiếu hành vi không đồng nghĩa xác suất mua bằng 0</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh Không có lịch sử trước T, Có cũ, trống 3 tháng gần, Có log 3 tháng gần, Chỉ trx trong quá khứ, Đủ 3 nguồn trong quá khứ"><title>So sánh Không có lịch sử trước T, Có cũ, trống 3 tháng gần, Có log 3 tháng gần, Chỉ trx trong quá khứ, Đủ 3 nguồn trong quá khứ</title><text x="0" y="51.0" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Không có lịch sử trước T</text><rect x="385" y="28.0" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28.0" width="501.3373141755303" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="51.0" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,86%</text><text x="0" y="105.0" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Có cũ, trống 3 tháng gần</text><rect x="385" y="82.0" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="82.0" width="47.366008522486126" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="105.0" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,18%</text><text x="0" y="159.0" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Có log 3 tháng gần</text><rect x="385" y="136.0" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="136.0" width="210.44835992223904" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="159.0" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,78%</text><text x="0" y="213.0" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Chỉ trx trong quá khứ</text><rect x="385" y="190.0" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="190.0" width="56.019371860204565" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="213.0" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">0,21%</text><text x="0" y="267.0" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">Đủ 3 nguồn trong quá khứ</text><rect x="385" y="244.0" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="244.0" width="325.3577546952319" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="267.0" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,21%</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">2,3%</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: giữ cold-start và thiếu nguồn; báo metric tách nhóm thay vì drop toàn bộ.</p>
+    <p class="method">Cutoff 01/12/2022, nhãn tháng 12; cohort chỉ dùng sự kiện trước cutoff. Các nhóm cuối có chồng lấn.</p><p class="source">Nguồn: docs/propensity_feasibility/any_product/cohorts_2022_12.csv · cập nhật 11/11/2026</p>
+    <span class="page">A02 / 07</span><div class="notes">Chỉ mô tả, không chọn feature từ calibration. Nhóm không lịch sử có 699 ID, 13 dương; nhóm cũ nhưng trống 3 tháng có 5.122 ID, 9 dương. Cỡ mẫu khác nhau, không diễn giải tỷ lệ cao là bằng chứng nhân quả.</div></section><section class="slide" data-title="Trx có đuôi rất dài: median 164, cực đại hơn một triệu dòng/ID" data-section="APPENDIX A3 · TRX / SPARSITY">
+    <p class="kicker">MBD-MINI / APPENDIX A3 · TRX / SPARSITY</p><h2>Trx có đuôi rất dài: median 164, cực đại hơn một triệu dòng/ID</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:42%"><col style="width:29%"><col style="width:29%"></colgroup><thead><tr><th>Thống kê toàn lịch sử</th><th>Trx / ID</th><th>Hàm ý</th></tr></thead><tbody><tr><td>Không có trx</td><td>1.503 ID (1,50%)</td><td>Giữ trong cohort scoring</td></tr><tr><td>Median · P95 · P99</td><td>164 · 1.378 · 2.234</td><td>Dùng log1p và rate</td></tr><tr><td>Trung bình · cực đại</td><td>386,8 · 1.020.773</td><td>Mean nhạy với đuôi lớn</td></tr><tr><td>Ô tháng trống xen giữa first–last log</td><td>182.757 khách–tháng</td><td>Không tự gọi là mất dữ liệu</td></tr><tr><td>Không có trx 3 tháng trước 01/12/2022</td><td>13.772 ID; 83 dương</td><td>Nhóm im lặng vẫn có nhãn dương</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: mô tả inactivity theo cutoff; không dùng last-event tương lai để lọc khách.</p>
+    <p class="method">Quantile theo toàn bộ 100.224 ID, gồm count=0. Inactivity ở dòng cuối dùng ba tháng lịch trước cutoff, không phải 84 ngày.</p><p class="source">Nguồn: review/events_per_customer.csv; remaining_questions/absence_patterns.csv; any_product/cohorts_2022_12.csv · cập nhật 11/11/2026</p>
+    <span class="page">A03 / 07</span><div class="notes">Quantile theo toàn bộ 100.224 ID, gồm count=0. Inactivity ở dòng cuối dùng ba tháng lịch trước cutoff, không phải 84 ngày.</div></section><section class="slide" data-title="Trx trước thời kỳ nhãn cung cấp lịch sử hợp lệ cho cutoff sau đó" data-section="APPENDIX A4 · TRX / LEAKAGE">
+    <p class="kicker">MBD-MINI / APPENDIX A4 · TRX / LEAKAGE</p><h2>Trx trước thời kỳ nhãn cung cấp lịch sử hợp lệ cho cutoff sau đó</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:34%"><col style="width:66%"></colgroup><thead><tr><th>Kiểm tra</th><th>Quy tắc / bằng chứng</th></tr></thead><tbody><tr><td>Sự kiện trước 02/2022</td><td>Được dùng cho feature tại cutoff muộn hơn</td></tr><tr><td>Sự kiện trong / sau tháng T</td><td>Loại khỏi feature dự đoán tháng T</td></tr><tr><td>trans_count nguồn</td><td>Không tái tạo được từ trx; chưa đưa vào X</td></tr><tr><td>diff_trans_date nguồn</td><td>Chưa chốt ngữ nghĩa / cutoff; chưa đưa vào X</td></tr><tr><td>Ngưỡng ngoại lai / vocabulary</td><td>Fit theo train; không lấy ngưỡng toàn kỳ cho model quá khứ</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: leakage phụ thuộc thời điểm khả dụng và cách tạo feature, không phụ thuộc có nhãn hay chưa.</p>
+    <p class="method">Audit 612 cấu hình trans_count không có công thức khớp toàn bộ. Điều đó chưa tự chứng minh cột nguồn dùng tương lai.</p><p class="source">Nguồn: docs/propensity_feasibility/remaining_questions/assessment.md · cập nhật 11/11/2026</p>
+    <span class="page">A04 / 07</span><div class="notes">Audit 612 cấu hình trans_count không có công thức khớp toàn bộ. Điều đó chưa tự chứng minh cột nguồn dùng tương lai.</div></section><section class="slide" data-title="Đa dạng mã geo có liên hệ yếu; chưa kết luận đóng góp mô hình" data-section="APPENDIX A5 · GEO / LIÊN HỆ NHÃN">
+    <p class="kicker">MBD-MINI / APPENDIX A5 · GEO / LIÊN HỆ NHÃN</p><h2>Đa dạng mã geo có liên hệ yếu; chưa kết luận đóng góp mô hình</h2>
+    <div class="chart"><svg viewBox="0 0 1160 350" role="img" aria-label="So sánh ≤0 mã geo / 30 ngày, (0; 5] mã geo / 30 ngày, (5; 20] mã geo / 30 ngày, &gt;20 mã geo / 30 ngày"><title>So sánh ≤0 mã geo / 30 ngày, (0; 5] mã geo / 30 ngày, (5; 20] mã geo / 30 ngày, &gt;20 mã geo / 30 ngày</title><text x="0" y="51" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">≤0 mã geo / 30 ngày</text><rect x="385" y="28" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="28" width="305.8575756617075" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="51" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,02%</text><text x="0" y="109" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">(0; 5] mã geo / 30 ngày</text><rect x="385" y="86" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="86" width="348.8811811119517" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="109" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,17%</text><text x="0" y="167" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">(5; 20] mã geo / 30 ngày</text><rect x="385" y="144" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="144" width="408.4556481876144" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="167" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,37%</text><text x="0" y="225" font-size="21" fill="var(--text-1)" text-anchor="start" font-weight="400">&gt;20 mã geo / 30 ngày</text><rect x="385" y="202" width="620" height="28" rx="6" fill="var(--surface-2)"/><rect x="385" y="202" width="476.9230769230769" height="28" rx="6" fill="var(--accent)"/><text x="1030" y="225" font-size="22" fill="var(--text-1)" text-anchor="start" font-weight="650">1,60%</text><line x1="385" y1="310" x2="1005" y2="310" stroke="var(--border-strong)" stroke-width="1"/><text x="385" y="338" font-size="16" fill="var(--text-3)" text-anchor="start" font-weight="400">0</text><text x="1005" y="338" font-size="16" fill="var(--text-3)" text-anchor="end" font-weight="400">2,1%</text></svg></div><p class="meaning">Ý nghĩa cho mô hình: kiểm tra H+trx+dialog so với thêm geo trước khi quyết định giữ hoặc bỏ.</p>
+    <p class="method">Train 02–08/2022; số mã geohash_6 phân biệt trong 30 ngày trước cutoff. Tỷ lệ dương từng nhóm, không đo khoảng cách.</p><p class="source">Nguồn: aggregate_data.json → rfm.geo; feature_target_associations.csv · cập nhật 11/11/2026</p>
+    <span class="page">A05 / 07</span><div class="notes">Không có null trong geo không có nghĩa dữ liệu sạch nhiễu. Chưa kiểm chứng tốc độ, khoảng cách hay vị trí thật. Không diễn giải cột mã số ẩn danh như tọa độ.</div></section><section class="slide" data-title="Chưa có ΔAP khi bỏ từng nguồn: cần ablation trên cùng nền H" data-section="APPENDIX A6 · ĐÓNG GÓP THEO NGUỒN">
+    <p class="kicker">MBD-MINI / APPENDIX A6 · ĐÓNG GÓP THEO NGUỒN</p><h2>Chưa có ΔAP khi bỏ từng nguồn: cần ablation trên cùng nền H</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:44%"><col style="width:38%"><col style="width:18%"></colgroup><thead><tr><th>Đối chứng cần chạy</th><th>Câu hỏi</th><th>Trạng thái</th></tr></thead><tbody><tr><td>H → H+trx</td><td>Trx tăng AP / Recall@K bao nhiêu?</td><td>Chưa chạy</td></tr><tr><td>H+trx → thêm dialog metadata</td><td>Dialog bổ sung ngoài trx?</td><td>Chưa chạy</td></tr><tr><td>H+trx+dialog → thêm geo</td><td>Geo bổ trợ hay không đáng kể?</td><td>Chưa chạy</td></tr><tr><td>Metadata → metadata + embedding</td><td>Nội dung thêm gì ngoài tần suất?</td><td>Chưa chạy</td></tr><tr><td>Full → bỏ lần lượt từng nguồn</td><td>ΔAP có ổn định theo tháng?</td><td>Chưa chạy</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: giữ split/cohort/config; báo chênh AP, Recall@K và bootstrap theo khách.</p>
+    <p class="method">Bảng thiết kế thí nghiệm, không phải kết quả. Feature importance và tương quan không thay thế ablation có kiểm soát.</p><p class="source">Nguồn: deliverables/baseline-final/REPORT.md → Phần chưa thực hiện · cập nhật 11/11/2026</p>
+    <span class="page">A06 / 07</span><div class="notes">Bảng thiết kế thí nghiệm, không phải kết quả. Feature importance và tương quan không thay thế ablation có kiểm soát.</div></section><section class="slide" data-title="Các chỉ số dùng mẫu số khác nhau và cần đọc đúng phạm vi" data-section="APPENDIX A7 · CÁCH TÍNH">
+    <p class="kicker">MBD-MINI / APPENDIX A7 · CÁCH TÍNH</p><h2>Các chỉ số dùng mẫu số khác nhau và cần đọc đúng phạm vi</h2>
+    <div class="chart"><div class="table-wrap"><table><colgroup><col style="width:35%"><col style="width:65%"></colgroup><thead><tr><th>Chỉ số / thiết kế</th><th>Cách tính / phạm vi</th></tr></thead><tbody><tr><td>Prevalence · lift nhóm</td><td>Dương / số mẫu; lift = prevalence nhóm / prevalence toàn train</td></tr><tr><td>Recall@1% · Precision@1%</td><td>TP trong top 1.003 / tổng dương; TP / 1.003</td></tr><tr><td>AP · macro theo tháng</td><td>Average Precision trên thứ hạng; trung bình đều 09–11/2022</td></tr><tr><td>Bootstrap</td><td>500 lần paired resample theo ID; các tháng cùng ID đi cùng nhau</td></tr><tr><td>Baseline vs rule</td><td>Cùng ngân sách; rule ties phá bằng hash cố định; không dùng yT</td></tr><tr><td>Cutoff / nhãn khả dụng</td><td>event_time < cutoff; lịch sử target chỉ dùng khi available_at ≤ cutoff</td></tr></tbody></table></div></div><p class="meaning">Ý nghĩa cho mô hình: không so metric khác cohort, khác ngân sách hoặc khác giả định nhãn.</p>
+    <p class="method">B+H 156 biến: CatBoost depth 4, 200 cây, learning rate 0,04, L2 5; không resampling/class weight.</p><p class="source">Nguồn: deliverables/baseline-final/REPORT.md; docs/propensity_baseline_design.md · cập nhật 11/11/2026</p>
+    <span class="page">A07 / 07</span><div class="notes">B+H 156 biến: CatBoost depth 4, 200 cây, learning rate 0,04, L2 5; không resampling/class weight.</div></section></main>
+<nav class="deck-nav" aria-label="Điều hướng"><button onclick="location.hash='#/1'">Đầu</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft'}))">←</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight'}))">→</button><button onclick="location.hash='#/20'">Phụ lục</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'o'}))">Mục lục (O)</button><button onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'s'}))">Trình chiếu (S)</button></nav>
+<script>/* html-ppt :: runtime.js
+ * Keyboard-driven deck runtime. Zero dependencies.
+ *
+ * Features:
+ *   ← → / space / PgUp PgDn / Home End  navigation
+ *   F  fullscreen
+ *   S  presenter mode (opens a NEW WINDOW with current/next slide preview + notes + timer)
+ *       The original window stays as audience view, synced via BroadcastChannel.
+ *       Slide previews use CSS transform:scale() at design resolution for pixel-perfect layout.
+ *   N  quick notes overlay (bottom drawer)
+ *   O  slide overview grid
+ *   T  cycle themes (reads data-themes on <html> or <body>)
+ *   A  cycle demo animation on current slide
+ *   URL hash #/N  deep-link to slide N (1-based)
+ *   Progress bar auto-managed
+ */
+(function () {
+  'use strict';
+
+  const ANIMS = ['fade-up','fade-down','fade-left','fade-right','rise-in','drop-in',
+    'zoom-pop','blur-in','glitch-in','typewriter','neon-glow','shimmer-sweep',
+    'gradient-flow','stagger-list','counter-up','path-draw','parallax-tilt',
+    'card-flip-3d','cube-rotate-3d','page-turn-3d','perspective-zoom',
+    'marquee-scroll','kenburns','confetti-burst','spotlight','morph-shape','ripple-reveal'];
+
+  /* Every class the runtime treats as speaker notes. base.css hides the same
+   * set from the audience — if you add one here, add it there too. */
+  const NOTE_SEL = '.notes, aside.notes, .speaker-notes';
+
+  function ready(fn){ if(document.readyState!='loading')fn(); else document.addEventListener('DOMContentLoaded',fn);}
+
+  /* ========== Parse URL for preview-only mode ==========
+   * When loaded as iframe.src = "index.html?preview=3", runtime enters a
+   * locked single-slide mode: only slide N is visible, no chrome, no keys,
+   * no hash updates. This is how the presenter window shows pixel-perfect
+   * previews — by loading the actual deck file in an iframe and telling it
+   * to display only a specific slide.
+   */
+  function getPreviewIdx() {
+    const m = /[?&]preview=(\d+)/.exec(location.search || '');
+    return m ? parseInt(m[1], 10) - 1 : -1;
+  }
+
+  /* ========== Design-canvas fit (issue #20) ==========
+   * Slides are authored against a fixed canvas (1920x1080 by default). The
+   * canvas is scaled — never reflowed — to fit whatever viewport it lands in,
+   * so the browser view, the presenter preview, the overview thumbnail and a
+   * headless PNG render are all the same picture.
+   *
+   * Opt out with <body data-fit="fluid">. Override the canvas per deck with
+   * <div class="deck" data-w="1080" data-h="1440"> (e.g. a 3:4 小红书 post).
+   */
+  function initCanvasFit(deck) {
+    if (document.body.getAttribute('data-fit') === 'fluid') return;
+
+    const w = parseInt(deck.getAttribute('data-w'), 10) || 1920;
+    const h = parseInt(deck.getAttribute('data-h'), 10) || 1080;
+    deck.style.setProperty('--deck-w', w + 'px');
+    deck.style.setProperty('--deck-h', h + 'px');
+
+    function fit() {
+      const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+      deck.style.setProperty('--deck-scale', String(scale));
+    }
+    fit();
+    window.addEventListener('resize', fit);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+    /* Webfonts can land after first paint; re-fit once they do. */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit).catch(function(){});
+  }
+
+  ready(function () {
+    const deck = document.querySelector('.deck');
+    if (!deck) return;
+    const slides = Array.from(deck.querySelectorAll('.slide'));
+    if (!slides.length) return;
+
+    initCanvasFit(deck);
+
+    /* ===== custom logo (issue #11) =====
+     * Deliberately initialised BEFORE the preview-mode branch below: the
+     * presenter's "pixel-perfect" preview is the audience view, so it has to
+     * carry the logo too. A hand-authored <img class="deck-logo"> is left
+     * exactly where it is — base.css styles both paths identically, so a deck
+     * can have a logo with runtime.js absent entirely.
+     */
+    const logoEl = (function initLogo(){
+      const attr = (n) => document.body.getAttribute(n) || document.documentElement.getAttribute(n);
+      let el = deck.querySelector(':scope > .deck-logo');
+      if (!el) {
+        const src = attr('data-logo');
+        if (!src) return null;
+        el = document.createElement('img');
+        el.className = 'deck-logo';
+        el.src = src;
+        el.alt = attr('data-logo-alt') || '';
+        deck.appendChild(el);
+      }
+      if (!el.hasAttribute('data-pos')) {
+        el.setAttribute('data-pos', attr('data-logo-position') || 'top-right');
+      }
+      /* Custom props go on .deck, not on the element: the element inherits
+         them, and the print rules (which paint the logo per page on
+         .slide::after) can read them too. An inline --logo-* on a
+         hand-authored element wins for the element, so mirror it up. */
+      const mirror = (attrName, prop) => {
+        const v = (attrName && attr(attrName)) || el.style.getPropertyValue(prop);
+        if (v) deck.style.setProperty(prop, v.trim());
+      };
+      mirror('data-logo-size', '--logo-size');
+      mirror('data-logo-opacity', '--logo-opacity');
+      mirror(null, '--logo-inset-x');
+      mirror(null, '--logo-inset-y');
+
+      /* Print can't use the element itself — see the @media print note in
+         base.css. Hand the URL and the corner to the per-page painter.
+         Use el.src, not getAttribute('src'): a relative url() inside a custom
+         property is resolved against the stylesheet that *uses* the var()
+         (assets/base.css), not against the deck, so it must be absolute. */
+      const src = el.src;
+      if (src) {
+        deck.style.setProperty('--logo-print', 'url("' + src.replace(/["\\]/g, '\\$&') + '")');
+        deck.setAttribute('data-logo-print', el.getAttribute('data-pos'));
+      }
+      return el;
+    })();
+
+    /* Per-slide opt-out: <section class="slide" data-no-logo> — covers and
+       full-bleed image slides usually carry their own branding. */
+    function syncLogo(slide){
+      if (!logoEl) return;
+      logoEl.style.display = (slide && slide.hasAttribute('data-no-logo')) ? 'none' : '';
+    }
+
+    const previewOnlyIdx = getPreviewIdx();
+    const isPreviewMode = previewOnlyIdx >= 0 && previewOnlyIdx < slides.length;
+
+    /* ===== Preview-only mode: show one slide, hide everything else ===== */
+    if (isPreviewMode) {
+      function showSlide(i) {
+        slides.forEach((s, j) => {
+          const active = (j === i);
+          s.classList.toggle('is-active', active);
+          s.style.display = active ? '' : 'none';
+          if (active) {
+            s.style.opacity = '1';
+            s.style.transform = 'none';
+            s.style.pointerEvents = 'auto';
+          }
+        });
+      }
+      showSlide(previewOnlyIdx);
+      syncLogo(slides[previewOnlyIdx]);
+      /* Hide chrome that the presenter shouldn't see in preview */
+      const hideSel = '.progress-bar, .notes-overlay, .overview, ' + NOTE_SEL;
+      document.querySelectorAll(hideSel).forEach(el => { el.style.display = 'none'; });
+      document.documentElement.setAttribute('data-preview', '1');
+      document.body.setAttribute('data-preview', '1');
+      /* Auto-detect theme base path for theme switching in preview mode */
+      function getPreviewThemeBase() {
+        const base = document.documentElement.getAttribute('data-theme-base');
+        if (base) return base;
+        const tl = document.getElementById('theme-link');
+        if (tl) {
+          const raw = tl.getAttribute('href') || '';
+          const ls = raw.lastIndexOf('/');
+          if (ls >= 0) return raw.substring(0, ls + 1);
+        }
+        return 'assets/themes/';
+      }
+      const previewThemeBase = getPreviewThemeBase();
+
+      /* Listen for postMessage from parent presenter window:
+       *  - preview-goto: switch visible slide WITHOUT reloading
+       *  - preview-theme: switch theme CSS link to match audience window */
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'preview-goto') {
+          const n = parseInt(e.data.idx, 10);
+          if (n >= 0 && n < slides.length) { showSlide(n); syncLogo(slides[n]); }
+        } else if (e.data.type === 'preview-theme' && e.data.name) {
+          let link = document.getElementById('theme-link');
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-link';
+            document.head.appendChild(link);
+          }
+          link.href = previewThemeBase + e.data.name + '.css';
+          document.documentElement.setAttribute('data-theme', e.data.name);
+        }
+      });
+      /* Signal to parent that preview iframe is ready */
+      try { window.parent && window.parent.postMessage({ type: 'preview-ready' }, '*'); } catch(e) {}
+      return;
+    }
+
+    let idx = 0;
+    const total = slides.length;
+
+    /* ===== BroadcastChannel for presenter sync ===== */
+    const CHANNEL_NAME = 'html-ppt-presenter-' + location.pathname;
+    let bc;
+    try { bc = new BroadcastChannel(CHANNEL_NAME); } catch(e) { bc = null; }
+
+    // Are we running inside the presenter popup? (legacy flag, now unused)
+    const isPresenterWindow = false;
+
+    /* ===== progress bar ===== */
+    let bar = document.querySelector('.progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'progress-bar';
+      bar.innerHTML = '<span></span>';
+      document.body.appendChild(bar);
+    }
+    const barFill = bar.querySelector('span');
+
+    /* ===== notes overlay (N key) ===== */
+    let notes = document.querySelector('.notes-overlay');
+    if (!notes) {
+      notes = document.createElement('div');
+      notes.className = 'notes-overlay';
+      document.body.appendChild(notes);
+    }
+
+    /* ===== overview grid (O key) ===== */
+    let overview = document.querySelector('.overview');
+    if (!overview) {
+      overview = document.createElement('div');
+      overview.className = 'overview';
+      slides.forEach((s, i) => {
+        const t = document.createElement('div');
+        t.className = 'thumb';
+        // Force 16:9 aspect ratio robustly
+        t.style.padding = '0 0 56.25% 0';
+        t.style.height = '0';
+        t.style.position = 'relative';
+        t.style.overflow = 'hidden';
+
+        const title = s.getAttribute('data-title') ||
+          (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1));
+
+        // Create a container for the mini-slide
+        const mini = document.createElement('div');
+        mini.className = 'mini-slide';
+        mini.style.position = 'absolute';
+        mini.style.top = '0';
+        mini.style.left = '0';
+        mini.style.width = '1920px';
+        mini.style.height = '1080px';
+        mini.style.transformOrigin = 'top left';
+        mini.style.pointerEvents = 'none';
+        mini.style.background = 'var(--bg)';
+
+        // Clone the slide content
+        const clone = s.cloneNode(true);
+        clone.className = 'slide is-active'; // force active styles
+        clone.style.position = 'absolute';
+        clone.style.inset = '0';
+        clone.style.transform = 'none';
+        clone.style.opacity = '1';
+        clone.style.padding = '72px 96px'; // ensure padding is kept
+
+        mini.appendChild(clone);
+        t.appendChild(mini);
+
+        // Add the number and title overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.inset = '0';
+        overlay.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.8) 100%)';
+        overlay.style.color = '#fff';
+        overlay.style.zIndex = '10';
+        overlay.style.pointerEvents = 'none';
+
+        const n = document.createElement('div');
+        n.className = 'n';
+        n.textContent = i + 1;
+        n.style.position = 'absolute';
+        n.style.top = '12px';
+        n.style.left = '16px';
+        n.style.fontWeight = '700';
+        n.style.fontSize = '16px';
+        n.style.color = '#fff';
+        n.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+
+        const text = document.createElement('div');
+        text.className = 't';
+        text.textContent = title.trim().slice(0,80);
+        text.style.position = 'absolute';
+        text.style.bottom = '12px';
+        text.style.left = '16px';
+        text.style.right = '16px';
+        text.style.fontWeight = '600';
+        text.style.fontSize = '14px';
+        text.style.color = '#fff';
+        text.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+
+        overlay.appendChild(n);
+        overlay.appendChild(text);
+        t.appendChild(overlay);
+
+        t.addEventListener('click', () => { go(i); toggleOverview(false); });
+        overview.appendChild(t);
+      });
+      document.body.appendChild(overview);
+    }
+
+    /* ===== navigation ===== */
+    function go(n, fromRemote){
+      n = Math.max(0, Math.min(total-1, n));
+      slides.forEach((s,i) => {
+        s.classList.toggle('is-active', i===n);
+        s.classList.toggle('is-prev', i<n);
+      });
+      idx = n;
+      syncLogo(slides[n]);
+      barFill.style.width = ((n+1)/total*100)+'%';
+      const numEl = document.querySelector('.slide-number');
+      if (numEl) { numEl.setAttribute('data-current', n+1); numEl.setAttribute('data-total', total); }
+
+      // notes (bottom overlay)
+      const note = slides[n].querySelector(NOTE_SEL);
+      notes.innerHTML = note ? note.innerHTML : '';
+
+      // hash
+      const hashTarget = '#/'+(n+1);
+      if (location.hash !== hashTarget && !isPresenterWindow) {
+        history.replaceState(null,'', hashTarget);
+      }
+
+      // re-trigger entry animations
+      slides[n].querySelectorAll('[data-anim]').forEach(el => {
+        const a = el.getAttribute('data-anim');
+        el.classList.remove('anim-'+a);
+        void el.offsetWidth;
+        el.classList.add('anim-'+a);
+      });
+
+      // counter-up
+      slides[n].querySelectorAll('.counter').forEach(el => {
+        const target = parseFloat(el.getAttribute('data-to')||el.textContent);
+        const dur = parseInt(el.getAttribute('data-dur')||'1200',10);
+        const start = performance.now();
+        const from = 0;
+        function tick(now){
+          const t = Math.min(1,(now-start)/dur);
+          const v = from + (target-from)*(1-Math.pow(1-t,3));
+          el.textContent = (target % 1 === 0) ? Math.round(v) : v.toFixed(1);
+          if (t<1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+
+      // Broadcast to other window (audience ↔ presenter)
+      if (!fromRemote && bc) {
+        bc.postMessage({ type: 'go', idx: n });
+      }
+    }
+
+    /* ===== listen for remote navigation / theme changes ===== */
+    if (bc) {
+      bc.onmessage = function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'go' && typeof e.data.idx === 'number') {
+          go(e.data.idx, true);
+        } else if (e.data.type === 'theme' && e.data.name) {
+          /* Sync theme across windows */
+          const i = themes.indexOf(e.data.name);
+          if (i >= 0) themeIdx = i;
+          applyTheme(e.data.name);
+        }
+      };
+    }
+
+    function toggleNotes(force){ notes.classList.toggle('open', force!==undefined?force:!notes.classList.contains('open')); }
+    function toggleOverview(force){
+      const isOpen = force!==undefined ? force : !overview.classList.contains('open');
+      overview.classList.toggle('open', isOpen);
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          const thumbs = overview.querySelectorAll('.thumb');
+          if (thumbs.length) {
+            const scale = thumbs[0].clientWidth / 1920;
+            overview.querySelectorAll('.mini-slide').forEach(m => {
+              m.style.transform = 'scale(' + scale + ')';
+            });
+          }
+        });
+      }
+    }
+
+    /* ========== PRESENTER MODE — Magnetic-card popup window ========== */
+    /* Opens a new window with 4 draggable, resizable cards:
+     *   CURRENT  — iframe(?preview=N)   pixel-perfect preview of current slide
+     *   NEXT     — iframe(?preview=N+1) pixel-perfect preview of next slide
+     *   SCRIPT   — large speaker notes (逐字稿)
+     *   TIMER    — elapsed timer + page counter + controls
+     * Cards remember position/size in localStorage.
+     * Two windows sync via BroadcastChannel.
+     */
+    let presenterWin = null;
+
+    function openPresenterWindow() {
+      if (presenterWin && !presenterWin.closed) {
+        presenterWin.focus();
+        return;
+      }
+
+      // Build absolute URL of THIS deck file (without hash/query)
+      const deckUrl = location.protocol + '//' + location.host + location.pathname;
+
+      // Collect slide titles + notes (HTML strings)
+      const slideMeta = slides.map((s, i) => {
+        const note = s.querySelector(NOTE_SEL);
+        return {
+          title: s.getAttribute('data-title') ||
+            (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1)),
+          notes: note ? note.innerHTML : ''
+        };
+      });
+
+      /* Capture current theme so presenter previews match the audience */
+      const currentTheme = root.getAttribute('data-theme') || (themes[themeIdx] || '');
+      const presenterHTML = buildPresenterHTML(deckUrl, slideMeta, total, idx, CHANNEL_NAME, currentTheme);
+
+      presenterWin = window.open('', 'html-ppt-presenter', 'width=1280,height=820,menubar=no,toolbar=no');
+      if (!presenterWin) {
+        alert('请允许弹出窗口以使用演讲者视图');
+        return;
+      }
+      presenterWin.document.open();
+      presenterWin.document.write(presenterHTML);
+      presenterWin.document.close();
+    }
+
+    function buildPresenterHTML(deckUrl, slideMeta, total, startIdx, channelName, currentTheme) {
+      /* Notes are authored HTML. Escaping "<" keeps a literal <\/script> in a
+         slide's notes from closing the inline script that carries this JSON —
+         which would kill the whole presenter init. */
+      const embed = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+      const metaJSON = embed(slideMeta);
+      const deckUrlJSON = embed(deckUrl);
+      const channelJSON = embed(channelName);
+      const themeJSON = embed(currentTheme || '');
+      const storageKey = 'html-ppt-presenter:' + location.pathname;
+
+      // Build the document as a single template string for clarity
+      return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Presenter View</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #1a1d24;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(88,166,255,.04), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(188,140,255,.04), transparent 50%);
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+  }
+  /* Stage: positioned area where cards live */
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+
+  /* Magnetic card */
+  .pcard {
+    position: absolute;
+    background: #0d1117;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.02);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    min-width: 180px; min-height: 100px;
+    transition: box-shadow .2s, border-color .2s;
+  }
+
+  /* Default geometry. The cards used to get position and size ONLY from
+     applyLayout(), which runs at the very end of the init — so anything that
+     stopped that script (a blocked inline script under CSP, a stale layout in
+     localStorage, any throw in the wiring above it) left four cards collapsed
+     on top of each other and just the hint bar visible (#14). These rules make
+     the presenter usable with zero JS; applyLayout() overrides them with px. */
+  #card-cur   { left: 16px; top: 16px;
+                width: calc(55% - 24px);  height: calc((100% - 36px) * 0.62 - 16px); }
+  #card-nxt   { left: calc(55% + 8px); top: 16px;
+                width: calc(45% - 24px);  height: calc((100% - 36px) * 0.42 - 16px); }
+  #card-notes { left: calc(55% + 8px); top: calc((100% - 36px) * 0.42 + 8px);
+                width: calc(45% - 24px);  height: calc((100% - 36px) * 0.58 - 16px); }
+  #card-timer { left: 16px; top: calc((100% - 36px) * 0.62 + 8px);
+                width: calc(55% - 24px);  height: calc((100% - 36px) * 0.38 - 16px); }
+
+  .pcard.dragging { box-shadow: 0 16px 48px rgba(0,0,0,.6), 0 0 0 2px rgba(88,166,255,.5); border-color: #58a6ff; transition: none; z-index: 9999; }
+  .pcard.resizing { box-shadow: 0 16px 48px rgba(0,0,0,.6), 0 0 0 2px rgba(63,185,80,.5); border-color: #3fb950; transition: none; z-index: 9999; }
+  .pcard:hover { border-color: rgba(88,166,255,.3); }
+
+  /* Card header (drag handle) */
+  .pcard-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.04);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    cursor: move;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .pcard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-color, #58a6ff); flex-shrink: 0; }
+  .pcard-title {
+    font-size: 11px; letter-spacing: .15em; text-transform: uppercase;
+    font-weight: 700; color: #8b949e; flex: 1;
+  }
+  .pcard-meta { font-size: 11px; color: #6e7681; }
+
+  /* Card body */
+  .pcard-body { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+
+  /* Preview cards (CURRENT/NEXT) — iframe-based pixel-perfect render */
+  .pcard-preview .pcard-body { background: #000; }
+  .pcard-preview iframe {
+    position: absolute; top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    border: none;
+    transform-origin: top left;
+    pointer-events: none;
+    background: transparent;
+  }
+  .pcard-preview .preview-end {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #484f58; font-size: 14px; letter-spacing: .12em;
+  }
+
+  /* Notes card */
+  .pcard-notes .pcard-body {
+    padding: 14px 18px;
+    overflow-y: auto;
+    font-size: 18px; line-height: 1.75;
+    color: #d0d7de;
+    font-family: "Noto Sans SC", -apple-system, sans-serif;
+  }
+  .pcard-notes .pcard-body p { margin: 0 0 .7em 0; }
+  .pcard-notes .pcard-body strong { color: #f0883e; }
+  .pcard-notes .pcard-body em { color: #58a6ff; font-style: normal; }
+  .pcard-notes .pcard-body code {
+    font-family: "SF Mono", monospace; font-size: .9em;
+    background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 4px;
+  }
+  .pcard-notes .empty { color: #484f58; font-style: italic; }
+
+  /* Timer card */
+  .pcard-timer .pcard-body {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 18px 20px; justify-content: center;
+  }
+  .timer-display {
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 42px; font-weight: 700;
+    color: #3fb950;
+    letter-spacing: .04em;
+    line-height: 1;
+  }
+  .timer-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; color: #8b949e;
+  }
+  .timer-row .label { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #6e7681; }
+  .timer-row .val { color: #e6edf3; font-weight: 600; font-family: "SF Mono", monospace; }
+  .timer-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .timer-btn {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    color: #e6edf3;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .timer-btn:hover { background: rgba(88,166,255,.15); border-color: #58a6ff; }
+  .timer-btn:active { transform: translateY(1px); }
+
+  /* Resize handle */
+  .pcard-resize {
+    position: absolute; right: 0; bottom: 0;
+    width: 18px; height: 18px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 60%, transparent 60%, transparent 70%, rgba(255,255,255,.25) 70%, rgba(255,255,255,.25) 80%, transparent 80%);
+    z-index: 5;
+  }
+  .pcard-resize:hover { background: linear-gradient(135deg, transparent 50%, #58a6ff 50%, #58a6ff 60%, transparent 60%, transparent 70%, #58a6ff 70%, #58a6ff 80%, transparent 80%); }
+
+  /* Bottom hint bar */
+  .hint-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 6px 16px;
+    font-size: 11px; color: #8b949e;
+    display: flex; gap: 18px; align-items: center;
+    z-index: 1000;
+  }
+  .hint-bar kbd {
+    background: rgba(255,255,255,.08);
+    padding: 1px 6px; border-radius: 3px;
+    font-family: "SF Mono", monospace;
+    font-size: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    color: #e6edf3;
+  }
+  .hint-bar .reset-layout {
+    margin-left: auto;
+    background: transparent; border: 1px solid rgba(255,255,255,.15);
+    color: #8b949e; padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
+  }
+  .hint-bar .reset-layout:hover { background: rgba(248,81,73,.15); border-color: #f85149; color: #f85149; }
+
+  body.is-dragging-card * { user-select: none !important; }
+  body.is-dragging-card iframe { pointer-events: none !important; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="pcard pcard-preview" id="card-cur" style="--dot-color:#58a6ff">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">CURRENT</span>
+      <span class="pcard-meta" id="cur-meta">—</span>
+    </div>
+    <div class="pcard-body"><iframe id="iframe-cur"></iframe></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-preview" id="card-nxt" style="--dot-color:#bc8cff">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">NEXT</span>
+      <span class="pcard-meta" id="nxt-meta">—</span>
+    </div>
+    <div class="pcard-body"><iframe id="iframe-nxt"></iframe></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-notes" id="card-notes" style="--dot-color:#f0883e">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">SPEAKER SCRIPT · 逐字稿</span>
+    </div>
+    <div class="pcard-body" id="notes-body"></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-timer" id="card-timer" style="--dot-color:#3fb950">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">TIMER</span>
+    </div>
+    <div class="pcard-body">
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div class="timer-row">
+        <span class="label">Slide</span>
+        <span class="val" id="timer-count">1 / ${total}</span>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn" id="btn-prev">← Prev</button>
+        <button class="timer-btn" id="btn-next">Next →</button>
+        <button class="timer-btn" id="btn-reset">⏱ Reset</button>
+      </div>
+    </div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+</div>
+
+<div class="hint-bar">
+  <span><kbd>← →</kbd> 翻页</span>
+  <span><kbd>R</kbd> 重置计时</span>
+  <span><kbd>Esc</kbd> 关闭</span>
+  <span style="color:#6e7681">拖动卡片头部移动 · 拖动右下角调整大小</span>
+  <button class="reset-layout" id="reset-layout">重置布局</button>
+</div>
+
+<script>
+(function(){
+  var slideMeta = ${metaJSON};
+  var total = ${total};
+  var idx = ${startIdx};
+  var deckUrl = ${deckUrlJSON};
+  var STORAGE_KEY = ${embed(storageKey)};
+  var bc;
+  try { bc = new BroadcastChannel(${channelJSON}); } catch(e) {}
+
+  var iframeCur = document.getElementById('iframe-cur');
+  var iframeNxt = document.getElementById('iframe-nxt');
+  var notesBody = document.getElementById('notes-body');
+  var curMeta = document.getElementById('cur-meta');
+  var nxtMeta = document.getElementById('nxt-meta');
+  var timerDisplay = document.getElementById('timer-display');
+  var timerCount = document.getElementById('timer-count');
+
+  /* Lay the cards out before anything else. This used to be the LAST statement
+     of the init, so every line below it was a single point of failure for the
+     whole presenter's visibility (#14). Function declarations hoist, so this is
+     safe here. */
+  applyLayout(readLayout());
+
+  /* ===== Default card layout ===== */
+  var CARD_IDS = ['card-cur','card-nxt','card-notes','card-timer'];
+  var MIN_W = 180, MIN_H = 100;
+
+  function defaultLayout() {
+    /* A popup that opened minimised or in a background tab can report 0 here;
+       the old code turned that into negative widths, which CSS discards. */
+    var w = Math.max(640, window.innerWidth || 0);
+    var h = Math.max(400, (window.innerHeight || 0) - 36); /* room for hint bar */
+    return {
+      'card-cur':   { x: 16,        y: 16,            w: Math.round(w*0.55) - 24, h: Math.round(h*0.62) - 16 },
+      'card-nxt':   { x: Math.round(w*0.55) + 8, y: 16, w: w - Math.round(w*0.55) - 24, h: Math.round(h*0.42) - 16 },
+      'card-notes': { x: Math.round(w*0.55) + 8, y: Math.round(h*0.42) + 8, w: w - Math.round(w*0.55) - 24, h: h - Math.round(h*0.42) - 16 },
+      'card-timer': { x: 16,        y: Math.round(h*0.62) + 8, w: Math.round(w*0.55) - 24, h: h - Math.round(h*0.62) - 16 }
+    };
+  }
+
+  /* ===== Apply / save / restore layout ===== */
+  function applyLayout(layout) {
+    Object.keys(layout).forEach(function(id){
+      var el = document.getElementById(id);
+      var l = layout[id];
+      if (el && l) {
+        el.style.left = l.x + 'px';
+        el.style.top = l.y + 'px';
+        el.style.width = l.w + 'px';
+        el.style.height = l.h + 'px';
+      }
+    });
+    rescaleAll();
+  }
+  /* A layout restored from localStorage was written against whatever window
+     size the deck was last presented at. Replayed in a smaller window it puts
+     every card off-screen, and there is no way back because the layout is
+     sticky — so clamp it into view and reject anything malformed. */
+  function sanitizeLayout(layout) {
+    if (!layout || typeof layout !== 'object') return null;
+    var vw = Math.max(MIN_W, window.innerWidth || 0);
+    var vh = Math.max(MIN_H, window.innerHeight || 0);
+    var out = {};
+    for (var i = 0; i < CARD_IDS.length; i++) {
+      var l = layout[CARD_IDS[i]];
+      if (!l) return null;
+      var cw = Math.min(Math.max(+l.w || 0, MIN_W), vw);
+      var ch = Math.min(Math.max(+l.h || 0, MIN_H), vh);
+      var cx = Math.min(Math.max(+l.x || 0, 0), Math.max(0, vw - MIN_W));
+      var cy = Math.min(Math.max(+l.y || 0, 0), Math.max(0, vh - 40));
+      if (!isFinite(cw) || !isFinite(ch) || !isFinite(cx) || !isFinite(cy)) return null;
+      out[CARD_IDS[i]] = { x: cx, y: cy, w: cw, h: ch };
+    }
+    return out;
+  }
+  function readLayout() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+    return sanitizeLayout(saved) || defaultLayout();
+  }
+  function saveLayout() {
+    var layout = {};
+    CARD_IDS.forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) {
+        layout[id] = {
+          x: parseInt(el.style.left,10) || 0,
+          y: parseInt(el.style.top,10) || 0,
+          w: parseInt(el.style.width,10) || 300,
+          h: parseInt(el.style.height,10) || 200
+        };
+      }
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(layout)); } catch(e) {}
+  }
+
+  /* ===== iframe rescale to fit card body ===== */
+  function rescaleIframe(iframe) {
+    if (!iframe || iframe.style.display === 'none') return;
+    var body = iframe.parentElement;
+    var cw = body.clientWidth, ch = body.clientHeight;
+    if (!cw || !ch) return;
+    var s = Math.min(cw / 1920, ch / 1080);
+    iframe.style.transform = 'scale(' + s + ')';
+    /* Center the scaled iframe in the body */
+    var sw = 1920 * s, sh = 1080 * s;
+    iframe.style.left = Math.max(0, (cw - sw) / 2) + 'px';
+    iframe.style.top = Math.max(0, (ch - sh) / 2) + 'px';
+  }
+  function rescaleAll() {
+    rescaleIframe(iframeCur);
+    rescaleIframe(iframeNxt);
+  }
+  window.addEventListener('resize', rescaleAll);
+
+  /* ===== Drag (move card by header) ===== */
+  document.querySelectorAll('[data-drag]').forEach(function(handle){
+    handle.addEventListener('mousedown', function(e){
+      if (e.button !== 0) return;
+      var card = handle.closest('.pcard');
+      if (!card) return;
+      e.preventDefault();
+      card.classList.add('dragging');
+      document.body.classList.add('is-dragging-card');
+      var startX = e.clientX, startY = e.clientY;
+      var startL = parseInt(card.style.left,10) || 0;
+      var startT = parseInt(card.style.top,10)  || 0;
+      function onMove(ev){
+        var nx = Math.max(0, Math.min(window.innerWidth - 100, startL + ev.clientX - startX));
+        var ny = Math.max(0, Math.min(window.innerHeight - 50, startT + ev.clientY - startY));
+        card.style.left = nx + 'px';
+        card.style.top = ny + 'px';
+      }
+      function onUp(){
+        card.classList.remove('dragging');
+        document.body.classList.remove('is-dragging-card');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        saveLayout();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+
+  /* ===== Resize (drag bottom-right corner) ===== */
+  document.querySelectorAll('[data-resize]').forEach(function(handle){
+    handle.addEventListener('mousedown', function(e){
+      if (e.button !== 0) return;
+      var card = handle.closest('.pcard');
+      if (!card) return;
+      e.preventDefault(); e.stopPropagation();
+      card.classList.add('resizing');
+      document.body.classList.add('is-dragging-card');
+      var startX = e.clientX, startY = e.clientY;
+      var startW = parseInt(card.style.width,10)  || card.offsetWidth;
+      var startH = parseInt(card.style.height,10) || card.offsetHeight;
+      function onMove(ev){
+        var nw = Math.max(180, startW + ev.clientX - startX);
+        var nh = Math.max(100, startH + ev.clientY - startY);
+        card.style.width = nw + 'px';
+        card.style.height = nh + 'px';
+        if (card.querySelector('iframe')) rescaleIframe(card.querySelector('iframe'));
+      }
+      function onUp(){
+        card.classList.remove('resizing');
+        document.body.classList.remove('is-dragging-card');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        rescaleAll();
+        saveLayout();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+
+  /* ===== Preview iframe ready tracking =====
+   * Each iframe loads the deck ONCE with ?preview=1 on init. Subsequent
+   * slide changes are sent via postMessage('preview-goto') so the iframe
+   * just toggles visibility of a different .slide — no reload, no flicker.
+   */
+  var iframeReady = { cur: false, nxt: false };
+  var currentTheme = ${themeJSON};
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'preview-ready') return;
+    var iframe = null;
+    if (e.source === iframeCur.contentWindow) {
+      iframeReady.cur = true;
+      iframe = iframeCur;
+      postPreviewGoto(iframeCur, idx);
+    } else if (e.source === iframeNxt.contentWindow) {
+      iframeReady.nxt = true;
+      iframe = iframeNxt;
+      postPreviewGoto(iframeNxt, idx + 1 < total ? idx + 1 : idx);
+    }
+    /* Sync current theme to the iframe */
+    if (iframe && currentTheme) {
+      try { iframe.contentWindow.postMessage({ type: 'preview-theme', name: currentTheme }, '*'); } catch(err) {}
+    }
+    if (iframe) rescaleIframe(iframe);
+  });
+
+  function postPreviewGoto(iframe, n) {
+    try {
+      iframe.contentWindow.postMessage({ type: 'preview-goto', idx: n }, '*');
+    } catch(e) {}
+  }
+
+  /* ===== Update content =====
+   * Smooth (no-reload) navigation: send postMessage to iframes instead of
+   * resetting src. Iframes stay loaded, just switch visible .slide.
+   */
+  function update(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    idx = n;
+
+    /* Current preview — postMessage (smooth) */
+    if (iframeReady.cur) postPreviewGoto(iframeCur, n);
+    curMeta.textContent = (n + 1) + '/' + total;
+
+    /* Next preview */
+    if (n + 1 < total) {
+      iframeNxt.style.display = '';
+      var endEl = document.querySelector('#card-nxt .preview-end');
+      if (endEl) endEl.remove();
+      if (iframeReady.nxt) postPreviewGoto(iframeNxt, n + 1);
+      nxtMeta.textContent = (n + 2) + '/' + total;
+    } else {
+      iframeNxt.style.display = 'none';
+      var body = document.querySelector('#card-nxt .pcard-body');
+      if (body && !body.querySelector('.preview-end')) {
+        var end = document.createElement('div');
+        end.className = 'preview-end';
+        end.textContent = '— END OF DECK —';
+        body.appendChild(end);
+      }
+      nxtMeta.textContent = 'END';
+    }
+
+    /* Notes */
+    var note = slideMeta[n].notes;
+    notesBody.innerHTML = note || '<span class="empty">（这一页还没有逐字稿）</span>';
+
+    /* Timer count */
+    timerCount.textContent = (n + 1) + ' / ' + total;
+  }
+
+  /* ===== Timer ===== */
+  var tStart = Date.now();
+  setInterval(function(){
+    var s = Math.floor((Date.now() - tStart) / 1000);
+    var mm = String(Math.floor(s/60)).padStart(2,'0');
+    var ss = String(s%60).padStart(2,'0');
+    timerDisplay.textContent = mm + ':' + ss;
+  }, 1000);
+  function resetTimer(){ tStart = Date.now(); timerDisplay.textContent = '00:00'; }
+
+  /* ===== BroadcastChannel sync ===== */
+  if (bc) {
+    bc.onmessage = function(e){
+      if (!e.data) return;
+      if (e.data.type === 'go') update(e.data.idx);
+      else if (e.data.type === 'theme' && e.data.name) {
+        currentTheme = e.data.name;
+        /* Forward theme change to preview iframes */
+        [iframeCur, iframeNxt].forEach(function(iframe){
+          try {
+            iframe.contentWindow.postMessage({ type: 'preview-theme', name: e.data.name }, '*');
+          } catch(err) {}
+        });
+      }
+    };
+  }
+  function go(n) {
+    update(n);
+    if (bc) bc.postMessage({ type: 'go', idx: idx });
+  }
+
+  /* ===== Buttons ===== */
+  document.getElementById('btn-prev').addEventListener('click', function(){ go(idx - 1); });
+  document.getElementById('btn-next').addEventListener('click', function(){ go(idx + 1); });
+  document.getElementById('btn-reset').addEventListener('click', resetTimer);
+  document.getElementById('reset-layout').addEventListener('click', function(){
+    if (confirm('恢复默认卡片布局？')) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+      applyLayout(defaultLayout());
+    }
+  });
+
+  /* ===== Keyboard ===== */
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch(e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': go(idx + 1); e.preventDefault(); break;
+      case 'ArrowLeft':  case 'PageUp':   go(idx - 1); e.preventDefault(); break;
+      case 'Home': go(0); break;
+      case 'End':  go(total - 1); break;
+      case 'r': case 'R': resetTimer(); break;
+      case 'Escape': window.close(); break;
+    }
+  });
+
+  /* ===== Iframe load → rescale (catches initial size) ===== */
+  iframeCur.addEventListener('load', function(){ rescaleIframe(iframeCur); });
+  iframeNxt.addEventListener('load', function(){ rescaleIframe(iframeNxt); });
+
+  /* ===== Init =====
+   * Load each iframe ONCE with the deck file. After they post
+   * 'preview-ready', all subsequent navigation is via postMessage
+   * (smooth, no reload, no flicker).
+   */
+  try {
+    iframeCur.src = deckUrl + '?preview=' + (idx + 1);
+    if (idx + 1 < total) iframeNxt.src = deckUrl + '?preview=' + (idx + 2);
+    /* Initialize notes/timer/count without touching iframes */
+    var m = slideMeta[idx] || {};
+    notesBody.innerHTML = m.notes || '<span class="empty">（这一页还没有逐字稿）</span>';
+    curMeta.textContent = (idx + 1) + '/' + total;
+    nxtMeta.textContent = (idx + 2) + '/' + total;
+    timerCount.textContent = (idx + 1) + ' / ' + total;
+  } catch (e) {
+    /* Report it, but never let it blank the cards. */
+    if (window.console && console.error) console.error('[html-ppt] presenter init:', e);
+  }
+})();
+</` + `script>
+</body></html>`;
+    }
+
+    function fullscreen(){ const el=document.documentElement;
+      if (!document.fullscreenElement) el.requestFullscreen&&el.requestFullscreen();
+      else document.exitFullscreen&&document.exitFullscreen();
+    }
+
+    // theme cycling
+    const root = document.documentElement;
+    const themesAttr = root.getAttribute('data-themes') || document.body.getAttribute('data-themes');
+    const themes = themesAttr ? themesAttr.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    let themeIdx = 0;
+
+    // Auto-detect theme base path from existing <link id="theme-link">
+    let themeBase = root.getAttribute('data-theme-base');
+    if (!themeBase) {
+      const existingLink = document.getElementById('theme-link');
+      if (existingLink) {
+        // el.getAttribute('href') gives the raw relative path written in HTML
+        const rawHref = existingLink.getAttribute('href') || '';
+        const lastSlash = rawHref.lastIndexOf('/');
+        themeBase = lastSlash >= 0 ? rawHref.substring(0, lastSlash + 1) : 'assets/themes/';
+      } else {
+        themeBase = 'assets/themes/';
+      }
+    }
+
+    function applyTheme(name) {
+      let link = document.getElementById('theme-link');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.id = 'theme-link';
+        document.head.appendChild(link);
+      }
+      link.href = themeBase + name + '.css';
+      root.setAttribute('data-theme', name);
+      const ind = document.querySelector('.theme-indicator');
+      if (ind) ind.textContent = name;
+    }
+    function cycleTheme(fromRemote){
+      if (!themes.length) return;
+      themeIdx = (themeIdx+1) % themes.length;
+      const name = themes[themeIdx];
+      applyTheme(name);
+      /* Broadcast to other window (audience ↔ presenter) */
+      if (!fromRemote && bc) bc.postMessage({ type: 'theme', name: name });
+    }
+
+    // animation cycling on current slide
+    let animIdx = 0;
+    function cycleAnim(){
+      animIdx = (animIdx+1) % ANIMS.length;
+      const a = ANIMS[animIdx];
+      const target = slides[idx].querySelector('[data-anim-target]') || slides[idx];
+      ANIMS.forEach(x => target.classList.remove('anim-'+x));
+      void target.offsetWidth;
+      target.classList.add('anim-'+a);
+      target.setAttribute('data-anim', a);
+      const ind = document.querySelector('.anim-indicator');
+      if (ind) ind.textContent = a;
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
+        case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
+        case 'Home': go(0); break;
+        case 'End': go(total-1); break;
+        case 'f': case 'F': fullscreen(); break;
+        case 's': case 'S': openPresenterWindow(); break;
+        case 'n': case 'N': toggleNotes(); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 't': case 'T': cycleTheme(); break;
+        case 'a': case 'A': cycleAnim(); break;
+        case 'Escape': toggleOverview(false); toggleNotes(false); break;
+      }
+    });
+
+    /* ===== Touch navigation =====
+     * Phones have no arrow keys (#15). Swipe left for next, right for prev.
+     *
+     * Deliberately passive: we never call preventDefault, so pinch-zoom and
+     * any native scrolling keep working and the browser is free to scroll
+     * while we are still deciding. A gesture only counts as a swipe if it is
+     * single-finger, clearly horizontal, long enough and quick enough —
+     * otherwise it falls through untouched.
+     */
+    (function initTouchNav(){
+      /* No capability sniffing on purpose. Touch listeners cost nothing on a
+         device that never fires them, and `ontouchstart in window` /
+         maxTouchPoints both misreport on touchscreen laptops and some
+         tablets — a guard here would silently remove the feature on exactly
+         the devices that need it. */
+      var SWIPE_MIN_PX = 50;    // shorter than this is a tap or a wobble
+      var SWIPE_RATIO  = 1.5;   // must be this much more horizontal than vertical
+      var SWIPE_MAX_MS = 800;   // slower than this is a drag, not a swipe
+
+      var x0 = 0, y0 = 0, t0 = 0, tracking = false;
+
+      function interactive(target) {
+        if (!target || !target.closest) return false;
+        /* Don't steal the gesture from the overview grid, the notes drawer,
+           or anything the author made scrollable or tappable. */
+        return !!target.closest('.overview, .notes-overlay, a, button, input, textarea, select, [data-no-swipe]');
+      }
+
+      document.addEventListener('touchstart', function(e){
+        if (e.touches.length !== 1 || interactive(e.target)) { tracking = false; return; }
+        x0 = e.touches[0].clientX;
+        y0 = e.touches[0].clientY;
+        t0 = Date.now();
+        tracking = true;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function(e){
+        /* A second finger means pinch-zoom — abandon the swipe. */
+        if (e.touches.length > 1) tracking = false;
+      }, { passive: true });
+
+      document.addEventListener('touchend', function(e){
+        if (!tracking) return;
+        tracking = false;
+        var t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        if (Date.now() - t0 > SWIPE_MAX_MS) return;
+        var dx = t.clientX - x0, dy = t.clientY - y0;
+        if (Math.abs(dx) < SWIPE_MIN_PX) return;
+        if (Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return;
+        go(dx < 0 ? idx + 1 : idx - 1);
+      }, { passive: true });
+
+      document.addEventListener('touchcancel', function(){ tracking = false; }, { passive: true });
+    })();
+
+    // hash deep-link
+    function fromHash(){
+      const m = /^#\/(\d+)/.exec(location.hash||'');
+      if (m) go(Math.max(0, parseInt(m[1],10)-1));
+    }
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+    go(idx);
+  });
+})();
+</script></body></html>

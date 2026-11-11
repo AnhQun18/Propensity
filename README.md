@@ -2,6 +2,10 @@
 
 Repository chứa package **7 bước thống kê mô tả** và tài liệu nghiên cứu propensity cho MBD-mini.
 
+**Deck tổng hợp EDA và tính phù hợp dữ liệu:** [HTML 19 slide chính + 7 phụ lục](deliverables/propensity-data-story/index.html).
+Nền sáng navy/teal, biểu đồ SVG và ghi chú cách tính; mở trực tiếp trình duyệt.
+Xem [phạm vi số liệu và hướng dẫn trình chiếu](deliverables/propensity-data-story/README.md).
+
 **Notebook EDA đủ 7 bước:** [notebooks/eda.ipynb](notebooks/eda.ipynb) đã chạy toàn bộ raw
 và 221 đặc trưng trên train. [Báo cáo HTML](deliverables/eda/report.html) có 12 biểu đồ,
 57 bảng CSV, kiểm tra thiếu/trùng/ngoại lai và kế hoạch Feature Engineering.
