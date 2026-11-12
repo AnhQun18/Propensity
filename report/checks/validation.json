@@ -1,0 +1,29 @@
+{
+  "pass_all": true,
+  "checks": {
+    "all_primary_table_hashes_match": true,
+    "reused_dataset_fingerprint_matches": true,
+    "current_raw_file_sizes_and_timestamps_match": true,
+    "snapshot_population_keys_binary_labels": true,
+    "cumulative_history_unique_and_before_cutoff": true,
+    "dialog_active_day_groups_cover_same_population": true,
+    "all_45_section_12_requirements_registered": true,
+    "no_missing_requirement_artifacts": true,
+    "pooled_counts_reconcile": true,
+    "monthly_counts_reconcile": true,
+    "wilson_bounds": true,
+    "small_sample_flags_exact": true,
+    "buyer_shares_sum_one": true,
+    "snapshot_counts_match_temporal_audit": true,
+    "cumulative_counts_match_temporal_audit": true,
+    "no_presentations_or_screenshot_files": true,
+    "no_model_fits": true,
+    "all_images_are_valid_code_generated_matplotlib_outputs": true
+  },
+  "dataset_fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "script_sha256": "6b5b638eb429ad39cb773cb177f3bf90a6bbec3fa6d436b438ec6590b8af0f23",
+  "model_fits": 0,
+  "elapsed_seconds": 83.1,
+  "analysis_execution_script_sha256": "12161f4ef6541a3fd47a9dae58f5004f77e3b69f414cb291da96d0f420ba8f7c",
+  "post_validation_patch": "Manifest writer excludes its own CSV on repeated runs; numerical outputs unchanged and re-hashed."
+}

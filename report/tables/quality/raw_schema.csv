@@ -1,0 +1,62 @@
+source,column,dtype
+clients,client_id,string
+clients,fold,Hive partition integer
+targets,client_id,string
+targets,mon,string
+targets,target_1,int32
+targets,target_2,int32
+targets,target_3,int32
+targets,target_4,int32
+targets,trans_count,int32
+targets,diff_trans_date,int32
+targets,fold,Hive partition integer
+trx,client_id,string
+trx,event_time,timestamp[ns]
+trx,amount,float
+trx,event_type,int32
+trx,event_subtype,int32
+trx,currency,int32
+trx,src_type11,int32
+trx,src_type12,int32
+trx,dst_type11,int32
+trx,dst_type12,int32
+trx,src_type21,int32
+trx,src_type22,int32
+trx,src_type31,int32
+trx,src_type32,int32
+trx,fold,Hive partition integer
+geo,client_id,string
+geo,event_time,timestamp[ns]
+geo,geohash_4,int32
+geo,geohash_5,int32
+geo,geohash_6,int32
+geo,fold,Hive partition integer
+dialog,client_id,string
+dialog,event_time,timestamp[ns]
+dialog,embedding,list<element: float>
+dialog,fold,Hive partition integer
+ptls_trx,client_id,string
+ptls_trx,event_time,list<element: int64>
+ptls_trx,amount,list<element: float>
+ptls_trx,event_type,list<element: int32>
+ptls_trx,event_subtype,list<element: int32>
+ptls_trx,currency,list<element: int32>
+ptls_trx,src_type11,list<element: int32>
+ptls_trx,src_type12,list<element: int32>
+ptls_trx,dst_type11,list<element: int32>
+ptls_trx,dst_type12,list<element: int32>
+ptls_trx,src_type21,list<element: int32>
+ptls_trx,src_type22,list<element: int32>
+ptls_trx,src_type31,list<element: int32>
+ptls_trx,src_type32,list<element: int32>
+ptls_trx,fold,Hive partition integer
+ptls_geo,client_id,string
+ptls_geo,event_time,list<element: int64>
+ptls_geo,geohash_4,list<element: int32>
+ptls_geo,geohash_5,list<element: int32>
+ptls_geo,geohash_6,list<element: int32>
+ptls_geo,fold,Hive partition integer
+ptls_dialog,client_id,string
+ptls_dialog,event_time,list<element: int64>
+ptls_dialog,embedding,list<element: list<element: float>>
+ptls_dialog,fold,Hive partition integer

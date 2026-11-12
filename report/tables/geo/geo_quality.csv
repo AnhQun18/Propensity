@@ -1,0 +1,4 @@
+column,rows,nulls,minimum,maximum,distinct_codes,format,duplicate_rows_global,duplicate_scope,geographic_range_status
+geohash_4,66295724,0,12,53808,18948,int32,0,full,not applicable until integer encoding verified
+geohash_5,66295724,0,5,428058,122982,int32,0,full,not applicable until integer encoding verified
+geohash_6,66295724,0,1,2936555,610866,int32,0,full,not applicable until integer encoding verified

@@ -1,0 +1,46 @@
+brief_section,requirement,status,table,figure,details
+12.1,target_schema_overview,complete,tables/targets/target_schema_overview.csv,figures/targets/target_schema_overview.png,9 cột gốc; y_any là nhãn dẫn xuất.
+12.1,target_null_by_month,complete,tables/targets/target_null_by_month.csv,figures/targets/target_null_by_month.png,Mẫu số mỗi ô: 100.224 khách–tháng.
+12.1,target_null_patterns,complete,tables/targets/target_null_patterns.csv,figures/targets/target_null_patterns.png,0 trong tên pattern nghĩa là nhãn được quan sát; không phải nhãn âm.
+12.1,target_positive_rates,complete,tables/targets/target_positive_rates.csv,figures/targets/target_positive_rates.png,"Mẫu số: 1.202.688 khách–tháng; cùng 100.224 khách lặp qua 12 tháng. Wilson là CI mô tả, không điều chỉnh phụ thuộc theo khách."
+12.1,target_prevalence_by_month,complete,tables/targets/target_prevalence_by_month.csv,figures/targets/target_prevalence_by_month.png,Mỗi target/tháng: 100.224 quan sát; Wilson CI 95% có trong CSV.
+12.1,target_imbalance_summary,complete,tables/targets/target_imbalance_summary.csv,figures/targets/target_imbalance_summary.png,"Mẫu số: 1.202.688 khách–tháng; cùng 100.224 khách lặp qua 12 tháng. Wilson là CI mô tả, không điều chỉnh phụ thuộc theo khách."
+12.1,target_monthly_dynamics,complete,tables/targets/target_monthly_dynamics.csv,figures/targets/target_monthly_dynamics.png,Mỗi target/tháng có 100.224 khách; các sản phẩm có thể đồng thời dương.
+12.1,y_any_summary,complete,tables/targets/y_any_summary.csv,figures/targets/y_any_summary.png,1 nếu có nhãn 1; 0 nếu cả bốn nhãn 0; còn lại null. Bản hiện tại không có nhãn null.
+12.1,customer_purchase_frequency,complete,tables/targets/customer_purchase_frequency.csv,figures/targets/customer_purchase_frequency.png,"Toàn bộ 100.224 khách; đây là số tháng dương, không phải số giao dịch mua."
+12.1,target_transition_matrix,complete,tables/targets/target_transition_matrix.csv,figures/targets/target_transition_matrix.png,"11 cặp tháng liên tiếp, 1.102.464 cặp khách–tháng cho mỗi target."
+12.1,target_transition_rates,complete,tables/targets/target_transition_rates.csv,figures/targets/target_transition_rates.png,Wilson CI cho mỗi tỷ lệ; CI chênh lệch và ratio từ cluster bootstrap 2.000 lượt.
+12.1,buyer_composition_by_month,complete,tables/targets/buyer_composition_by_month.csv,figures/targets/buyer_composition_by_month.png,Returning / first_observed / history_unknown cùng chia cho toàn bộ người mua tháng đó.
+12.1,target_collection_timeline,complete,tables/targets/target_collection_timeline.csv,figures/targets/target_collection_timeline.png,Tháng nhãn 02/2022–01/2023 theo quy ước EDA hiện tại; mapping không dịch thêm một tháng.
+12.1,target_buyer_share_ci,complete,tables/targets/target_buyer_share_ci.csv,figures/targets/target_buyer_share_ci.png,Mẫu số: all_current_buyers; history_unknown được giữ riêng; CI 95% có trong CSV.
+12.2,trx_overview,complete,tables/trx/trx_overview.csv,figures/trx/trx_overview.png,Toàn bộ detail/trx; không cộng ptls.
+12.2,trx_monthly_coverage,complete,tables/trx/trx_monthly_coverage.csv,figures/trx/trx_monthly_coverage.png,Khách active: có ít nhất một sự kiện trong tháng; không đồng nghĩa quan sát liên tục.
+12.2,trx_customer_activity,complete,tables/trx/trx_customer_activity.csv,figures/trx/trx_customer_activity.png,"Mẫu số: toàn bộ 100.224 khách, gồm cả 0 log."
+12.2,trx_rfm_by_target,complete,tables/trx/trx_rfm_by_target.csv,figures/trx/trx_rfm_by_target.png,F/M: tháng T−1; M chỉ currency=11; recency: sự kiện gần nhất trước cutoff.
+12.2,trx_rfm_lift,complete,tables/trx/trx_rfm_lift.csv,figures/trx/trx_rfm_lift.png,"Biểu đồ: y_any; CSV gồm đủ 5 nhãn, n_total/n_positive và cluster bootstrap 2.000 lượt."
+12.2,trx_category_summary,complete,tables/trx/trx_category_summary.csv,figures/trx/trx_category_summary.png,Toàn lịch sử; mã ẩn danh giữ nguyên ý nghĩa; CSV gồm đầy đủ phân bố category.
+12.2,trx_category_target_lift,complete,tables/trx/trx_category_target_lift.csv,figures/trx/trx_category_target_lift.png,"Top 5 event_type chọn theo tần suất, trước khi xem nhãn; cùng cửa sổ T−1; CSV gồm đủ 5 nhãn."
+12.2,trx_inter_event_gap,complete,tables/trx/trx_inter_event_gap.csv,figures/trx/trx_inter_event_gap.png,Cặp sự kiện cùng khách và cùng tháng; 12 cửa sổ T−1; không bắc cầu qua tháng.
+12.2,trx_quality,complete,tables/trx/trx_quality.csv,figures/trx/trx_quality.png,"Kiểm tra missing, duplicate và giá trị không hợp lệ; từng dòng giữ phạm vi và mẫu số riêng."
+12.3,dialog_overview,complete,tables/dialog/dialog_overview.csv,figures/dialog/dialog_overview.png,Một dòng detail/dialog là một tương tác có embedding; không phải raw text.
+12.3,dialog_monthly_coverage,complete,tables/dialog/dialog_monthly_coverage.csv,figures/dialog/dialog_monthly_coverage.png,Đơn vị: khách có ≥1 tương tác; CSV có cả số tương tác và density.
+12.3,dialog_customer_activity,complete,tables/dialog/dialog_customer_activity.csv,figures/dialog/dialog_customer_activity.png,Thống kê toàn bộ 100.224 khách; recency/gap T−1 có trong snapshot.
+12.3,dialog_metadata_target,complete,tables/dialog/dialog_metadata_target.csv,figures/dialog/dialog_metadata_target.png,"Frequency, recency và gap; đủ 5 nhãn. Cluster bootstrap 95%; n+<30 được gắn cờ."
+12.3,dialog_embedding_quality,complete,tables/dialog/dialog_embedding_quality.csv,figures/dialog/dialog_embedding_quality.png,217.205 vector; norm L2; số chiều không phải độ dài hội thoại.
+12.3,dialog_embedding_exploration,complete,tables/dialog/dialog_embedding_exploration.csv,figures/dialog/dialog_embedding_exploration.png,"Phép chiếu không giám sát, không đánh giá hiệu năng và không khẳng định cụm có ý nghĩa nghiệp vụ."
+12.4,geo_overview,complete,tables/geo/geo_overview.csv,figures/geo/geo_overview.png,"Các geohash đang được xử lý như mã vùng, chưa decode tọa độ."
+12.4,geo_monthly_coverage,complete,tables/geo/geo_monthly_coverage.csv,figures/geo/geo_monthly_coverage.png,Khách có ≥1 log trong tháng; dữ liệu bắt đầu tháng 12/2021.
+12.4,geo_quality,complete,tables/geo/geo_quality.csv,figures/geo/geo_quality.png,"Đây là khoảng giá trị integer, không phải khoảng latitude/longitude."
+12.4,geo_customer_spatial_summary,complete,tables/geo/geo_customer_spatial_summary.csv,figures/geo/geo_customer_spatial_summary.png,Khách–tháng trong cửa sổ T−1; missing khi không đủ log không được thay bằng 0.
+12.4,geo_target_comparison,complete,tables/geo/geo_target_comparison.csv,figures/geo/geo_target_comparison.png,Cùng cửa sổ T−1; CSV có 5 target và cỡ mẫu; không suy khoảng cách địa lý.
+12.4,geo_encoding_audit,audited_unverified,tables/geo/geo_encoding_audit.csv,figures/geo/geo_encoding_audit.png,"Đã chạy kiểm tra. Encoding vẫn unverified; không tạo tọa độ, khoảng cách hoặc bản đồ giả."
+12.5,temporal_alignment_audit,complete,tables/temporal/temporal_alignment_audit.csv,figures/temporal/temporal_alignment_audit.png,Mapping T = tháng chứa mon; UTC là quy ước nghiên cứu; timezone ETL nhãn gốc chưa xác nhận.
+12.5,customer_month_tminus1_snapshots,complete,tables/temporal/customer_month_tminus1_snapshots.csv,figures/temporal/customer_month_tminus1_snapshots.png,Bảng đầy đủ: data/customer_month_tminus1_snapshots.parquet. Không phải bảng huấn luyện.
+12.5,customer_month_cumulative_history,complete,tables/temporal/customer_month_cumulative_history.csv,figures/temporal/customer_month_cumulative_history.png,Bảng đầy đủ có observed_start và collection_start theo nguồn; ngày đầu không chứng minh log liên tục.
+12.5,temporal_coverage_by_source,complete,tables/temporal/temporal_coverage_by_source.csv,figures/temporal/temporal_coverage_by_source.png,Có log không đồng nghĩa quan sát liên tục. Tháng không nằm trong phạm vi nguồn không được coi là zero.
+12.5,small_sample_flags,complete,tables/temporal/small_sample_flags.csv,figures/temporal/small_sample_flags.png,Quy tắc: n_positive < 30; không loại nhóm hiếm âm thầm.
+12.5,rate_confidence_intervals,complete,tables/temporal/rate_confidence_intervals.csv,figures/temporal/rate_confidence_intervals.png,Wilson CI 95% cho tỷ lệ; pooled có thêm cluster CI để phản ánh khách lặp lại.
+12.5,lift_confidence_intervals,complete,tables/temporal/lift_confidence_intervals.csv,figures/temporal/lift_confidence_intervals.png,"Bootstrap theo client_id, 2.000 lần, seed 42; giữ ci_status và số lượt có mẫu số hợp lệ."
+12.6,cross_modal_customer_overlap,complete,tables/cross_modal/cross_modal_customer_overlap.csv,figures/cross_modal/cross_modal_customer_overlap.png,"Các mask loại trừ nhau; một bit cho TRX, DIALOG, GEO. Tổng bằng 100.224 khách."
+12.6,cross_modal_monthly_coverage,complete,tables/cross_modal/cross_modal_monthly_coverage.csv,figures/cross_modal/cross_modal_monthly_coverage.png,12 tháng target; mask mô tả nguồn có log trong cùng cửa sổ tháng trước.
+12.6,dataset_timeline,complete,tables/cross_modal/dataset_timeline.csv,figures/cross_modal/dataset_timeline.png,Event dates và tháng nhãn khác grain; ngày biên không chứng minh tháng đầy đủ.

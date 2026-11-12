@@ -1,0 +1,487 @@
+[
+  {
+    "number": 1,
+    "section": "A / BỐI CẢNH",
+    "title": "MBD-mini: hiểu dữ liệu trước khi đọc tín hiệu",
+    "insight": "Dataset Understanding & Exploratory Data Analysis · dữ liệu ngân hàng đã ẩn danh.",
+    "method": "MBD-mini tại máy · 12 tháng nhãn 02/2022–01/2023 · cập nhật 11/11/2026.",
+    "sources": [
+      "source_overview",
+      "target_monthly"
+    ],
+    "notes": "Mở đầu bằng ba cấp độ: một sự kiện, một khách và một khách trong một tháng. MBD gốc mô tả khách hàng doanh nghiệp; không suy rộng sang toàn bộ khách hàng cá nhân. Mục tiêu bài này là hiểu dữ liệu và giới hạn diễn giải. Dataset Understanding & Exploratory Data Analysis · dữ liệu ngân hàng đã ẩn danh. MBD-mini tại máy · 12 tháng nhãn 02/2022–01/2023 · cập nhật 11/11/2026. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 2,
+    "section": "A / BỐI CẢNH",
+    "title": "Dataset ghi nhận kết quả sản phẩm trong một tháng",
+    "insight": "Bốn target là bốn nhãn sản phẩm có thể đồng thời dương; tên thương mại chưa được xác nhận.",
+    "method": "Quy ước nghiên cứu: tháng chứa mon là T; không dịch mon thêm một tháng.",
+    "sources": [
+      "temporal_alignment",
+      "target_monthly"
+    ],
+    "notes": " Bốn target là bốn nhãn sản phẩm có thể đồng thời dương; tên thương mại chưa được xác nhận. Quy ước nghiên cứu: tháng chứa mon là T; không dịch mon thêm một tháng. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 3,
+    "section": "A / BỐI CẢNH",
+    "title": "Hơn 105 triệu sự kiện, nhưng số khách là 100 nghìn",
+    "insight": "Số dòng sự kiện, số khách và số khách–tháng là ba mẫu số khác nhau.",
+    "method": "Toàn lịch sử detail; không cộng dữ liệu ptls vào detail vì đây là hai dạng biểu diễn.",
+    "sources": [
+      "source_overview",
+      "sequence_reconciliation"
+    ],
+    "notes": " Số dòng sự kiện, số khách và số khách–tháng là ba mẫu số khác nhau. Toàn lịch sử detail; không cộng dữ liệu ptls vào detail vì đây là hai dạng biểu diễn. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 4,
+    "section": "A / BỐI CẢNH",
+    "title": "client_id nối các bảng có grain khác nhau",
+    "insight": "Tổng hợp từng nguồn về khách–tháng trước khi đối chiếu nhãn; tránh nhân dòng khi join nhiều nguồn.",
+    "method": "fold là metadata chia khách; giữ cùng client_id và kiểm tra quan hệ một–nhiều.",
+    "sources": [
+      "raw_schema",
+      "target_schema"
+    ],
+    "notes": " Tổng hợp từng nguồn về khách–tháng trước khi đối chiếu nhãn; tránh nhân dòng khi join nhiều nguồn. fold là metadata chia khách; giữ cùng client_id và kiểm tra quan hệ một–nhiều. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 5,
+    "section": "A / BỐI CẢNH",
+    "title": "Các nguồn bắt đầu khác nhau; cutoff phải thống nhất",
+    "insight": "TRX từ cuối 2020; DIALOG từ 02/2021; GEO từ 12/2021. Nhãn bắt đầu 02/2022.",
+    "method": "Timestamp gốc không ghi timezone. UTC là quy ước nghiên cứu; tháng đầu/cuối có thể chỉ ghi nhận một phần.",
+    "sources": [
+      "source_overview",
+      "temporal_alignment"
+    ],
+    "notes": " TRX từ cuối 2020; DIALOG từ 02/2021; GEO từ 12/2021. Nhãn bắt đầu 02/2022. Timestamp gốc không ghi timezone. UTC là quy ước nghiên cứu; tháng đầu/cuối có thể chỉ ghi nhận một phần. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 6,
+    "section": "B / TARGETS",
+    "title": "Target có nhãn sản phẩm và hai cột phụ trợ",
+    "insight": "Không dùng tên trans_count để suy ra số lần mua sản phẩm; không mặc định cột phụ là lịch sử trước cutoff.",
+    "method": "Kiểm kê tất cả cột từ Parquet; mon lưu dạng chuỗi ngày cuối tháng.",
+    "sources": [
+      "target_schema",
+      "raw_schema"
+    ],
+    "notes": " Không dùng tên trans_count để suy ra số lần mua sản phẩm; không mặc định cột phụ là lịch sử trước cutoff. Kiểm kê tất cả cột từ Parquet; mon lưu dạng chuỗi ngày cuối tháng. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 7,
+    "section": "B / TARGETS",
+    "title": "Bốn nhãn đầy đủ; null nằm ở diff_trans_date",
+    "insight": "Không có nhãn null trong bản hiện có. 120.786 ô diff_trans_date null không làm mất nhãn của dòng đó.",
+    "method": "Mẫu số: 1.202.688 khách–tháng. Ngoài thời kỳ nhãn là chưa có bảng nhãn, không phải nhãn âm.",
+    "sources": [
+      "target_schema",
+      "target_null_patterns",
+      "raw_missing"
+    ],
+    "notes": " Không có nhãn null trong bản hiện có. 120.786 ô diff_trans_date null không làm mất nhãn của dòng đó. Mẫu số: 1.202.688 khách–tháng. Ngoài thời kỳ nhãn là chưa có bảng nhãn, không phải nhãn âm. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 8,
+    "section": "B / TARGETS",
+    "title": "Chỉ nhãn gộp có prevalence quanh 1%",
+    "insight": "target_2 chỉ có 577 khách–tháng dương trên toàn kỳ: việc chia nhỏ nhóm dễ thiếu mẫu.",
+    "method": "Mẫu số từng nhãn: 1.202.688 nhãn hợp lệ. CI 95%: cluster bootstrap khách, 2.000 lần.",
+    "sources": [
+      "rates_cluster_ci"
+    ],
+    "notes": " target_2 chỉ có 577 khách–tháng dương trên toàn kỳ: việc chia nhỏ nhóm dễ thiếu mẫu. Mẫu số từng nhãn: 1.202.688 nhãn hợp lệ. CI 95%: cluster bootstrap khách, 2.000 lần. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 9,
+    "section": "B / TARGETS",
+    "title": "y_any là phép OR bảo thủ của bốn nhãn",
+    "insight": "y_any = 1,0688% trên toàn kỳ. Không cộng tỷ lệ của bốn target vì có nhãn cùng dương.",
+    "method": "Đã đối soát union bốn target và tính duy nhất (client_id, mon).",
+    "sources": [
+      "rates_cluster_ci",
+      "target_null_patterns"
+    ],
+    "notes": " y_any = 1,0688% trên toàn kỳ. Không cộng tỷ lệ của bốn target vì có nhãn cùng dương. Đã đối soát union bốn target và tính duy nhất (client_id, mon). Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 10,
+    "section": "B / TARGETS",
+    "title": "Tỷ lệ dương thay đổi trong 12 tháng quan sát",
+    "insight": "Đọc biến động từng target cùng số mẫu dương; mỗi tháng có đủ 100.224 khách.",
+    "method": "Trục Y: tỷ lệ dương. Vạch: Wilson CI 95%. Số cạnh đường y_any là số khách dương; nhãn không null.",
+    "sources": [
+      "target_monthly"
+    ],
+    "notes": " Đọc biến động từng target cùng số mẫu dương; mỗi tháng có đủ 100.224 khách. Trục Y: tỷ lệ dương. Vạch: Wilson CI 95%. Số cạnh đường y_any là số khách dương; nhãn không null. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 11,
+    "section": "B / TARGETS",
+    "title": "Số tháng dương cho thấy mức độ lặp lại được quan sát",
+    "insight": "10.411 khách từng có y_any dương; 81,61% trong số này chỉ có một tháng dương.",
+    "method": "Biểu đồ chỉ gồm khách từng dương. Đây là số tháng dương, không phải số giao dịch hoặc số lần mua trong đời.",
+    "sources": [
+      "target_frequency",
+      "target_purchase_history_summary"
+    ],
+    "notes": " 10.411 khách từng có y_any dương; 81,61% trong số này chỉ có một tháng dương. Biểu đồ chỉ gồm khách từng dương. Đây là số tháng dương, không phải số giao dịch hoặc số lần mua trong đời. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 12,
+    "section": "B / TARGETS",
+    "title": "Mua tháng trước liên hệ thế nào với tháng tiếp theo?",
+    "insight": "Với y_any: 7,06% sau tháng dương, so với 1,00% sau tháng âm; tỷ số 7,03×.",
+    "method": "11 cặp tháng lịch liên tiếp; chỉ dùng nhãn hợp lệ ở cả hai tháng. Vạch: CI 95% bootstrap theo khách.",
+    "sources": [
+      "rates_cluster_ci",
+      "target_transition_comparison",
+      "target_transitions_monthly"
+    ],
+    "notes": " Với y_any: 7,06% sau tháng dương, so với 1,00% sau tháng âm; tỷ số 7,03×. 11 cặp tháng lịch liên tiếp; chỉ dùng nhãn hợp lệ ở cả hai tháng. Vạch: CI 95% bootstrap theo khách. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 13,
+    "section": "B / TARGETS",
+    "title": "Người mua hiện tại gồm ba nhóm lịch sử",
+    "insight": "Tháng đầu chưa có lịch sử nhãn trước đó nên thuộc Unknown; các tháng sau phân loại trong cửa sổ quan sát.",
+    "method": "Mẫu số mỗi cột: toàn bộ người mua tháng T; ba share cộng 100%. CI Wilson và số đếm nằm trong bảng nguồn.",
+    "sources": [
+      "buyer_composition_monthly"
+    ],
+    "notes": " Tháng đầu chưa có lịch sử nhãn trước đó nên thuộc Unknown; các tháng sau phân loại trong cửa sổ quan sát. Mẫu số mỗi cột: toàn bộ người mua tháng T; ba share cộng 100%. CI Wilson và số đếm nằm trong bảng nguồn. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 14,
+    "section": "B / TARGETS",
+    "title": "Target đầy đủ, nhưng hiếm và chỉ quan sát 12 tháng",
+    "insight": "Chất lượng nhãn tốt ở khung hiện có; giới hạn chính là độ hiếm và thời gian quan sát.",
+    "method": "Không sử dụng trans_count / diff_trans_date như bằng chứng đã có tại cutoff nếu chưa xác minh cửa sổ.",
+    "sources": [
+      "target_monthly",
+      "target_schema",
+      "target_transition_comparison"
+    ],
+    "notes": " Chất lượng nhãn tốt ở khung hiện có; giới hạn chính là độ hiếm và thời gian quan sát. Không sử dụng trans_count / diff_trans_date như bằng chứng đã có tại cutoff nếu chưa xác minh cửa sổ. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 15,
+    "section": "C / TRX",
+    "title": "TRX có lịch sử dài và độ phủ khách cao",
+    "insight": "98.721 khách có ít nhất một giao dịch trong toàn lịch sử; 1.503 khách không có log TRX.",
+    "method": "Hai panel: triệu sự kiện và nghìn khách. TRX không null ID/time; currency có 118 null, giữ nguyên mã thuộc tính thiếu.",
+    "sources": [
+      "source_monthly",
+      "source_overview",
+      "customer_activity",
+      "raw_missing"
+    ],
+    "notes": " 98.721 khách có ít nhất một giao dịch trong toàn lịch sử; 1.503 khách không có log TRX. Hai panel: triệu sự kiện và nghìn khách. TRX không null ID/time; currency có 118 null, giữ nguyên mã thuộc tính thiếu. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 16,
+    "section": "C / TRX",
+    "title": "Một số khách đóng góp lượng giao dịch rất lớn",
+    "insight": "Tổng giao dịch không phản ánh đều từng khách; luôn trình bày median và quantile cùng mean.",
+    "method": "Toàn lịch sử, mẫu số 100.224 khách, gồm cả count = 0; không loại hoặc cap đuôi.",
+    "sources": [
+      "customer_activity"
+    ],
+    "notes": " Tổng giao dịch không phản ánh đều từng khách; luôn trình bày median và quantile cùng mean. Toàn lịch sử, mẫu số 100.224 khách, gồm cả count = 0; không loại hoặc cap đuôi. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 17,
+    "section": "C / TRX",
+    "title": "RFM mô tả ba khía cạnh khác nhau của hoạt động",
+    "insight": "Lift so với cùng baseline y_any 1,0688%; khác biệt là liên hệ mô tả trong tập quan sát.",
+    "method": "F/M: tháng T−1; R: gần nhất trước cutoff; M: currency 11. Vạch đen: CI 95%; nét đứt: lift = 1; *: n+ < 30.",
+    "sources": [
+      "rates_cluster_ci",
+      "feature_group_definitions"
+    ],
+    "notes": " Lift so với cùng baseline y_any 1,0688%; khác biệt là liên hệ mô tả trong tập quan sát. F/M: tháng T−1; R: gần nhất trước cutoff; M: currency 11. Vạch đen: CI 95%; nét đứt: lift = 1; *: n+ < 30. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 18,
+    "section": "C / TRX",
+    "title": "Mã giao dịch phổ biến không đồng nghĩa lift cao",
+    "insight": "Popularity dùng số event; lift dùng mỗi khách–tháng có mã đúng một lần, dù phát sinh nhiều giao dịch.",
+    "method": "Top 5 mã theo tần suất toàn kỳ, chọn độc lập với nhãn. Nhóm có thể chồng lấn; baseline là toàn bộ khách–tháng.",
+    "sources": [
+      "trx_categories",
+      "rates_cluster_ci"
+    ],
+    "notes": " Popularity dùng số event; lift dùng mỗi khách–tháng có mã đúng một lần, dù phát sinh nhiều giao dịch. Top 5 mã theo tần suất toàn kỳ, chọn độc lập với nhãn. Nhóm có thể chồng lấn; baseline là toàn bộ khách–tháng. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 19,
+    "section": "C / TRX",
+    "title": "Nhịp giao dịch cần đọc trên các khách có đủ cặp sự kiện",
+    "insight": "Gap không xác định khi có dưới hai sự kiện trong tháng; không điền gap bằng 0 cho nhóm này.",
+    "method": "Gap giữa hai timestamp liên tiếp cùng khách và cùng tháng; không bắc cầu qua ranh giới tháng.",
+    "sources": [
+      "feature_target_summary"
+    ],
+    "notes": " Gap không xác định khi có dưới hai sự kiện trong tháng; không điền gap bằng 0 cho nhóm này. Gap giữa hai timestamp liên tiếp cùng khách và cùng tháng; không bắc cầu qua ranh giới tháng. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 20,
+    "section": "D / DIALOG",
+    "title": "DIALOG phủ ít khách hơn TRX và có hoạt động thưa",
+    "insight": "217.205 tương tác, 46.320 khách từng có DIALOG; thiếu log không cho biết lý do không tương tác.",
+    "method": "Độ phủ toàn kỳ khác độ phủ trong từng tháng. DIALOG bắt đầu 10/02/2021 theo timestamp lưu.",
+    "sources": [
+      "source_monthly",
+      "source_overview",
+      "customer_activity"
+    ],
+    "notes": " 217.205 tương tác, 46.320 khách từng có DIALOG; thiếu log không cho biết lý do không tương tác. Độ phủ toàn kỳ khác độ phủ trong từng tháng. DIALOG bắt đầu 10/02/2021 theo timestamp lưu. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 21,
+    "section": "D / DIALOG",
+    "title": "Tần suất và Recency là hai góc nhìn về tương tác",
+    "insight": "Giữ riêng khách không có DIALOG trong T−1 và khách chưa từng có DIALOG trước cutoff.",
+    "method": "Count theo tháng T−1; Recency dùng toàn bộ quá khứ trước T. CI cluster bootstrap; *: n+ < 30.",
+    "sources": [
+      "rates_cluster_ci",
+      "feature_target_summary"
+    ],
+    "notes": " Giữ riêng khách không có DIALOG trong T−1 và khách chưa từng có DIALOG trước cutoff. Count theo tháng T−1; Recency dùng toàn bộ quá khứ trước T. CI cluster bootstrap; *: n+ < 30. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 22,
+    "section": "D / DIALOG",
+    "title": "Embedding hợp lệ về cấu trúc chưa xác nhận ý nghĩa nội dung",
+    "insight": "Không có raw text hoặc duration để đọc chủ đề, số token hay thời lượng; chưa công bố tín hiệu ngữ nghĩa bổ sung.",
+    "method": "Norm L2 = sqrt(sum(x²)); kiểm tra đầy đủ 217.205 vector. Không dùng PCA/UMAP để suy khả năng phân biệt nhãn.",
+    "sources": [
+      "embedding_quality"
+    ],
+    "notes": " Không có raw text hoặc duration để đọc chủ đề, số token hay thời lượng; chưa công bố tín hiệu ngữ nghĩa bổ sung. Norm L2 = sqrt(sum(x²)); kiểm tra đầy đủ 217.205 vector. Không dùng PCA/UMAP để suy khả năng phân biệt nhãn. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 23,
+    "section": "D / DIALOG",
+    "title": "DIALOG cho biết mức độ tương tác, còn nội dung bị giới hạn",
+    "insight": "DIALOG bổ sung góc nhìn về tương tác; độ phủ thưa và thiếu văn bản giới hạn diễn giải.",
+    "method": "Kết quả mô tả trên dữ liệu có sẵn; các nhóm hiếm được giữ lại và gắn cờ.",
+    "sources": [
+      "source_overview",
+      "embedding_quality",
+      "rates_cluster_ci"
+    ],
+    "notes": " DIALOG bổ sung góc nhìn về tương tác; độ phủ thưa và thiếu văn bản giới hạn diễn giải. Kết quả mô tả trên dữ liệu có sẵn; các nhóm hiếm được giữ lại và gắn cờ. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 24,
+    "section": "E / GEO",
+    "title": "GEO nhiều sự kiện nhưng chỉ bắt đầu từ cuối 2021",
+    "insight": "66.295.724 quan sát ở 72.573 khách. Số sự kiện lớn không có nghĩa mọi khách đều có GEO.",
+    "method": "Nguồn bắt đầu 11/12/2021. Schema gồm ba mã integer; không có latitude/longitude.",
+    "sources": [
+      "source_overview",
+      "source_monthly",
+      "raw_schema"
+    ],
+    "notes": " 66.295.724 quan sát ở 72.573 khách. Số sự kiện lớn không có nghĩa mọi khách đều có GEO. Nguồn bắt đầu 11/12/2021. Schema gồm ba mã integer; không có latitude/longitude. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 25,
+    "section": "E / GEO",
+    "title": "Mã vùng cho phép mô tả sự đa dạng và tập trung",
+    "insight": "Số vùng và entropy phụ thuộc số sự kiện được ghi nhận; bảng nguồn có đối chiếu theo mức độ quan sát.",
+    "method": "Mỗi integer được xem như category. Entropy = −Σp·ln(p); không suy khoảng cách hoặc số chuyến đi.",
+    "sources": [
+      "feature_target_summary"
+    ],
+    "notes": " Số vùng và entropy phụ thuộc số sự kiện được ghi nhận; bảng nguồn có đối chiếu theo mức độ quan sát. Mỗi integer được xem như category. Entropy = −Σp·ln(p); không suy khoảng cách hoặc số chuyến đi. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 26,
+    "section": "E / GEO",
+    "title": "Liên hệ GEO–nhãn cần đọc cùng độ dày quan sát",
+    "insight": "GEO mô tả vùng hoạt động được ghi nhận; chưa xác minh encoding để vẽ bản đồ hoặc tính quãng đường.",
+    "method": "Cùng T−1 và baseline y_any. Chuyển mã chỉ tính cặp timestamp có mã rõ ràng, cùng tháng; *: n+ < 30.",
+    "sources": [
+      "rates_cluster_ci",
+      "feature_target_summary"
+    ],
+    "notes": " GEO mô tả vùng hoạt động được ghi nhận; chưa xác minh encoding để vẽ bản đồ hoặc tính quãng đường. Cùng T−1 và baseline y_any. Chuyển mã chỉ tính cặp timestamp có mã rõ ràng, cùng tháng; *: n+ < 30. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 27,
+    "section": "F / TỔNG HỢP",
+    "title": "Ba nguồn giao nhau trên 35.424 khách",
+    "insight": "468 khách không có log ở cả ba nguồn vẫn được giữ trong dân số và trong bảng nhãn.",
+    "method": "8 nhóm loại trừ nhau trên toàn lịch sử; không dùng độ phủ tương lai để lọc cohort tại cutoff quá khứ.",
+    "sources": [
+      "cross_modal_full_history",
+      "cross_modal_monthly"
+    ],
+    "notes": " 468 khách không có log ở cả ba nguồn vẫn được giữ trong dân số và trong bảng nhãn. 8 nhóm loại trừ nhau trên toàn lịch sử; không dùng độ phủ tương lai để lọc cohort tại cutoff quá khứ. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 28,
+    "section": "F / TỔNG HỢP",
+    "title": "Mỗi bảng cung cấp một góc nhìn khác nhau",
+    "insight": "“Bổ sung góc nhìn” được hỗ trợ bởi schema và EDA; chưa phải bằng chứng về giá trị dự báo gia tăng.",
+    "method": "Các bảng tổng hợp cùng client_id, cùng cửa sổ T−1 và cutoff.",
+    "sources": [
+      "raw_schema",
+      "feature_target_summary",
+      "embedding_quality"
+    ],
+    "notes": " “Bổ sung góc nhìn” được hỗ trợ bởi schema và EDA; chưa phải bằng chứng về giá trị dự báo gia tăng. Các bảng tổng hợp cùng client_id, cùng cửa sổ T−1 và cutoff. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 29,
+    "section": "F / TỔNG HỢP",
+    "title": "MBD-mini phù hợp nghiên cứu propensity với điều kiện rõ",
+    "insight": "Có nền tảng dữ liệu để nghiên cứu; kết luận phải giới hạn theo thời gian, nguồn quan sát và cỡ mẫu dương.",
+    "method": "Đánh giá mô tả theo đúng 5 tiêu chí; không chấm điểm tổng hợp hoặc suy hiệu quả dự báo.",
+    "sources": [
+      "source_overview",
+      "target_monthly",
+      "rates_cluster_ci",
+      "temporal_alignment"
+    ],
+    "notes": " Có nền tảng dữ liệu để nghiên cứu; kết luận phải giới hạn theo thời gian, nguồn quan sát và cỡ mẫu dương. Đánh giá mô tả theo đúng 5 tiêu chí; không chấm điểm tổng hợp hoặc suy hiệu quả dự báo. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 30,
+    "section": "F / KẾT LUẬN",
+    "title": "Hiểu rõ dữ liệu để đặt câu hỏi có thể trả lời",
+    "insight": "Mọi kết quả trong bài truy ngược được về bảng tổng hợp và nguồn dữ liệu; giới hạn đi cùng phát hiện.",
+    "method": "Phụ lục A1–A10: từ điển, công thức, số liệu theo tháng, temporal audit và phương pháp CI.",
+    "sources": [
+      "target_schema",
+      "source_overview",
+      "feature_target_summary"
+    ],
+    "notes": " Mọi kết quả trong bài truy ngược được về bảng tổng hợp và nguồn dữ liệu; giới hạn đi cùng phát hiện. Phụ lục A1–A10: từ điển, công thức, số liệu theo tháng, temporal audit và phương pháp CI. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 31,
+    "section": "A1 / TỪ ĐIỂN",
+    "title": "Toàn bộ cột của bảng targets",
+    "insight": "fold đến từ partition; y_any là nhãn tổng hợp được tính trong EDA.",
+    "method": "Dtype ở bảng là kiểu sau đọc; raw_schema.csv lưu kiểu vật lý Parquet.",
+    "sources": [
+      "target_schema",
+      "raw_schema"
+    ],
+    "notes": " fold đến từ partition; y_any là nhãn tổng hợp được tính trong EDA. Dtype ở bảng là kiểu sau đọc; raw_schema.csv lưu kiểu vật lý Parquet. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 32,
+    "section": "A2 / NULL",
+    "title": "Không có pattern thiếu nhãn trong bản hiện tại",
+    "insight": "Pattern thực nghiệm không đủ chứng minh nguyên nhân thu thập; giữ mức “chưa xác minh” khi thiếu ETL.",
+    "method": "Null rate dùng mẫu số toàn bộ dòng; prevalence chỉ dùng nhãn 0/1 hợp lệ.",
+    "sources": [
+      "target_null_patterns",
+      "target_schema"
+    ],
+    "notes": " Pattern thực nghiệm không đủ chứng minh nguyên nhân thu thập; giữ mức “chưa xác minh” khi thiếu ETL. Null rate dùng mẫu số toàn bộ dòng; prevalence chỉ dùng nhãn 0/1 hợp lệ. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 33,
+    "section": "A3 / LOGIC",
+    "title": "Kiểm tra đủ 81 tổ hợp 0 / 1 / null của y_any",
+    "insight": "81 là số tổ hợp logic kiểm tra, không phải số quan sát dữ liệu. Các trường hợp partial-null hiện không xuất hiện.",
+    "method": "Dữ liệu thực đã đối soát y_any với union bốn target; miền kỳ vọng {0,1,null}.",
+    "sources": [
+      "target_schema",
+      "target_null_patterns"
+    ],
+    "notes": " 81 là số tổ hợp logic kiểm tra, không phải số quan sát dữ liệu. Các trường hợp partial-null hiện không xuất hiện. Dữ liệu thực đã đối soát y_any với union bốn target; miền kỳ vọng {0,1,null}. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 34,
+    "section": "A4 / CHI TIẾT THÁNG",
+    "title": "Prevalence theo từng tháng và từng nhãn",
+    "insight": "Mỗi ô dùng 100.224 nhãn hợp lệ; bảng CSV kèm n+, n−, null, Wilson CI và cờ mẫu nhỏ.",
+    "method": "12 tháng: 02/2022–01/2023. Không trung bình phần trăm giữa nhóm có mẫu số khác nhau.",
+    "sources": [
+      "target_monthly"
+    ],
+    "notes": " Mỗi ô dùng 100.224 nhãn hợp lệ; bảng CSV kèm n+, n−, null, Wilson CI và cờ mẫu nhỏ. 12 tháng: 02/2022–01/2023. Không trung bình phần trăm giữa nhóm có mẫu số khác nhau. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 35,
+    "section": "A5 / CHUYỂN TIẾP",
+    "title": "Ma trận 2×2 gộp 11 cặp tháng liên tiếp",
+    "insight": "Repeat = (1→1)/(1→0 + 1→1); nonbuyer = (0→1)/(0→0 + 0→1).",
+    "method": "Returning xét bất kỳ tháng dương trước T; repeat chỉ xét tháng T−1. Không đồng nhất hai khái niệm.",
+    "sources": [
+      "target_transitions_monthly",
+      "target_transition_comparison"
+    ],
+    "notes": " Repeat = (1→1)/(1→0 + 1→1); nonbuyer = (0→1)/(0→0 + 0→1). Returning xét bất kỳ tháng dương trước T; repeat chỉ xét tháng T−1. Không đồng nhất hai khái niệm. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 36,
+    "section": "A6 / TRX KỸ THUẬT",
+    "title": "Amount giữ riêng currency; ngoại lai không đồng nghĩa lỗi",
+    "insight": "Phần lớn cờ log-IQR currency 11 nằm ở đuôi thấp; không gọi toàn bộ là giao dịch quá lớn.",
+    "method": "Kế thừa bảng đính chính ngày 11/11/2026; chart RFM monetary chỉ dùng currency 11.",
+    "sources": [
+      "amount_outliers",
+      "amount_currency"
+    ],
+    "notes": " Phần lớn cờ log-IQR currency 11 nằm ở đuôi thấp; không gọi toàn bộ là giao dịch quá lớn. Kế thừa bảng đính chính ngày 11/11/2026; chart RFM monetary chỉ dùng currency 11. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 37,
+    "section": "A7 / DIALOG KỸ THUẬT",
+    "title": "Gap và vector là hai loại phép đo khác nhau",
+    "insight": "Vector có 768 chiều; số chiều không đo độ dài cuộc hội thoại. Gap đo khoảng cách timestamp giữa các tương tác.",
+    "method": "Gap chỉ tính cặp cùng tháng. Chưa thực hiện PCA/UMAP hoặc suy chủ đề từ vector.",
+    "sources": [
+      "feature_target_summary",
+      "embedding_quality"
+    ],
+    "notes": " Vector có 768 chiều; số chiều không đo độ dài cuộc hội thoại. Gap đo khoảng cách timestamp giữa các tương tác. Gap chỉ tính cặp cùng tháng. Chưa thực hiện PCA/UMAP hoặc suy chủ đề từ vector. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 38,
+    "section": "A8 / GEO KỸ THUẬT",
+    "title": "Chuyển mã vùng có điều kiện về thứ tự timestamp",
+    "insight": "Không lấy hiệu hai integer để tính khoảng cách; không gọi chuyển mã là chuyến đi.",
+    "method": "Giữ bản ghi raw. Việc gom timestamp chỉ phục vụ xác định thứ tự cặp chuyển mã.",
+    "sources": [
+      "feature_target_summary",
+      "rates_cluster_ci",
+      "raw_schema"
+    ],
+    "notes": " Không lấy hiệu hai integer để tính khoảng cách; không gọi chuyển mã là chuyến đi. Giữ bản ghi raw. Việc gom timestamp chỉ phục vụ xác định thứ tự cặp chuyển mã. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 39,
+    "section": "A9 / TEMPORAL AUDIT",
+    "title": "Sự kiện T−1 được đối chiếu trước từng cutoff",
+    "insight": "Mọi max_used_event đều < đầu tháng T; CSV audit lưu cả số sự kiện tích lũy và số bị loại sau cutoff.",
+    "method": "Cùng UTC và lịch tháng cho cả ba nguồn. Số đếm 0 nghĩa không có log trong file, không xác nhận không hoạt động.",
+    "sources": [
+      "temporal_event_audit",
+      "temporal_alignment"
+    ],
+    "notes": " Mọi max_used_event đều < đầu tháng T; CSV audit lưu cả số sự kiện tích lũy và số bị loại sau cutoff. Cùng UTC và lịch tháng cho cả ba nguồn. Số đếm 0 nghĩa không có log trong file, không xác nhận không hoạt động. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  },
+  {
+    "number": 40,
+    "section": "A10 / CỠ MẪU VÀ CI",
+    "title": "Khoảng tin cậy cần đi cùng mẫu số và coverage",
+    "insight": "CI mô tả biến thiên khi resample khách trong dataset; không bảo đảm khái quát sang dân số ngân hàng khác.",
+    "method": "Bảng rate giữ n, n+, n− và phương pháp. Không có positive: không báo CI bootstrap suy biến tại 0.",
+    "sources": [
+      "rates_cluster_ci",
+      "target_transition_comparison"
+    ],
+    "notes": " CI mô tả biến thiên khi resample khách trong dataset; không bảo đảm khái quát sang dân số ngân hàng khác. Bảng rate giữ n, n+, n− và phương pháp. Không có positive: không báo CI bootstrap suy biến tại 0. Khi trình bày, hãy chỉ rõ đơn vị quan sát và mẫu số trước khi đọc tỷ lệ. Một khách có thể xuất hiện ở nhiều tháng, vì vậy kết quả gộp không phải số người độc lập. Những khác biệt đang thấy mô tả tập dữ liệu này và không giải thích nguyên nhân hành vi. Không tìm thấy sự kiện trong file cũng chưa đủ để xác nhận khách không hoạt động ngoài phạm vi thu thập. Nếu người nghe muốn kiểm tra chi tiết, mở bảng số liệu nguồn của trang này: bảng giữ cả cỡ mẫu, định nghĩa và giới hạn tính toán. Với tỷ lệ hoặc lift, đọc khoảng tin cậy cùng số mẫu dương; nhóm gắn dấu sao là tín hiệu cần thận trọng. Từ phát hiện này, chuyển sang câu hỏi tiếp theo về thông tin quan sát được và điều còn chưa xác minh."
+  }
+]

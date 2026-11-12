@@ -1,0 +1,396 @@
+metric_id,kind,metric,target,group,n_total,n_positive,n_negative,small_positive
+0,prevalence,target_1,target_1,All,1202688,5362,1197326,False
+1,transition,previous_0,target_1,All,1097261,4625,1092636,False
+2,transition,previous_1,target_1,All,5203,180,5023,False
+3,buyer_composition,returning,target_1,All,5362,460,4902,False
+4,buyer_composition,first_observed,target_1,All,5362,4345,1017,False
+5,buyer_composition,history_unknown,target_1,All,5362,557,4805,False
+6,prevalence,target_2,target_2,All,1202688,577,1202111,False
+7,transition,previous_0,target_2,All,1101912,509,1101403,False
+8,transition,previous_1,target_2,All,552,35,517,False
+9,buyer_composition,returning,target_2,All,577,87,490,False
+10,buyer_composition,first_observed,target_2,All,577,457,120,False
+11,buyer_composition,history_unknown,target_2,All,577,33,544,False
+12,prevalence,target_3,target_3,All,1202688,4530,1198158,False
+13,transition,previous_0,target_3,All,1098149,4139,1094010,False
+14,transition,previous_1,target_3,All,4315,115,4200,False
+15,buyer_composition,returning,target_3,All,4530,350,4180,False
+16,buyer_composition,first_observed,target_3,All,4530,3904,626,False
+17,buyer_composition,history_unknown,target_3,All,4530,276,4254,False
+18,prevalence,target_4,target_4,All,1202688,3060,1199628,False
+19,transition,previous_0,target_4,All,1099697,2652,1097045,False
+20,transition,previous_1,target_4,All,2767,170,2597,False
+21,buyer_composition,returning,target_4,All,3060,562,2498,False
+22,buyer_composition,first_observed,target_4,All,3060,2260,800,False
+23,buyer_composition,history_unknown,target_4,All,3060,238,2822,False
+24,prevalence,y_any,y_any,All,1202688,12854,1189834,False
+25,transition,previous_0,y_any,All,1090285,10953,1079332,False
+26,transition,previous_1,y_any,All,12179,860,11319,False
+27,buyer_composition,returning,y_any,All,12854,2443,10411,False
+28,buyer_composition,first_observed,y_any,All,12854,9370,3484,False
+29,buyer_composition,history_unknown,y_any,All,12854,1041,11813,False
+30,feature,trx_events,target_1,<= 0,277009,1265,275744,False
+31,feature,trx_events,target_2,<= 0,277009,21,276988,True
+32,feature,trx_events,target_3,<= 0,277009,225,276784,False
+33,feature,trx_events,target_4,<= 0,277009,270,276739,False
+34,feature,trx_events,y_any,<= 0,277009,1681,275328,False
+35,feature,trx_events,target_1,"(0, 5]",304479,877,303602,False
+36,feature,trx_events,target_2,"(0, 5]",304479,47,304432,False
+37,feature,trx_events,target_3,"(0, 5]",304479,542,303937,False
+38,feature,trx_events,target_4,"(0, 5]",304479,355,304124,False
+39,feature,trx_events,y_any,"(0, 5]",304479,1720,302759,False
+40,feature,trx_events,target_1,"(5, 20]",317028,1159,315869,False
+41,feature,trx_events,target_2,"(5, 20]",317028,131,316897,False
+42,feature,trx_events,target_3,"(5, 20]",317028,1198,315830,False
+43,feature,trx_events,target_4,"(5, 20]",317028,741,316287,False
+44,feature,trx_events,y_any,"(5, 20]",317028,3054,313974,False
+45,feature,trx_events,target_1,"(20, 100]",290807,1857,288950,False
+46,feature,trx_events,target_2,"(20, 100]",290807,331,290476,False
+47,feature,trx_events,target_3,"(20, 100]",290807,2393,288414,False
+48,feature,trx_events,target_4,"(20, 100]",290807,1527,289280,False
+49,feature,trx_events,y_any,"(20, 100]",290807,5831,284976,False
+50,feature,trx_events,target_1,> 100,13365,204,13161,False
+51,feature,trx_events,target_2,> 100,13365,47,13318,False
+52,feature,trx_events,target_3,> 100,13365,172,13193,False
+53,feature,trx_events,target_4,> 100,13365,167,13198,False
+54,feature,trx_events,y_any,> 100,13365,568,12797,False
+55,feature,trx_recency_days,target_1,Unknown / no usable event,88572,1006,87566,False
+56,feature,trx_recency_days,target_2,Unknown / no usable event,88572,9,88563,True
+57,feature,trx_recency_days,target_3,Unknown / no usable event,88572,139,88433,False
+58,feature,trx_recency_days,target_4,Unknown / no usable event,88572,179,88393,False
+59,feature,trx_recency_days,y_any,Unknown / no usable event,88572,1261,87311,False
+60,feature,trx_recency_days,target_1,<= 3,575366,3180,572186,False
+61,feature,trx_recency_days,target_2,<= 3,575366,476,574890,False
+62,feature,trx_recency_days,target_3,<= 3,575366,3587,571779,False
+63,feature,trx_recency_days,target_4,<= 3,575366,2297,573069,False
+64,feature,trx_recency_days,y_any,<= 3,575366,9080,566286,False
+65,feature,trx_recency_days,target_1,"(3, 10]",213168,650,212518,False
+66,feature,trx_recency_days,target_2,"(3, 10]",213168,64,213104,False
+67,feature,trx_recency_days,target_3,"(3, 10]",213168,529,212639,False
+68,feature,trx_recency_days,target_4,"(3, 10]",213168,370,212798,False
+69,feature,trx_recency_days,y_any,"(3, 10]",213168,1528,211640,False
+70,feature,trx_recency_days,target_1,"(10, 30]",135742,265,135477,False
+71,feature,trx_recency_days,target_2,"(10, 30]",135742,16,135726,True
+72,feature,trx_recency_days,target_3,"(10, 30]",135742,188,135554,False
+73,feature,trx_recency_days,target_4,"(10, 30]",135742,122,135620,False
+74,feature,trx_recency_days,y_any,"(10, 30]",135742,561,135181,False
+75,feature,trx_recency_days,target_1,"(30, 90]",90996,138,90858,False
+76,feature,trx_recency_days,target_2,"(30, 90]",90996,10,90986,True
+77,feature,trx_recency_days,target_3,"(30, 90]",90996,61,90935,False
+78,feature,trx_recency_days,target_4,"(30, 90]",90996,54,90942,False
+79,feature,trx_recency_days,y_any,"(30, 90]",90996,245,90751,False
+80,feature,trx_recency_days,target_1,> 90,98844,123,98721,False
+81,feature,trx_recency_days,target_2,> 90,98844,2,98842,True
+82,feature,trx_recency_days,target_3,> 90,98844,26,98818,True
+83,feature,trx_recency_days,target_4,> 90,98844,38,98806,False
+84,feature,trx_recency_days,y_any,> 90,98844,179,98665,False
+85,feature,trx_amount_currency11,target_1,<= 0,277009,1265,275744,False
+86,feature,trx_amount_currency11,target_2,<= 0,277009,21,276988,True
+87,feature,trx_amount_currency11,target_3,<= 0,277009,225,276784,False
+88,feature,trx_amount_currency11,target_4,<= 0,277009,270,276739,False
+89,feature,trx_amount_currency11,y_any,<= 0,277009,1681,275328,False
+90,feature,trx_amount_currency11,target_1,"(0, 10000]",63862,301,63561,False
+91,feature,trx_amount_currency11,target_2,"(0, 10000]",63862,7,63855,True
+92,feature,trx_amount_currency11,target_3,"(0, 10000]",63862,120,63742,False
+93,feature,trx_amount_currency11,target_4,"(0, 10000]",63862,92,63770,False
+94,feature,trx_amount_currency11,y_any,"(0, 10000]",63862,492,63370,False
+95,feature,trx_amount_currency11,target_1,"(10000, 100000]",128884,382,128502,False
+96,feature,trx_amount_currency11,target_2,"(10000, 100000]",128884,13,128871,True
+97,feature,trx_amount_currency11,target_3,"(10000, 100000]",128884,283,128601,False
+98,feature,trx_amount_currency11,target_4,"(10000, 100000]",128884,191,128693,False
+99,feature,trx_amount_currency11,y_any,"(10000, 100000]",128884,832,128052,False
+100,feature,trx_amount_currency11,target_1,"(100000, 1000000]",283377,877,282500,False
+101,feature,trx_amount_currency11,target_2,"(100000, 1000000]",283377,84,283293,False
+102,feature,trx_amount_currency11,target_3,"(100000, 1000000]",283377,907,282470,False
+103,feature,trx_amount_currency11,target_4,"(100000, 1000000]",283377,577,282800,False
+104,feature,trx_amount_currency11,y_any,"(100000, 1000000]",283377,2327,281050,False
+105,feature,trx_amount_currency11,target_1,> 1000000,449556,2537,447019,False
+106,feature,trx_amount_currency11,target_2,> 1000000,449556,452,449104,False
+107,feature,trx_amount_currency11,target_3,> 1000000,449556,2995,446561,False
+108,feature,trx_amount_currency11,target_4,> 1000000,449556,1930,447626,False
+109,feature,trx_amount_currency11,y_any,> 1000000,449556,7522,442034,False
+110,feature,dialog_events,target_1,<= 0,1129233,4174,1125059,False
+111,feature,dialog_events,target_2,<= 0,1129233,463,1128770,False
+112,feature,dialog_events,target_3,<= 0,1129233,3508,1125725,False
+113,feature,dialog_events,target_4,<= 0,1129233,2380,1126853,False
+114,feature,dialog_events,y_any,<= 0,1129233,10030,1119203,False
+115,feature,dialog_events,target_1,"(0, 1]",50106,741,49365,False
+116,feature,dialog_events,target_2,"(0, 1]",50106,59,50047,False
+117,feature,dialog_events,target_3,"(0, 1]",50106,604,49502,False
+118,feature,dialog_events,target_4,"(0, 1]",50106,416,49690,False
+119,feature,dialog_events,y_any,"(0, 1]",50106,1721,48385,False
+120,feature,dialog_events,target_1,"(1, 2]",13516,225,13291,False
+121,feature,dialog_events,target_2,"(1, 2]",13516,29,13487,True
+122,feature,dialog_events,target_3,"(1, 2]",13516,204,13312,False
+123,feature,dialog_events,target_4,"(1, 2]",13516,129,13387,False
+124,feature,dialog_events,y_any,"(1, 2]",13516,552,12964,False
+125,feature,dialog_events,target_1,"(2, 5]",8326,177,8149,False
+126,feature,dialog_events,target_2,"(2, 5]",8326,21,8305,True
+127,feature,dialog_events,target_3,"(2, 5]",8326,175,8151,False
+128,feature,dialog_events,target_4,"(2, 5]",8326,113,8213,False
+129,feature,dialog_events,y_any,"(2, 5]",8326,443,7883,False
+130,feature,dialog_events,target_1,> 5,1507,45,1462,False
+131,feature,dialog_events,target_2,> 5,1507,5,1502,True
+132,feature,dialog_events,target_3,> 5,1507,39,1468,False
+133,feature,dialog_events,target_4,> 5,1507,22,1485,True
+134,feature,dialog_events,y_any,> 5,1507,108,1399,False
+135,feature,dialog_recency_days,target_1,Unknown / no usable event,749185,2248,746937,False
+136,feature,dialog_recency_days,target_2,Unknown / no usable event,749185,209,748976,False
+137,feature,dialog_recency_days,target_3,Unknown / no usable event,749185,1518,747667,False
+138,feature,dialog_recency_days,target_4,Unknown / no usable event,749185,1037,748148,False
+139,feature,dialog_recency_days,y_any,Unknown / no usable event,749185,4744,744441,False
+140,feature,dialog_recency_days,target_1,<= 7,23330,621,22709,False
+141,feature,dialog_recency_days,target_2,<= 7,23330,49,23281,False
+142,feature,dialog_recency_days,target_3,<= 7,23330,468,22862,False
+143,feature,dialog_recency_days,target_4,<= 7,23330,325,23005,False
+144,feature,dialog_recency_days,y_any,<= 7,23330,1358,21972,False
+145,feature,dialog_recency_days,target_1,"(7, 30]",49111,559,48552,False
+146,feature,dialog_recency_days,target_2,"(7, 30]",49111,62,49049,False
+147,feature,dialog_recency_days,target_3,"(7, 30]",49111,548,48563,False
+148,feature,dialog_recency_days,target_4,"(7, 30]",49111,346,48765,False
+149,feature,dialog_recency_days,y_any,"(7, 30]",49111,1445,47666,False
+150,feature,dialog_recency_days,target_1,"(30, 90]",89417,539,88878,False
+151,feature,dialog_recency_days,target_2,"(30, 90]",89417,68,89349,False
+152,feature,dialog_recency_days,target_3,"(30, 90]",89417,657,88760,False
+153,feature,dialog_recency_days,target_4,"(30, 90]",89417,418,88999,False
+154,feature,dialog_recency_days,y_any,"(30, 90]",89417,1626,87791,False
+155,feature,dialog_recency_days,target_1,"(90, 180]",95378,549,94829,False
+156,feature,dialog_recency_days,target_2,"(90, 180]",95378,85,95293,False
+157,feature,dialog_recency_days,target_3,"(90, 180]",95378,533,94845,False
+158,feature,dialog_recency_days,target_4,"(90, 180]",95378,367,95011,False
+159,feature,dialog_recency_days,y_any,"(90, 180]",95378,1456,93922,False
+160,feature,dialog_recency_days,target_1,> 180,196267,846,195421,False
+161,feature,dialog_recency_days,target_2,> 180,196267,104,196163,False
+162,feature,dialog_recency_days,target_3,> 180,196267,806,195461,False
+163,feature,dialog_recency_days,target_4,> 180,196267,567,195700,False
+164,feature,dialog_recency_days,y_any,> 180,196267,2225,194042,False
+165,feature,geo_unique_regions,target_1,Unknown / no usable event,505517,1939,503578,False
+166,feature,geo_unique_regions,target_2,Unknown / no usable event,505517,164,505353,False
+167,feature,geo_unique_regions,target_3,Unknown / no usable event,505517,1542,503975,False
+168,feature,geo_unique_regions,target_4,Unknown / no usable event,505517,1038,504479,False
+169,feature,geo_unique_regions,y_any,Unknown / no usable event,505517,4479,501038,False
+170,feature,geo_unique_regions,target_1,<= 1,39168,164,39004,False
+171,feature,geo_unique_regions,target_2,<= 1,39168,20,39148,True
+172,feature,geo_unique_regions,target_3,<= 1,39168,135,39033,False
+173,feature,geo_unique_regions,target_4,<= 1,39168,78,39090,False
+174,feature,geo_unique_regions,y_any,<= 1,39168,373,38795,False
+175,feature,geo_unique_regions,target_1,"(1, 5]",128810,562,128248,False
+176,feature,geo_unique_regions,target_2,"(1, 5]",128810,55,128755,False
+177,feature,geo_unique_regions,target_3,"(1, 5]",128810,484,128326,False
+178,feature,geo_unique_regions,target_4,"(1, 5]",128810,296,128514,False
+179,feature,geo_unique_regions,y_any,"(1, 5]",128810,1330,127480,False
+180,feature,geo_unique_regions,target_1,"(5, 20]",317281,1457,315824,False
+181,feature,geo_unique_regions,target_2,"(5, 20]",317281,176,317105,False
+182,feature,geo_unique_regions,target_3,"(5, 20]",317281,1365,315916,False
+183,feature,geo_unique_regions,target_4,"(5, 20]",317281,907,316374,False
+184,feature,geo_unique_regions,y_any,"(5, 20]",317281,3697,313584,False
+185,feature,geo_unique_regions,target_1,"(20, 100]",206268,1205,205063,False
+186,feature,geo_unique_regions,target_2,"(20, 100]",206268,153,206115,False
+187,feature,geo_unique_regions,target_3,"(20, 100]",206268,974,205294,False
+188,feature,geo_unique_regions,target_4,"(20, 100]",206268,724,205544,False
+189,feature,geo_unique_regions,y_any,"(20, 100]",206268,2886,203382,False
+190,feature,geo_unique_regions,target_1,> 100,5644,35,5609,False
+191,feature,geo_unique_regions,target_2,> 100,5644,9,5635,True
+192,feature,geo_unique_regions,target_3,> 100,5644,30,5614,False
+193,feature,geo_unique_regions,target_4,> 100,5644,17,5627,True
+194,feature,geo_unique_regions,y_any,> 100,5644,89,5555,False
+195,feature,geo_dominant_share,target_1,Unknown / no usable event,505517,1939,503578,False
+196,feature,geo_dominant_share,target_2,Unknown / no usable event,505517,164,505353,False
+197,feature,geo_dominant_share,target_3,Unknown / no usable event,505517,1542,503975,False
+198,feature,geo_dominant_share,target_4,Unknown / no usable event,505517,1038,504479,False
+199,feature,geo_dominant_share,y_any,Unknown / no usable event,505517,4479,501038,False
+200,feature,geo_dominant_share,target_1,<= 0.25,177286,982,176304,False
+201,feature,geo_dominant_share,target_2,<= 0.25,177286,120,177166,False
+202,feature,geo_dominant_share,target_3,<= 0.25,177286,761,176525,False
+203,feature,geo_dominant_share,target_4,<= 0.25,177286,574,176712,False
+204,feature,geo_dominant_share,y_any,<= 0.25,177286,2299,174987,False
+205,feature,geo_dominant_share,target_1,"(0.25, 0.5]",324330,1595,322735,False
+206,feature,geo_dominant_share,target_2,"(0.25, 0.5]",324330,198,324132,False
+207,feature,geo_dominant_share,target_3,"(0.25, 0.5]",324330,1483,322847,False
+208,feature,geo_dominant_share,target_4,"(0.25, 0.5]",324330,987,323343,False
+209,feature,geo_dominant_share,y_any,"(0.25, 0.5]",324330,4025,320305,False
+210,feature,geo_dominant_share,target_1,"(0.5, 0.75]",122498,543,121955,False
+211,feature,geo_dominant_share,target_2,"(0.5, 0.75]",122498,59,122439,False
+212,feature,geo_dominant_share,target_3,"(0.5, 0.75]",122498,496,122002,False
+213,feature,geo_dominant_share,target_4,"(0.5, 0.75]",122498,315,122183,False
+214,feature,geo_dominant_share,y_any,"(0.5, 0.75]",122498,1353,121145,False
+215,feature,geo_dominant_share,target_1,"(0.75, 0.95]",32159,128,32031,False
+216,feature,geo_dominant_share,target_2,"(0.75, 0.95]",32159,14,32145,True
+217,feature,geo_dominant_share,target_3,"(0.75, 0.95]",32159,111,32048,False
+218,feature,geo_dominant_share,target_4,"(0.75, 0.95]",32159,63,32096,False
+219,feature,geo_dominant_share,y_any,"(0.75, 0.95]",32159,305,31854,False
+220,feature,geo_dominant_share,target_1,> 0.95,40898,175,40723,False
+221,feature,geo_dominant_share,target_2,> 0.95,40898,22,40876,True
+222,feature,geo_dominant_share,target_3,> 0.95,40898,137,40761,False
+223,feature,geo_dominant_share,target_4,> 0.95,40898,83,40815,False
+224,feature,geo_dominant_share,y_any,> 0.95,40898,393,40505,False
+225,feature,geo_entropy,target_1,Unknown / no usable event,505517,1939,503578,False
+226,feature,geo_entropy,target_2,Unknown / no usable event,505517,164,505353,False
+227,feature,geo_entropy,target_3,Unknown / no usable event,505517,1542,503975,False
+228,feature,geo_entropy,target_4,Unknown / no usable event,505517,1038,504479,False
+229,feature,geo_entropy,y_any,Unknown / no usable event,505517,4479,501038,False
+230,feature,geo_entropy,target_1,<= 0.5,51797,215,51582,False
+231,feature,geo_entropy,target_2,<= 0.5,51797,28,51769,True
+232,feature,geo_entropy,target_3,<= 0.5,51797,168,51629,False
+233,feature,geo_entropy,target_4,<= 0.5,51797,102,51695,False
+234,feature,geo_entropy,y_any,<= 0.5,51797,488,51309,False
+235,feature,geo_entropy,target_1,"(0.5, 1]",66939,293,66646,False
+236,feature,geo_entropy,target_2,"(0.5, 1]",66939,29,66910,True
+237,feature,geo_entropy,target_3,"(0.5, 1]",66939,247,66692,False
+238,feature,geo_entropy,target_4,"(0.5, 1]",66939,156,66783,False
+239,feature,geo_entropy,y_any,"(0.5, 1]",66939,691,66248,False
+240,feature,geo_entropy,target_1,"(1, 2]",254644,1150,253494,False
+241,feature,geo_entropy,target_2,"(1, 2]",254644,130,254514,False
+242,feature,geo_entropy,target_3,"(1, 2]",254644,1060,253584,False
+243,feature,geo_entropy,target_4,"(1, 2]",254644,682,253962,False
+244,feature,geo_entropy,y_any,"(1, 2]",254644,2868,251776,False
+245,feature,geo_entropy,target_1,"(2, 3]",252428,1344,251084,False
+246,feature,geo_entropy,target_2,"(2, 3]",252428,165,252263,False
+247,feature,geo_entropy,target_3,"(2, 3]",252428,1185,251243,False
+248,feature,geo_entropy,target_4,"(2, 3]",252428,852,251576,False
+249,feature,geo_entropy,y_any,"(2, 3]",252428,3346,249082,False
+250,feature,geo_entropy,target_1,> 3,71363,421,70942,False
+251,feature,geo_entropy,target_2,> 3,71363,61,71302,False
+252,feature,geo_entropy,target_3,> 3,71363,328,71035,False
+253,feature,geo_entropy,target_4,> 3,71363,230,71133,False
+254,feature,geo_entropy,y_any,> 3,71363,982,70381,False
+255,feature,geo_transition_rate,target_1,Unknown / no usable event,527008,2039,524969,False
+256,feature,geo_transition_rate,target_2,Unknown / no usable event,527008,171,526837,False
+257,feature,geo_transition_rate,target_3,Unknown / no usable event,527008,1632,525376,False
+258,feature,geo_transition_rate,target_4,Unknown / no usable event,527008,1086,525922,False
+259,feature,geo_transition_rate,y_any,Unknown / no usable event,527008,4708,522300,False
+260,feature,geo_transition_rate,target_1,<= 0.1,19968,77,19891,False
+261,feature,geo_transition_rate,target_2,<= 0.1,19968,15,19953,True
+262,feature,geo_transition_rate,target_3,<= 0.1,19968,47,19921,False
+263,feature,geo_transition_rate,target_4,<= 0.1,19968,36,19932,False
+264,feature,geo_transition_rate,y_any,<= 0.1,19968,167,19801,False
+265,feature,geo_transition_rate,target_1,"(0.1, 0.25]",12017,42,11975,False
+266,feature,geo_transition_rate,target_2,"(0.1, 0.25]",12017,8,12009,True
+267,feature,geo_transition_rate,target_3,"(0.1, 0.25]",12017,44,11973,False
+268,feature,geo_transition_rate,target_4,"(0.1, 0.25]",12017,22,11995,True
+269,feature,geo_transition_rate,y_any,"(0.1, 0.25]",12017,113,11904,False
+270,feature,geo_transition_rate,target_1,"(0.25, 0.5]",56458,246,56212,False
+271,feature,geo_transition_rate,target_2,"(0.25, 0.5]",56458,27,56431,True
+272,feature,geo_transition_rate,target_3,"(0.25, 0.5]",56458,231,56227,False
+273,feature,geo_transition_rate,target_4,"(0.25, 0.5]",56458,134,56324,False
+274,feature,geo_transition_rate,y_any,"(0.25, 0.5]",56458,608,55850,False
+275,feature,geo_transition_rate,target_1,"(0.5, 0.75]",178824,812,178012,False
+276,feature,geo_transition_rate,target_2,"(0.5, 0.75]",178824,101,178723,False
+277,feature,geo_transition_rate,target_3,"(0.5, 0.75]",178824,756,178068,False
+278,feature,geo_transition_rate,target_4,"(0.5, 0.75]",178824,502,178322,False
+279,feature,geo_transition_rate,y_any,"(0.5, 0.75]",178824,2072,176752,False
+280,feature,geo_transition_rate,target_1,> 0.75,408413,2146,406267,False
+281,feature,geo_transition_rate,target_2,> 0.75,408413,255,408158,False
+282,feature,geo_transition_rate,target_3,> 0.75,408413,1820,406593,False
+283,feature,geo_transition_rate,target_4,> 0.75,408413,1280,407133,False
+284,feature,geo_transition_rate,y_any,> 0.75,408413,5186,403227,False
+285,feature,trx_gap_days,target_1,Unknown / no usable event,369118,1535,367583,False
+286,feature,trx_gap_days,target_2,Unknown / no usable event,369118,35,369083,False
+287,feature,trx_gap_days,target_3,Unknown / no usable event,369118,347,368771,False
+288,feature,trx_gap_days,target_4,Unknown / no usable event,369118,373,368745,False
+289,feature,trx_gap_days,y_any,Unknown / no usable event,369118,2157,366961,False
+290,feature,trx_gap_days,target_1,<= 0.01,267,3,264,True
+291,feature,trx_gap_days,target_2,<= 0.01,267,0,267,True
+292,feature,trx_gap_days,target_3,<= 0.01,267,1,266,True
+293,feature,trx_gap_days,target_4,<= 0.01,267,0,267,True
+294,feature,trx_gap_days,y_any,<= 0.01,267,3,264,True
+295,feature,trx_gap_days,target_1,"(0.01, 0.1]",11773,84,11689,False
+296,feature,trx_gap_days,target_2,"(0.01, 0.1]",11773,10,11763,True
+297,feature,trx_gap_days,target_3,"(0.01, 0.1]",11773,100,11673,False
+298,feature,trx_gap_days,target_4,"(0.01, 0.1]",11773,104,11669,False
+299,feature,trx_gap_days,y_any,"(0.01, 0.1]",11773,289,11484,False
+300,feature,trx_gap_days,target_1,"(0.1, 1]",320075,2149,317926,False
+301,feature,trx_gap_days,target_2,"(0.1, 1]",320075,379,319696,False
+302,feature,trx_gap_days,target_3,"(0.1, 1]",320075,2574,317501,False
+303,feature,trx_gap_days,target_4,"(0.1, 1]",320075,1656,318419,False
+304,feature,trx_gap_days,y_any,"(0.1, 1]",320075,6441,313634,False
+305,feature,trx_gap_days,target_1,"(1, 7]",418924,1404,417520,False
+306,feature,trx_gap_days,target_2,"(1, 7]",418924,142,418782,False
+307,feature,trx_gap_days,target_3,"(1, 7]",418924,1379,417545,False
+308,feature,trx_gap_days,target_4,"(1, 7]",418924,845,418079,False
+309,feature,trx_gap_days,y_any,"(1, 7]",418924,3580,415344,False
+310,feature,trx_gap_days,target_1,> 7,82531,187,82344,False
+311,feature,trx_gap_days,target_2,> 7,82531,11,82520,True
+312,feature,trx_gap_days,target_3,> 7,82531,129,82402,False
+313,feature,trx_gap_days,target_4,> 7,82531,82,82449,False
+314,feature,trx_gap_days,y_any,> 7,82531,384,82147,False
+315,feature,dialog_gap_days,target_1,Unknown / no usable event,1179339,4915,1174424,False
+316,feature,dialog_gap_days,target_2,Unknown / no usable event,1179339,522,1178817,False
+317,feature,dialog_gap_days,target_3,Unknown / no usable event,1179339,4112,1175227,False
+318,feature,dialog_gap_days,target_4,Unknown / no usable event,1179339,2796,1176543,False
+319,feature,dialog_gap_days,y_any,Unknown / no usable event,1179339,11751,1167588,False
+320,feature,dialog_gap_days,target_1,<= 1,1382,38,1344,False
+321,feature,dialog_gap_days,target_2,<= 1,1382,3,1379,True
+322,feature,dialog_gap_days,target_3,<= 1,1382,26,1356,True
+323,feature,dialog_gap_days,target_4,<= 1,1382,14,1368,True
+324,feature,dialog_gap_days,y_any,<= 1,1382,74,1308,False
+325,feature,dialog_gap_days,target_1,"(1, 7]",12045,272,11773,False
+326,feature,dialog_gap_days,target_2,"(1, 7]",12045,32,12013,False
+327,feature,dialog_gap_days,target_3,"(1, 7]",12045,220,11825,False
+328,feature,dialog_gap_days,target_4,"(1, 7]",12045,147,11898,False
+329,feature,dialog_gap_days,y_any,"(1, 7]",12045,625,11420,False
+330,feature,dialog_gap_days,target_1,"(7, 14]",6783,106,6677,False
+331,feature,dialog_gap_days,target_2,"(7, 14]",6783,14,6769,True
+332,feature,dialog_gap_days,target_3,"(7, 14]",6783,124,6659,False
+333,feature,dialog_gap_days,target_4,"(7, 14]",6783,73,6710,False
+334,feature,dialog_gap_days,y_any,"(7, 14]",6783,295,6488,False
+335,feature,dialog_gap_days,target_1,"(14, 30]",3134,31,3103,False
+336,feature,dialog_gap_days,target_2,"(14, 30]",3134,6,3128,True
+337,feature,dialog_gap_days,target_3,"(14, 30]",3134,48,3086,False
+338,feature,dialog_gap_days,target_4,"(14, 30]",3134,30,3104,False
+339,feature,dialog_gap_days,y_any,"(14, 30]",3134,109,3025,False
+340,feature,dialog_gap_days,target_1,> 30,5,0,5,True
+341,feature,dialog_gap_days,target_2,> 30,5,0,5,True
+342,feature,dialog_gap_days,target_3,> 30,5,0,5,True
+343,feature,dialog_gap_days,target_4,> 30,5,0,5,True
+344,feature,dialog_gap_days,y_any,> 30,5,0,5,True
+345,category,category_1,target_1,present in T-1,756303,3433,752870,False
+346,category,category_1,target_2,present in T-1,756303,520,755783,False
+347,category,category_1,target_3,present in T-1,756303,3873,752430,False
+348,category,category_1,target_4,present in T-1,756303,2549,753754,False
+349,category,category_1,y_any,present in T-1,756303,9860,746443,False
+350,category,category_46,target_1,present in T-1,456390,2026,454364,False
+351,category,category_46,target_2,present in T-1,456390,362,456028,False
+352,category,category_46,target_3,present in T-1,456390,2766,453624,False
+353,category,category_46,target_4,present in T-1,456390,1425,454965,False
+354,category,category_46,y_any,present in T-1,456390,6287,450103,False
+355,category,category_40,target_1,present in T-1,333081,2787,330294,False
+356,category,category_40,target_2,present in T-1,333081,363,332718,False
+357,category,category_40,target_3,present in T-1,333081,3079,330002,False
+358,category,category_40,target_4,present in T-1,333081,1840,331241,False
+359,category,category_40,y_any,present in T-1,333081,7696,325385,False
+360,category,category_49,target_1,present in T-1,177928,1329,176599,False
+361,category,category_49,target_2,present in T-1,177928,186,177742,False
+362,category,category_49,target_3,present in T-1,177928,1319,176609,False
+363,category,category_49,target_4,present in T-1,177928,703,177225,False
+364,category,category_49,y_any,present in T-1,177928,3374,174554,False
+365,category,category_11,target_1,present in T-1,242489,1922,240567,False
+366,category,category_11,target_2,present in T-1,242489,230,242259,False
+367,category,category_11,target_3,present in T-1,242489,2203,240286,False
+368,category,category_11,target_4,present in T-1,242489,1282,241207,False
+369,category,category_11,y_any,present in T-1,242489,5412,237077,False
+370,feature,dialog_active_days,target_1,0 ngày,1129233,4174,1125059,False
+371,feature,dialog_active_days,target_1,1 ngày,50681,752,49929,False
+372,feature,dialog_active_days,target_1,2–3 ngày,18415,338,18077,False
+373,feature,dialog_active_days,target_1,4–10 ngày,4246,93,4153,False
+374,feature,dialog_active_days,target_1,>10 ngày,113,5,108,True
+375,feature,dialog_active_days,target_2,0 ngày,1129233,463,1128770,False
+376,feature,dialog_active_days,target_2,1 ngày,50681,60,50621,False
+377,feature,dialog_active_days,target_2,2–3 ngày,18415,38,18377,False
+378,feature,dialog_active_days,target_2,4–10 ngày,4246,16,4230,True
+379,feature,dialog_active_days,target_2,>10 ngày,113,0,113,True
+380,feature,dialog_active_days,target_3,0 ngày,1129233,3508,1125725,False
+381,feature,dialog_active_days,target_3,1 ngày,50681,611,50070,False
+382,feature,dialog_active_days,target_3,2–3 ngày,18415,309,18106,False
+383,feature,dialog_active_days,target_3,4–10 ngày,4246,100,4146,False
+384,feature,dialog_active_days,target_3,>10 ngày,113,2,111,True
+385,feature,dialog_active_days,target_4,0 ngày,1129233,2380,1126853,False
+386,feature,dialog_active_days,target_4,1 ngày,50681,422,50259,False
+387,feature,dialog_active_days,target_4,2–3 ngày,18415,188,18227,False
+388,feature,dialog_active_days,target_4,4–10 ngày,4246,70,4176,False
+389,feature,dialog_active_days,target_4,>10 ngày,113,0,113,True
+390,feature,dialog_active_days,y_any,0 ngày,1129233,10030,1119203,False
+391,feature,dialog_active_days,y_any,1 ngày,50681,1746,48935,False
+392,feature,dialog_active_days,y_any,2–3 ngày,18415,808,17607,False
+393,feature,dialog_active_days,y_any,4–10 ngày,4246,263,3983,False
+394,feature,dialog_active_days,y_any,>10 ngày,113,7,106,True

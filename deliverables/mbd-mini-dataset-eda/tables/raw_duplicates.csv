@@ -1,0 +1,14 @@
+source,kind,duplicate_n,duplicate_groups,analyzed_rows,scope
+clients,unique_key,0,0,100224,full
+clients,full_row,0,0,100224,full
+targets,unique_key,0,0,1202688,full
+targets,full_row,0,0,1202688,full
+trx,full_row,0,0,38764930,full
+trx,same_client_time_candidate,1,1,38764930,full
+geo,full_row,0,0,66295724,full
+geo,same_client_time_candidate,0,0,66295724,full
+dialog,full_row,0,0,217205,full
+dialog,same_client_time_candidate,0,0,217205,full
+ptls_trx,unique_key,0,0,98721,full
+ptls_geo,unique_key,0,0,72573,full
+ptls_dialog,unique_key,0,0,46320,full

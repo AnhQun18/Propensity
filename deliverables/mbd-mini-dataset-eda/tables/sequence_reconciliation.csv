@@ -1,0 +1,4 @@
+source,detail_events,ptls_events,max_detail_events,max_sequence_events,customers_shorter_sequence,customers_longer_sequence,customer_presence_mismatch
+trx,38764930,36744910,1020773,10000,13,0,0
+geo,66295724,66295724,39487,39487,0,0,0
+dialog,217205,217205,114,114,0,0,0

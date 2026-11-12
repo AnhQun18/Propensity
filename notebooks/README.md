@@ -3,7 +3,7 @@
 | Notebook | Mục đích | Dữ liệu |
 | --- | --- | --- |
 | [eda.ipynb](eda.ipynb) | EDA đủ 7 bước, thống kê toàn bộ raw, liên hệ với `y_any` trên train, xuất HTML/Markdown/CSV | Raw `data/MBD-mini/` + output ready notebook 03 |
-| [01_data_preview.ipynb](01_data_preview.ipynb) | Xem schema và vài dòng mẫu | `sampledata/mbd_mini/` |
+| [01_data_preview.ipynb](01_data_preview.ipynb) | Xem schema/dòng mẫu và head() dữ liệu đã xử lí | `sampledata/mbd_mini/`, `processed/` hoặc output ready notebook 03 |
 | [02_data_preparation.ipynb](02_data_preparation.ipynb) | Chuẩn hóa nhãn/log, feature khách–tháng, audit và protocol | Raw `data/MBD-mini/` hoặc đường dẫn cấu hình |
 | [03_data_processing.ipynb](03_data_processing.ipynb) | Quy trình xử lí hiện tại, có bảng các bước, kiểm tra ma trận và tách supervised/unlabelled | Raw theo `configs/propensity_processing.json` |
 | [04_merge_processed.ipynb](04_merge_processed.ipynb) | Ghép các bảng khách–tháng đã nối nguồn thành một Parquet, đối soát và lưu vào `processed/` | Output ready/schema v2 của notebook 03 |

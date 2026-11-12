@@ -1,0 +1,2 @@
+source,rows,clients,first_event,last_event,columns,reference_clients,coverage_percent
+trx,38764930,98721,2020-12-31 21:00:02.169545,2022-12-31 20:59:58.460193,15,100224,98.5003591954023

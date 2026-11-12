@@ -1,0 +1,64 @@
+feature,group,rows,lower,upper
+trx_events,<= 0,277009,,0.0
+trx_events,"(0, 5]",304479,0.0,5.0
+trx_events,"(5, 20]",317028,5.0,20.0
+trx_events,"(20, 100]",290807,20.0,100.0
+trx_events,> 100,13365,100.0,
+trx_recency_days,Unknown / no usable event,88572,,
+trx_recency_days,<= 3,575366,,3.0
+trx_recency_days,"(3, 10]",213168,3.0,10.0
+trx_recency_days,"(10, 30]",135742,10.0,30.0
+trx_recency_days,"(30, 90]",90996,30.0,90.0
+trx_recency_days,> 90,98844,90.0,
+trx_amount_currency11,<= 0,277009,,0.0
+trx_amount_currency11,"(0, 10000]",63862,0.0,10000.0
+trx_amount_currency11,"(10000, 100000]",128884,10000.0,100000.0
+trx_amount_currency11,"(100000, 1000000]",283377,100000.0,1000000.0
+trx_amount_currency11,> 1000000,449556,1000000.0,
+dialog_events,<= 0,1129233,,0.0
+dialog_events,"(0, 1]",50106,0.0,1.0
+dialog_events,"(1, 2]",13516,1.0,2.0
+dialog_events,"(2, 5]",8326,2.0,5.0
+dialog_events,> 5,1507,5.0,
+dialog_recency_days,Unknown / no usable event,749185,,
+dialog_recency_days,<= 7,23330,,7.0
+dialog_recency_days,"(7, 30]",49111,7.0,30.0
+dialog_recency_days,"(30, 90]",89417,30.0,90.0
+dialog_recency_days,"(90, 180]",95378,90.0,180.0
+dialog_recency_days,> 180,196267,180.0,
+geo_unique_regions,Unknown / no usable event,505517,,
+geo_unique_regions,<= 1,39168,,1.0
+geo_unique_regions,"(1, 5]",128810,1.0,5.0
+geo_unique_regions,"(5, 20]",317281,5.0,20.0
+geo_unique_regions,"(20, 100]",206268,20.0,100.0
+geo_unique_regions,> 100,5644,100.0,
+geo_dominant_share,Unknown / no usable event,505517,,
+geo_dominant_share,<= 0.25,177286,,0.25
+geo_dominant_share,"(0.25, 0.5]",324330,0.25,0.5
+geo_dominant_share,"(0.5, 0.75]",122498,0.5,0.75
+geo_dominant_share,"(0.75, 0.95]",32159,0.75,0.95
+geo_dominant_share,> 0.95,40898,0.95,
+geo_entropy,Unknown / no usable event,505517,,
+geo_entropy,<= 0.5,51797,,0.5
+geo_entropy,"(0.5, 1]",66939,0.5,1.0
+geo_entropy,"(1, 2]",254644,1.0,2.0
+geo_entropy,"(2, 3]",252428,2.0,3.0
+geo_entropy,> 3,71363,3.0,
+geo_transition_rate,Unknown / no usable event,527008,,
+geo_transition_rate,<= 0.1,19968,,0.1
+geo_transition_rate,"(0.1, 0.25]",12017,0.1,0.25
+geo_transition_rate,"(0.25, 0.5]",56458,0.25,0.5
+geo_transition_rate,"(0.5, 0.75]",178824,0.5,0.75
+geo_transition_rate,> 0.75,408413,0.75,
+trx_gap_days,Unknown / no usable event,369118,,
+trx_gap_days,<= 0.01,267,,0.01
+trx_gap_days,"(0.01, 0.1]",11773,0.01,0.1
+trx_gap_days,"(0.1, 1]",320075,0.1,1.0
+trx_gap_days,"(1, 7]",418924,1.0,7.0
+trx_gap_days,> 7,82531,7.0,
+dialog_gap_days,Unknown / no usable event,1179339,,
+dialog_gap_days,<= 1,1382,,1.0
+dialog_gap_days,"(1, 7]",12045,1.0,7.0
+dialog_gap_days,"(7, 14]",6783,7.0,14.0
+dialog_gap_days,"(14, 30]",3134,14.0,30.0
+dialog_gap_days,> 30,5,30.0,

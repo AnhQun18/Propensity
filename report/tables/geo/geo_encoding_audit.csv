@@ -1,0 +1,3 @@
+child,parent,codes_with_multiple_parents,encoding_status,decode_permitted,interpretation
+geohash_5,geohash_4,0,unverified,False,Category identifiers only; hierarchy test cannot recover the original encoding.
+geohash_6,geohash_5,0,unverified,False,Category identifiers only; hierarchy test cannot recover the original encoding.

@@ -1,0 +1,468 @@
+{
+  "created_utc": "2026-11-11T15:13:27.706385+00:00",
+  "dataset": "ai-lab/MBD-mini",
+  "scope": "all 12 label months, full detail event history; calendar T-1 comparisons",
+  "fingerprint": "21797227b070110fa91eca437d17a0834c26cfe5a5ade5114d0f7cedc7e97ccb",
+  "fingerprint_kind": "Parquet relative paths, bytes, mtimes, row counts and schemas; not raw content hash",
+  "timezone": "UTC research convention; original label ETL timezone unconfirmed",
+  "mapping": "T = calendar month containing mon",
+  "window": "[start(T-1), start(T))",
+  "bootstrap": {
+    "unit": "client_id",
+    "replicates": 2000,
+    "seed": 42,
+    "method": "nonparametric multinomial cluster bootstrap; shared draws for group and baseline",
+    "unstable_policy": "Point retained; no CI when no observed positive or bootstrap denominator can be zero; explicit ci_status and valid replicate counts"
+  },
+  "model_fits": 0,
+  "raw_modified": false,
+  "individual_data": "outputs/dataset_eda/customer_month_snapshots.parquet (local only)",
+  "tables": {
+    "target_schema": {
+      "rows": 10,
+      "columns": [
+        "column",
+        "dtype",
+        "null_count",
+        "null_rate",
+        "unique_count"
+      ],
+      "sha256": "8175d05d05b94eb0dc4ed5fa5d44c52db9c1dde7c3b8fbf23f82021a321bb0af"
+    },
+    "target_null_patterns": {
+      "rows": 1,
+      "columns": [
+        "pattern",
+        "rows",
+        "rate"
+      ],
+      "sha256": "7e144c483fe9291eb066c32e665ceb3ad96a469cb49949ae312bcfa53848a809"
+    },
+    "target_monthly": {
+      "rows": 60,
+      "columns": [
+        "target",
+        "month",
+        "n_total",
+        "n_positive",
+        "n_negative",
+        "n_null",
+        "rate",
+        "ci_low",
+        "ci_high",
+        "small_positive"
+      ],
+      "sha256": "e855a9aa2df6e885b32e78e6a3bb168c2edbe8bfa2868ac421af9d72159d7db5"
+    },
+    "target_frequency": {
+      "rows": 35,
+      "columns": [
+        "target",
+        "positive_months",
+        "customers"
+      ],
+      "sha256": "bec37659ab79aa7a525a87eccce89517ab36ece4a07548a7a3af59a2086828ef"
+    },
+    "target_transitions_monthly": {
+      "rows": 110,
+      "columns": [
+        "target",
+        "month",
+        "previous",
+        "n_total",
+        "n_positive",
+        "n_negative",
+        "rate",
+        "ci_low",
+        "ci_high",
+        "small_positive"
+      ],
+      "sha256": "a8ae79e62c103b4f31a02b9ad373eefe29763656e3fd6078a82158bb0e790ced"
+    },
+    "buyer_composition_monthly": {
+      "rows": 180,
+      "columns": [
+        "target",
+        "month",
+        "buyer_group",
+        "buyers",
+        "all_current_buyers",
+        "share",
+        "ci_low",
+        "ci_high",
+        "small_positive"
+      ],
+      "sha256": "604661c80fd6fe7e5d3f12948d8a0bdd16377f1150e3b5e79fc6f44513de1d46"
+    },
+    "raw_schema": {
+      "rows": 61,
+      "columns": [
+        "source",
+        "column",
+        "dtype"
+      ],
+      "sha256": "bbd4a0f238a26a901ea9ed4709def5b09bb71a830ce70d4ac3c181961dbf9909"
+    },
+    "source_overview": {
+      "rows": 3,
+      "columns": [
+        "source",
+        "rows",
+        "clients",
+        "first_event",
+        "last_event"
+      ],
+      "sha256": "2cdc7326a612f1ba9b003f330c7e6a48cadc5e54fcf0a0b9c05e709d4c1b1c85"
+    },
+    "source_monthly": {
+      "rows": 61,
+      "columns": [
+        "source",
+        "month",
+        "events",
+        "active_clients",
+        "events_per_active_client",
+        "median",
+        "p95",
+        "log_coverage"
+      ],
+      "sha256": "01ee9f406cf0dcd57b51ed8d3fa3ea85564711b7573dd46a31f7953116be5d3e"
+    },
+    "customer_activity": {
+      "rows": 3,
+      "columns": [
+        "source",
+        "clients",
+        "zero_log",
+        "mean",
+        "minimum",
+        "p25",
+        "median",
+        "p75",
+        "p90",
+        "p95",
+        "p99",
+        "maximum",
+        "top1_share",
+        "top5_share"
+      ],
+      "sha256": "dc7a4d52a9b5d93ecd21aa47bed62dc9cdcd3e34f40ed8dc0e1bba5180d958af"
+    },
+    "temporal_event_audit": {
+      "rows": 36,
+      "columns": [
+        "source",
+        "outcome_month",
+        "window_start",
+        "cutoff",
+        "window_events",
+        "cumulative_events",
+        "excluded_at_or_after_cutoff",
+        "max_used_event",
+        "boundary_check"
+      ],
+      "sha256": "7df93af5243f933e15ac6ce4c1cb5e388c165f9ec5f90f11cf73d8b9c93ba8d1"
+    },
+    "temporal_alignment": {
+      "rows": 12,
+      "columns": [
+        "outcome_month",
+        "cutoff",
+        "window_start",
+        "window_end_exclusive",
+        "timezone_status"
+      ],
+      "sha256": "a87e8beb1e377292b0f6504379e995028e066208080e504a261b10fb6a83d1ac"
+    },
+    "embedding_quality": {
+      "rows": 1,
+      "columns": [
+        "rows",
+        "null_vectors",
+        "wrong_dimension",
+        "bad_elements",
+        "zero_vectors",
+        "minimum",
+        "p25",
+        "median",
+        "p75",
+        "maximum"
+      ],
+      "sha256": "708f8066d2070fd535e52472c2e935440e43a5849a5f827bb92025ee3c9da597"
+    },
+    "trx_categories": {
+      "rows": 55,
+      "columns": [
+        "event_type",
+        "events",
+        "clients"
+      ],
+      "sha256": "e2cd1f8856c942b9a702f66e7c59ed9cb77aeea7580d6a6fcb0956434f6056f4"
+    },
+    "feature_group_definitions": {
+      "rows": 63,
+      "columns": [
+        "feature",
+        "group",
+        "rows",
+        "lower",
+        "upper"
+      ],
+      "sha256": "5adc6d717ec9bb62a369009d833e4196416ff07b93e3e368a72d96788e25ccba"
+    },
+    "feature_target_summary": {
+      "rows": 118,
+      "columns": [
+        "feature",
+        "target",
+        "label",
+        "n_total",
+        "n_observed",
+        "n_missing",
+        "median",
+        "p25",
+        "p75",
+        "p95"
+      ],
+      "sha256": "5ecd725a9831ac082aa146b8f89a063ed1f2033e9c315b1b054637f295aff368"
+    },
+    "cross_modal_monthly": {
+      "rows": 96,
+      "columns": [
+        "outcome_month",
+        "mask",
+        "customer_months"
+      ],
+      "sha256": "f4a2fc4960c2f8f0979fa1c0d5c71c3f7b019614ce007b09db82fc3b05047cee"
+    },
+    "cross_modal_full_history": {
+      "rows": 8,
+      "columns": [
+        "mask",
+        "clients"
+      ],
+      "sha256": "3b1b1a4ae76083e7f88e4b2e18f1ae53769317a60cc663d9c0be5ccd0f741e53"
+    },
+    "rates_cluster_ci": {
+      "rows": 370,
+      "columns": [
+        "metric_id",
+        "kind",
+        "metric",
+        "target",
+        "group",
+        "n_total",
+        "n_positive",
+        "n_negative",
+        "rate",
+        "small_positive",
+        "ci_low",
+        "ci_high",
+        "ci_method",
+        "replicates",
+        "seed",
+        "valid_replicates",
+        "baseline",
+        "lift",
+        "lift_ci_low",
+        "lift_ci_high",
+        "lift_valid_replicates",
+        "ci_status"
+      ],
+      "sha256": "0c7e079ee69eb4533bf60125cb05280b0d2bf1778e95dfa324bfae2fba657b2a"
+    },
+    "target_transition_comparison": {
+      "rows": 5,
+      "columns": [
+        "target",
+        "repeat_rate",
+        "nonbuyer_rate",
+        "difference",
+        "difference_ci_low",
+        "difference_ci_high",
+        "relative_rate",
+        "ratio_ci_low",
+        "ratio_ci_high"
+      ],
+      "sha256": "33e2c2c27580a2e65fabe16594e52eaa5720b718188bf56af3da0b7dc0bf6a36"
+    },
+    "raw_missing": {
+      "rows": 61,
+      "columns": [
+        "source",
+        "column",
+        "rows",
+        "missing_n",
+        "missing_rate"
+      ],
+      "sha256": "ac1058b3b251a45e8b360c13a4c57719b5ee5a3924abeab4c0f6f7271bfb6180"
+    },
+    "raw_duplicates": {
+      "rows": 13,
+      "columns": [
+        "source",
+        "kind",
+        "duplicate_n",
+        "duplicate_groups",
+        "analyzed_rows",
+        "scope"
+      ],
+      "sha256": "b860cd91d19f360a70cc83e4f8d603fab9774ff74dc3f88cc582ba666db354c0"
+    },
+    "sequence_reconciliation": {
+      "rows": 3,
+      "columns": [
+        "source",
+        "detail_events",
+        "ptls_events",
+        "max_detail_events",
+        "max_sequence_events",
+        "customers_shorter_sequence",
+        "customers_longer_sequence",
+        "customer_presence_mismatch"
+      ],
+      "sha256": "85680af7947050b5f8d11dd4f60ce44ba44d493ff1364044b701b66b80ef4aaf"
+    },
+    "amount_currency": {
+      "rows": 14,
+      "columns": [
+        "currency",
+        "valid_n",
+        "mean",
+        "median",
+        "std",
+        "min",
+        "max",
+        "q1",
+        "q3",
+        "skewness"
+      ],
+      "sha256": "c856c4a460fcbdb7e680724ae71a27630e16d34c63639f9959836698c982d614"
+    },
+    "amount_outliers": {
+      "rows": 14,
+      "columns": [
+        "currency",
+        "valid_n",
+        "log_valid_n",
+        "negative_n",
+        "zero_n",
+        "analysis_scale",
+        "analysis_status",
+        "iqr_applicable",
+        "log_q1",
+        "log_median",
+        "log_q3",
+        "iqr_lower",
+        "iqr_upper",
+        "iqr_lower_input_units",
+        "iqr_upper_input_units",
+        "log_below_n",
+        "log_above_n",
+        "iqr_n",
+        "iqr_pct",
+        "zscore_n",
+        "zscore_pct",
+        "zscore_defined",
+        "raw_q1",
+        "raw_median",
+        "raw_q3",
+        "raw_iqr_lower",
+        "raw_iqr_upper",
+        "raw_iqr_n",
+        "raw_iqr_pct",
+        "raw_zscore_n",
+        "raw_zscore_pct",
+        "action",
+        "ln_valid_n",
+        "ln_iqr_lower",
+        "ln_iqr_upper",
+        "ln_below_n",
+        "ln_above_n",
+        "ln_iqr_n",
+        "ln_iqr_pct"
+      ],
+      "sha256": "bf625830e948a3224cee611ee75842c0569c664982243c3a2cb1e500bc15614c"
+    },
+    "target_purchase_history_summary": {
+      "rows": 10,
+      "columns": [
+        "target",
+        "population",
+        "customers",
+        "mean",
+        "p25",
+        "median",
+        "p75",
+        "p90",
+        "p95",
+        "p99",
+        "maximum",
+        "top1_positive_months_share",
+        "top5_positive_months_share"
+      ],
+      "sha256": "31c18d0082384e694f857a76e64f711f89fe747a9d342ad5ac043c2c64ed202f"
+    }
+  },
+  "reused": [
+    {
+      "table": "raw_missing",
+      "source": "docs/mbd_mini_eda/tables/review/missing_values.csv",
+      "sha256": "38c659280f09add3bfe4b3a3a17287201b3056d8c018032c75087dbae9d3bfc0",
+      "verification": "raw input fingerprint matches full-history review; updated log1p outlier table"
+    },
+    {
+      "table": "raw_duplicates",
+      "source": "docs/mbd_mini_eda/tables/review/duplicates.csv",
+      "sha256": "bbbebb97bc9d17ce6d5787f3ff62841595f10d8750f0895f9d9b0ae3a01403e3",
+      "verification": "raw input fingerprint matches full-history review; updated log1p outlier table"
+    },
+    {
+      "table": "sequence_reconciliation",
+      "source": "docs/mbd_mini_eda/tables/review/sequence_reconciliation.csv",
+      "sha256": "1d12dd05247712705dcf45d758942b9ae1de5a6ac78686da5c1ddec9d165b513",
+      "verification": "raw input fingerprint matches full-history review; updated log1p outlier table"
+    },
+    {
+      "table": "amount_currency",
+      "source": "deliverables/eda/tables/amount_by_currency.csv",
+      "sha256": "087701289ce031aa2e131ebd0a2b481edf02b36cc1b6cdc9237fbefda6677c28",
+      "verification": "raw input fingerprint matches full-history review; updated log1p outlier table"
+    },
+    {
+      "table": "amount_outliers",
+      "source": "deliverables/eda/tables/amount_outliers_by_currency.csv",
+      "sha256": "a74f6263978e2f1a9a77ddc5f812fd4c3ac7e3da9fb94794dff1fed9df4de7fe",
+      "verification": "raw input fingerprint matches full-history review; updated log1p outlier table"
+    }
+  ],
+  "checks": {
+    "label_rows": 1202688,
+    "clients": 100224,
+    "label_nulls": 0,
+    "label_duplicate_keys": 0,
+    "y_any_positive": 12854,
+    "trx_rows": 38764930,
+    "dialog_rows": 217205,
+    "geo_rows": 66295724,
+    "snapshot_rows": 1202688,
+    "bootstrap_replicates": 2000,
+    "bootstrap_finite_rate_fraction": 0.9998986486486486,
+    "raw_inventory_unchanged": true
+  },
+  "duration_seconds": 323.2,
+  "versions": {
+    "duckdb": "2.0.0",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1"
+  },
+  "html_build": {
+    "template": "presenter-mode-reveal",
+    "theme": "corporate-clean",
+    "main_slides": 30,
+    "appendix_slides": 10,
+    "standalone": true
+  }
+}

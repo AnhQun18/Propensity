@@ -1,0 +1,11 @@
+column,dtype,null_count,null_rate,unique_count
+client_id,str,0,0.0,100224
+mon,str,0,0.0,12
+target_1,int32,0,0.0,2
+target_2,int32,0,0.0,2
+target_3,int32,0,0.0,2
+target_4,int32,0,0.0,2
+trans_count,int32,0,0.0,1001
+diff_trans_date,Int32,120786,0.10043003671775223,362
+fold,int64,0,0.0,5
+y_any,int32,0,0.0,2

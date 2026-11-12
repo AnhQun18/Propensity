@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBD-mini · Phần A</title>
+<!-- Adapted from HTML PPT Studio / presenter-mode-reveal, MIT, lewis (2026).
+     Four editable slides for Part A of the MBD-mini presentation.
+     All styles, runtime and editing controls are embedded for offline use. -->
+<style id="studio-base">/* html-ppt :: base.css — reset + shared tokens + layout primitives */
+/* Default tokens. Themes in assets/themes/*.css override the :root block. */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f7f7f8;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --border: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.16);
+  --text-1: #111216;
+  --text-2: #55596a;
+  --text-3: #8a8f9e;
+  --accent: #3b6cff;
+  /* Text drawn on top of an --accent fill. Every theme in assets/themes/
+   * and every full-deck style.css overrides this with whichever of white /
+   * near-black clears WCAG AA against its own accent — a hardcoded ink
+   * cannot, because accents here range from #ffffff to #000000.
+   * This default is black rather than white on purpose: against the default
+   * --accent #3b6cff, white measures 4.40:1 and black 4.77:1, so only black
+   * clears AA for normal text. Reached by any deck that links no theme. */
+  --accent-ink: #000000;
+  --accent-2: #7a5cff;
+  --accent-3: #ff5c8a;
+  --good: #1aaf6c;
+  --warn: #f5a524;
+  --bad:  #e0445a;
+  --grad: linear-gradient(135deg,#3b6cff,#7a5cff 55%,#ff5c8a);
+  --grad-soft: linear-gradient(135deg,#eef2ff,#f5ecff 55%,#ffeef5);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 26px;
+  --shadow: 0 10px 30px rgba(18,24,40,.08), 0 2px 6px rgba(18,24,40,.04);
+  --shadow-lg: 0 24px 60px rgba(18,24,40,.14), 0 6px 16px rgba(18,24,40,.06);
+  --font-sans: 'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --font-serif: 'Playfair Display','Noto Serif SC',Georgia,serif;
+  --font-mono: 'JetBrains Mono','IBM Plex Mono',SFMono-Regular,Menlo,monospace;
+  --font-display: var(--font-sans);
+  --letter-tight: -.03em;
+  --letter-normal: -.01em;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text-1);
+  font-family:var(--font-sans);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  letter-spacing:var(--letter-normal)}
+
+/* Viewport host: centres the fixed-size design canvas and letterboxes the rest.
+   Every px in a slide therefore means the same thing in the browser, in the
+   presenter preview, in the overview thumbnail and in a headless render. */
+body{width:100vw;height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+img,svg,video{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,pre,samp{font-family:var(--font-mono)}
+
+/* ================= SLIDE SYSTEM ================= */
+/* ================= DESIGN CANVAS =================
+   Slides are authored against a FIXED 1920x1080 canvas and scaled to fit the
+   viewport by runtime.js (--deck-scale). Before this, .deck was 100vw/100vh
+   while type and spacing stayed in absolute px, so a 1512x850 laptop window
+   and a 1920x1080 render produced visibly different pages (issue #20).
+
+   Escape hatches:
+     <body data-fit="fluid">      -> old behaviour, canvas follows the viewport
+     <div class="deck" data-w=".." data-h="..">  -> custom canvas (e.g. 1080x1440 for 3:4)
+*/
+.deck{position:relative;flex:none;
+  width:var(--deck-w,1920px);height:var(--deck-h,1080px);
+  overflow:hidden;background:var(--bg);
+  transform:scale(var(--deck-scale,1));transform-origin:center center}
+
+/* Opt out: fluid canvas, exactly what the deck did before. */
+body[data-fit="fluid"]{display:block}
+body[data-fit="fluid"] .deck{width:100vw;height:100vh;transform:none}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:72px 96px;
+  box-sizing:border-box;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+  transform:translateX(30px);
+  overflow:hidden;
+}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+
+/* single-page standalone (used when a layout file is opened directly) */
+body.single .slide{position:relative;width:100%;height:100%;opacity:1;transform:none;pointer-events:auto}
+body[data-fit="fluid"].single .slide{width:100vw;height:100vh}
+
+/* ================= TYPOGRAPHY ================= */
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.kicker{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+h1.title,.h1{font-family:var(--font-display);font-size:72px;line-height:1.05;font-weight:800;letter-spacing:var(--letter-tight);margin:0 0 18px;color:var(--text-1)}
+h2.title,.h2{font-family:var(--font-display);font-size:54px;line-height:1.1;font-weight:700;letter-spacing:var(--letter-tight);margin:0 0 14px}
+h3,.h3{font-size:32px;line-height:1.2;font-weight:600;letter-spacing:var(--letter-normal);margin:0 0 10px}
+h4,.h4{font-size:22px;line-height:1.3;font-weight:600;margin:0 0 8px}
+.lede{font-size:22px;line-height:1.55;color:var(--text-2);font-weight:300;max-width:62ch}
+.dim{color:var(--text-2)}
+.dim2{color:var(--text-3)}
+.mono{font-family:var(--font-mono)}
+.serif{font-family:var(--font-serif)}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+
+/* ================= LAYOUT PRIMITIVES ================= */
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid{display:grid;gap:24px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.fill{flex:1}
+.sp-t{padding-top:24px}.sp-b{padding-bottom:24px}
+.mt-s{margin-top:8px}.mt-m{margin-top:18px}.mt-l{margin-top:32px}
+.mb-s{margin-bottom:8px}.mb-m{margin-bottom:18px}.mb-l{margin-bottom:32px}
+
+/* ================= CARDS ================= */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card-soft{background:var(--surface-2);border:1px solid var(--border)}
+.card-outline{background:transparent;border:1.5px solid var(--border-strong);box-shadow:none}
+.card-accent{background:var(--surface);border-top:3px solid var(--accent)}
+.card-hover{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500;
+  background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.pill-accent{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 28%,transparent)}
+
+/* ================= BARS / DIVIDERS ================= */
+.divider{height:1px;background:var(--border);width:100%}
+.divider-accent{height:3px;width:72px;background:var(--accent);border-radius:2px}
+
+/* ================= IMAGES (issue #17) =================
+ * Framing primitives shared by every image-* layout. The frame owns the
+ * aspect ratio and the crop; the <img> just fills it. That's what lets you
+ * swap in a photo of any shape without touching the layout.
+ *   <figure class="img-frame"><img src="…" alt=""></figure>
+ *   .img-frame.contain  -> letterbox instead of crop (screenshots, diagrams,
+ *                          logos — anything where cropping loses information)
+ *   --img-ratio         -> aspect ratio of the frame (default 16/10)
+ *   --img-pos           -> object-position, e.g. "top" to protect a headline
+ */
+.img-frame{position:relative;margin:0;overflow:hidden;
+  border-radius:var(--radius);box-shadow:var(--shadow);background:var(--surface-2);
+  aspect-ratio:var(--img-ratio,16/10)}
+.img-frame > img{width:100%;height:100%;object-fit:cover;object-position:var(--img-pos,center)}
+.img-frame.contain{background:var(--bg-soft);box-shadow:none;border:1px solid var(--border)}
+.img-frame.contain > img{object-fit:contain}
+.img-frame.fill{height:100%;aspect-ratio:auto}
+.img-scrim{position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 42%,rgba(8,10,20,.72))}
+.img-cap{margin:10px 2px 0;font-size:14px;line-height:1.5;color:var(--text-3)}
+.img-tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:999px;
+  background:rgba(10,12,20,.55);color:#fff;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;backdrop-filter:blur(6px)}
+
+/* ================= CHROME (header/footer/progress) ================= */
+.deck-header{position:absolute;top:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;z-index:10;pointer-events:none}
+.deck-footer{position:absolute;bottom:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-3);z-index:10;pointer-events:none}
+.slide-number::before{content:attr(data-current)}
+.slide-number::after{content:" / " attr(data-total)}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar > span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s var(--ease)}
+
+/* ---- custom logo (issue #11) ----
+ * One logo per deck, drawn over the slide area. Two ways in, same CSS:
+ *   1. hand-author it  -> <img class="deck-logo" data-pos="bottom-right" src="…">
+ *   2. declare it once -> <body data-logo="…" data-logo-position="bottom-right">
+ * (1) needs no JS at all; (2) is created by runtime.js. It lives inside .deck
+ * so it scales with the deck. On an exported PDF it is painted per page by the
+ * @media print block below, not by this element — see the note there. */
+.deck-logo{position:absolute;z-index:11;pointer-events:none;
+  height:var(--logo-size,44px);width:auto;max-width:30%;object-fit:contain;
+  opacity:var(--logo-opacity,.9)}
+.deck-logo[data-pos="top-left"]     {top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="top-right"]    {top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-left"]  {bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px)}
+.deck-logo[data-pos="bottom-right"] {bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px)}
+.deck-logo:not([data-pos])          {top:28px;right:40px}
+
+/* ================= PRESENTER / OVERVIEW ================= */
+/* Keep this list in sync with NOTE_SEL in assets/runtime.js — the runtime
+ * reads speaker notes from all of these, so all of them must be hidden
+ * from the audience. */
+.notes,.speaker-notes{display:none!important}
+.notes-overlay{position:fixed;inset:auto 0 0 0;max-height:42vh;background:rgba(20,22,30,.95);color:#e8ebf4;
+  padding:20px 32px;font-size:16px;line-height:1.6;border-top:1px solid rgba(255,255,255,.1);transform:translateY(100%);
+  transition:transform .3s var(--ease);z-index:40;overflow:auto;font-family:var(--font-sans)}
+.notes-overlay.open{transform:translateY(0)}
+.overview{position:fixed;inset:0;background:rgba(10,12,18,.92);backdrop-filter:blur(12px);z-index:50;
+  display:none;padding:40px;overflow:auto}
+.overview.open{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-content:start}
+.overview .thumb{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  aspect-ratio:16/9;overflow:hidden;cursor:pointer;position:relative;color:var(--text-1);padding:16px;
+  font-size:11px;transition:transform .2s var(--ease)}
+.overview .thumb:hover{transform:scale(1.04)}
+.overview .thumb .n{position:absolute;top:8px;left:10px;font-weight:700;font-size:14px;color:var(--text-3)}
+.overview .thumb .t{position:absolute;bottom:10px;left:14px;right:14px;font-weight:600;color:var(--text-1)}
+
+/* ================= PRESENTER VIEW ================= */
+/* Presenter view opens in a separate popup window (S key).
+ * All presenter styles are self-contained in the popup HTML generated by runtime.js.
+ * The audience window (this file) is NOT affected — it stays as normal deck view.
+ * Only the .notes class below is needed to hide speaker notes from audience. */
+
+/* ================= UTILITY ================= */
+.hidden{display:none!important}
+.nowrap{white-space:nowrap}
+.tr{text-align:right}.tc{text-align:center}.tl{text-align:left}
+.uppercase{text-transform:uppercase;letter-spacing:.12em}
+
+/* ================= PRINT ================= */
+@media print{
+  /* Every declaration here is !important on purpose. A template stylesheet
+   * scopes its rules as `.tpl-name .slide`, which is specificity (0,2,0) and
+   * beats a bare `.slide` at (0,1,0) — so without !important a template
+   * silently keeps its screen layout in print. That is how dir-key-nav-minimal
+   * (position:absolute) printed 8 slides onto 1 page and xhs-post printed 9
+   * onto 2: only the opacity/transform declarations on this rule carried
+   * !important, and the ones that decide pagination did not. */
+  body{display:block!important;width:auto!important;height:auto!important;overflow:visible!important}
+  .deck{transform:none!important;width:100%!important;height:auto!important;
+        min-height:0!important;display:block!important}
+  .slide{position:relative!important;inset:auto!important;
+         opacity:1!important;transform:none!important;
+         page-break-after:always;break-after:page;
+         width:100%!important;height:100vh!important;max-height:100vh!important}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .deck-header,.deck-footer,.progress-bar,.notes-overlay,.overview{display:none!important}
+
+  /* Logo in print. The .deck-logo element is position:absolute inside .deck,
+   * and print collapses .deck to height:auto with every slide stacked — so the
+   * element can only anchor ONCE against the whole document and lands on a
+   * single page (or none). Hide it and paint the logo per slide instead: in
+   * print one .slide is exactly one page. runtime.js mirrors the image URL and
+   * placement onto .deck (--logo-print / data-logo-print), so this only kicks
+   * in when the runtime is present; a JS-less deck keeps the element. */
+  .deck[data-logo-print] > .deck-logo{display:none!important}
+  .deck[data-logo-print] .slide:not([data-no-logo])::after{
+    content:"";position:absolute;z-index:11;pointer-events:none;
+    width:30%;height:var(--logo-size,44px);
+    background-image:var(--logo-print);background-repeat:no-repeat;
+    background-size:contain;opacity:var(--logo-opacity,.9)}
+  .deck[data-logo-print="top-left"]     .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left top}
+  .deck[data-logo-print="top-right"]    .slide:not([data-no-logo])::after{top:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right top}
+  .deck[data-logo-print="bottom-left"]  .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);left:var(--logo-inset-x,40px);background-position:left bottom}
+  .deck[data-logo-print="bottom-right"] .slide:not([data-no-logo])::after{bottom:var(--logo-inset-y,28px);right:var(--logo-inset-x,40px);background-position:right bottom}
+}
+</style>
+<style id="studio-theme">/* theme: corporate-clean — 企业商务 */
+:root{
+  --bg:#ffffff;--bg-soft:#f5f7fa;--surface:#ffffff;--surface-2:#f0f3f7;
+  --border:rgba(10,37,64,.12);--border-strong:rgba(10,37,64,.28);
+  --text-1:#0a2540;--text-2:#425466;--text-3:#8898aa;
+  --accent:#0a2540;--accent-2:#1d4ed8;--accent-3:#64748b;
+  --accent-ink:#ffffff;  /* text on --accent — 15.5:1 */
+  --good:#0e9f6e;--warn:#d97706;--bad:#dc2626;
+  --grad:linear-gradient(135deg,#0a2540,#1d4ed8);
+  --grad-soft:linear-gradient(135deg,#f0f4fb,#e4ecf7);
+  --radius:6px;--radius-sm:4px;--radius-lg:10px;
+  --shadow:0 1px 3px rgba(10,37,64,.08),0 4px 12px rgba(10,37,64,.05);
+  --shadow-lg:0 4px 12px rgba(10,37,64,.1),0 16px 40px rgba(10,37,64,.08);
+  --font-sans:'Inter','Noto Sans SC',sans-serif;
+  --font-display:'Inter','Noto Sans SC',sans-serif;
+}
+.card{border:1px solid var(--border)}
+.divider-accent{background:var(--accent);height:3px;width:56px}
+.kicker{color:var(--accent-2)}
+h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
+</style>
+<style>
+:root{--font-sans:'Segoe UI',Arial,sans-serif;--font-display:var(--font-sans);--font-mono:Consolas,monospace;--text-1:#142d4e;--text-2:#526176;--text-3:#64748b;--accent:#2463a6;--accent-2:#2463a6;--trx:#2463a6;--dialog:#7655a3;--geo:#168078;--target:#ad5815;--page:#edf0f4;--edit-bg:#f1f7ff;--shadow:none;--shadow-lg:0 8px 32px #142d4e1a}
+body{background:var(--page)}.slide{padding:82px 108px 86px;justify-content:flex-start;transition:none;transform:none;gap:0}.slide.is-prev{transform:none}.kicker{font-size:20px;letter-spacing:.13em;margin:0 0 18px;font-weight:650}.h2{font-size:51px;line-height:1.2;max-width:1540px;margin:0 0 24px}.subtitle{font-size:28px;color:var(--text-2);margin:0;line-height:1.5}.content{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}.takeaway{font-size:29px;font-weight:650;color:var(--accent);line-height:1.4;margin:20px 0 0}.source{font-size:16px;color:var(--text-3);line-height:1.4;margin:18px 0 0;max-width:1640px}.deck-footer{position:absolute;bottom:30px;left:108px;right:108px;font-size:17px;color:var(--text-3);display:flex;justify-content:space-between}.slide-number{position:static!important;font-size:17px!important;color:var(--text-3)!important}.cover .content{justify-content:center}.cover h1{font-size:134px;letter-spacing:-.055em;line-height:1.05;margin:0 0 20px;font-weight:700}.cover .english{font-size:36px;margin:0 0 38px;color:var(--text-2)}.cover .cover-line{width:1040px;border-top:2px solid var(--border);padding-top:34px;font-size:38px;line-height:1.4;margin:0}.cover .cover-meta{font-size:23px;color:var(--text-2);margin-top:42px}
+.flow{display:grid;grid-template-columns:1fr 100px 1fr;gap:40px;align-items:center;margin:38px 0}.flow-block{border-top:3px solid var(--border-strong);padding-top:25px}.flow h3{font-size:32px;margin:0 0 23px}.flow p{font-size:29px;line-height:1.6;margin:4px 0}.flow-arrow{font-size:64px;color:var(--text-3);text-align:center}.trx{color:var(--trx)}.dialog{color:var(--dialog)}.geo{color:var(--geo)}.target{color:var(--target)}.small-note{font-size:23px;color:var(--text-2);margin:16px 0 0;line-height:1.5}
+.stats{display:grid;grid-template-columns:1fr 1.22fr 1.38fr .65fr;gap:36px;margin:12px 0 35px}.stat strong{display:block;font-size:53px;letter-spacing:-.04em;line-height:1.1;font-weight:700}.stat span{font-size:23px;color:var(--text-2);display:block;margin-top:12px}table{border-collapse:collapse;width:100%;font-size:27px}th{text-align:left;font-size:20px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-2);border-bottom:2px solid var(--border-strong);padding:14px 18px}td{padding:17px 18px;border-bottom:1px solid var(--border);line-height:1.4}th:first-child,td:first-child{padding-left:0}.num{text-align:right;font-variant-numeric:tabular-nums}.architecture td{font-size:25px;padding-top:19px;padding-bottom:19px}.architecture td:first-child{font-weight:700;width:250px}.architecture td:nth-child(2){width:380px}.keyline{font-size:27px;margin:30px 0 0}code{font-size:.9em}
+.timeline{margin:14px 0 22px}.axis{margin-left:225px;position:relative;height:43px}.axis span{position:absolute;transform:translateX(-50%);font-size:18px;color:var(--text-2);white-space:nowrap}.axis span:first-child{transform:none}.axis span:last-child{transform:translateX(-100%)}.timeline-row{display:grid;grid-template-columns:225px 1fr;align-items:center;height:70px}.timeline-row b{font-size:25px}.track{height:44px;position:relative;border-bottom:1px solid var(--border);background:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:7.6923% 100%}.bar{position:absolute;top:29px;height:9px;left:var(--start);right:var(--end);background:currentColor}.bar-label{position:absolute;top:0;left:var(--start);font-size:18px;white-space:nowrap;font-weight:500}.time-bottom{display:grid;grid-template-columns:1.05fr 1fr;gap:50px;border-top:2px solid var(--border);padding-top:22px}.time-bottom h3{font-size:24px;margin:0 0 12px}.time-bottom p{font-size:23px;line-height:1.5;margin:8px 0}.formula{font-size:25px!important;font-weight:650}.time-caveat{font-size:20px;color:var(--text-2);line-height:1.4;margin:18px 0 0}
+.editor-bar{position:fixed;z-index:1000;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);box-shadow:var(--shadow-lg);font:13px var(--font-sans);white-space:nowrap}.editor-bar button{font:inherit;cursor:pointer;background:var(--surface);color:var(--text-1);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px}.editor-bar button:hover,.editor-bar button[aria-pressed="true"]{background:var(--edit-bg);border-color:var(--accent)}.editor-bar .primary{background:var(--accent);color:var(--accent-ink)}.edit-status{color:var(--text-2);padding:0 7px;max-width:260px;overflow:hidden;text-overflow:ellipsis}[data-edit]{white-space:pre-wrap}.editing [data-edit]{outline:1px dashed var(--accent);outline-offset:4px;cursor:text;min-width:8px}.editing [data-edit]:focus{background:var(--edit-bg);outline:2px solid var(--accent)}.preview-mode .editor-bar,:fullscreen .editor-bar{display:none}.progress-bar{height:3px!important}.editor-bar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:700px){.editor-bar{bottom:8px;gap:5px;padding:6px}.edit-status{display:none}.editor-bar button{padding:8px;font-size:12px}.editor-bar .optional{display:none}}
+@media print{.editor-bar{display:none!important}.slide{transition:none!important}.deck-footer{bottom:30px}.slide [data-edit]{outline:none!important}}
+</style>
+
+<style id="revision-v2">
+:root{--observed:#101010;--unobserved:#c8d1da;--history-bg:#edf4fb;--outcome-bg:#fbf2e9}
+.erd{position:relative;width:1704px;height:660px;margin:12px auto 0;flex:none}.erd-links{position:absolute;inset:0;width:100%;height:100%;color:var(--text-3)}.erd-cardinality{font:22px var(--font-sans);fill:var(--text-2)}.entity{position:absolute;border:2px solid var(--border-strong);background:var(--bg);border-radius:5px;overflow:hidden}.entity h3{font:700 26px var(--font-mono);margin:0;padding:13px 20px;border-bottom:2px solid var(--border-strong);background:var(--bg-soft)}.entity-field{display:grid;grid-template-columns:72px 1fr auto;align-items:baseline;gap:8px;padding:6px 17px;line-height:1.35;font:20px var(--font-mono)}.entity-field .key{font:700 15px var(--font-sans);color:var(--text-3)}.entity-field .dtype{font-size:17px;color:var(--text-2)}.entity-field:first-of-type{padding-top:12px}.entity-field:last-child{padding-bottom:15px}.entity-clients{left:660px;top:20px;width:380px;height:170px}.entity-targets{left:0;top:0;width:480px}.entity-dialog{left:1230px;top:0;width:474px}.entity-trx{left:210px;top:355px;width:570px}.entity-geo{left:990px;top:355px;width:510px}.entity-trx .entity-field{font-size:18px;padding:4px 17px}
+.behavior-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:80px;margin:15px 0 25px}.behavior{text-align:center}.behavior h3{font-size:32px;letter-spacing:.04em;margin:0 0 4px}.behavior-type{font-size:23px;color:var(--text-2);margin:0 0 22px}.donut{width:310px;height:310px;margin:auto;position:relative;border-radius:50%;background:conic-gradient(var(--observed) calc(var(--coverage)*1%),var(--unobserved) 0);display:grid;place-items:center}.donut:before{content:'';position:absolute;inset:48px;background:var(--bg);border-radius:50%}.donut-center{position:relative;text-align:center;z-index:1}.donut-center strong{display:block;font-size:49px;line-height:1.15;font-weight:700;letter-spacing:-.035em;color:var(--observed)}.donut-center span{display:block;white-space:pre-line;font-size:22px;line-height:1.3;color:var(--text-2);margin-top:10px}.behavior-total{display:block;font-size:42px;line-height:1.2;margin:26px 0 7px;letter-spacing:-.03em}.behavior-total-label{font-size:24px;color:var(--text-2);margin:0}.donut-legend{display:flex;justify-content:center;gap:45px;margin:10px 0 0;font-size:22px;color:var(--text-2)}.donut-legend>span{display:flex;align-items:center;gap:12px}.donut-legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--observed)}.donut-legend .unobserved{background:var(--unobserved)}.coverage-note{font-size:22px;text-align:center;color:var(--text-2);margin:20px 0 0}
+.range-table{margin:0 0 38px}.range-head,.range-row{display:grid;grid-template-columns:185px 225px 1fr 225px;column-gap:30px;align-items:center}.range-head{height:64px;font-size:19px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em}.range-head>span:last-child,.range-row>strong:last-child{text-align:right}.range-row{height:84px;border-bottom:1px solid var(--border)}.range-row b{font-size:27px}.range-row strong{font-size:27px;font-weight:600;font-variant-numeric:tabular-nums}.range-axis{position:relative;height:24px;font-size:16px;letter-spacing:0;text-transform:none}.range-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}.range-axis span:first-child{transform:none}.range-axis span:last-child{transform:translateX(-100%);top:-22px}.range-track{height:40px;position:relative;background:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:7.6923% 100%}.range-track i{position:absolute;top:16px;height:10px;background:currentColor}.prediction-flow{display:grid;grid-template-columns:1fr 110px .82fr;gap:28px;align-items:stretch}.prediction-flow>div{padding:25px 32px;border-top:4px solid var(--accent);background:var(--history-bg)}.prediction-flow>div>span{font-size:19px;letter-spacing:.09em;font-weight:600}.prediction-flow strong{display:block;font-size:39px;margin:8px 0;line-height:1.2}.prediction-flow p{font-size:24px;margin:0;color:var(--text-2)}.prediction-flow .outcome-period{border-color:var(--target);background:var(--outcome-bg)}.prediction-arrow{display:grid;place-items:center;font-size:62px;color:var(--text-3)}
+</style>
+</head>
+<body class="tpl-presenter-mode-reveal">
+<main class="deck" aria-label="Bài trình bày MBD-mini Phần A" data-w="1920" data-h="1080">
+<section class="slide cover is-active" data-title="MBD-mini · Dataset Understanding & EDA">
+  <p class="kicker" data-edit>PHẦN A · BỐI CẢNH, CẤU TRÚC VÀ THỜI GIAN</p>
+  <div class="content">
+    <h1 data-edit>MBD-mini</h1>
+    <p class="english" data-edit>Dataset Understanding &amp; Exploratory Data Analysis</p>
+    <p class="cover-line" data-edit>Hiểu cấu trúc dữ liệu, hành vi quan sát được
+và giới hạn diễn giải</p>
+    <p class="cover-meta" data-edit>Bối cảnh ngân hàng · Dữ liệu đã ẩn danh</p>
+  </div>
+  <footer class="deck-footer"><span>MBD-mini · Dataset Understanding &amp; EDA</span><span class="slide-number"></span></footer>
+  <aside class="notes"><p data-edit>Mục tiêu của bài trình bày là giúp người xem hiểu bộ dữ liệu MBD-mini trước khi diễn giải bất kỳ tín hiệu nào. Chúng ta sẽ lần lượt xem các nguồn dữ liệu ghi nhận điều gì, thời gian thu thập ra sao và mỗi bảng có đơn vị quan sát nào. Phần A thiết lập bối cảnh để các phần TARGETS, TRX, DIALOG và GEO sau đó sử dụng cùng cách đọc. Dữ liệu đã ẩn danh nên tên trường và các mã phân loại không tự cung cấp đầy đủ ý nghĩa nghiệp vụ. Khi chưa có tài liệu xác nhận, cần giữ nguyên tên mã và nêu giới hạn diễn giải. Sau phần mở đầu, ta cần phân biệt được khách hàng, sự kiện và khách–tháng. Đây là ba mẫu số khác nhau và sẽ xuất hiện xuyên suốt bài trình bày.</p></aside>
+</section>
+<section class="slide" data-title="ERD database">
+<p class="kicker" data-edit>02 · ERD DATABASE</p>
+<h2 class="h2" data-edit>Cấu trúc dữ liệu và quan hệ giữa các bảng</h2>
+<p class="subtitle" data-edit>ERD logic · Các bảng liên kết qua client_id</p>
+<div class="content"><div class="erd" aria-label="ERD gồm CLIENT_SPLIT liên kết một-nhiều tới TARGETS, TRX, DIALOG và GEO">
+<svg class="erd-links" viewBox="0 0 1704 660" aria-hidden="true">
+<g fill="none" stroke="currentColor" stroke-width="2.5"><path d="M660 108 H480 M1040 108 H1230 M850 190 V320 H495 V355 M850 320 H1245 V355"/>
+<path d="M498 108 L480 96 M498 108 L480 120 M1212 108 L1230 96 M1212 108 L1230 120 M495 337 L483 355 M495 337 L507 355 M1245 337 L1233 355 M1245 337 L1257 355"/></g>
+<g class="erd-cardinality"><text x="632" y="94">1</text><text x="510" y="94">N</text><text x="1058" y="94">1</text><text x="1170" y="94">0..N</text><text x="868" y="230">1</text><text x="512" y="345">0..N</text><text x="1263" y="345">0..N</text></g>
+</svg><article class="entity entity-clients"><h3 class="" data-edit>CLIENT_SPLIT</h3><div class="entity-field"><span class="key">PK</span><span data-edit>client_id</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key"></span><span data-edit>fold</span><span class="dtype" data-edit>integer</span></div></article><article class="entity entity-targets"><h3 class="target" data-edit>TARGETS</h3><div class="entity-field"><span class="key">PK, FK</span><span data-edit>client_id</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key">PK</span><span data-edit>mon</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key"></span><span data-edit>target_1 / 2 / 3 / 4</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>trans_count</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>diff_trans_date</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>fold</span><span class="dtype" data-edit>integer</span></div></article><article class="entity entity-dialog"><h3 class="dialog" data-edit>DIALOG</h3><div class="entity-field"><span class="key">FK</span><span data-edit>client_id</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key"></span><span data-edit>event_time</span><span class="dtype" data-edit>timestamp</span></div><div class="entity-field"><span class="key"></span><span data-edit>embedding</span><span class="dtype" data-edit>float[]</span></div><div class="entity-field"><span class="key"></span><span data-edit>fold</span><span class="dtype" data-edit>integer</span></div></article><article class="entity entity-trx"><h3 class="trx" data-edit>TRX</h3><div class="entity-field"><span class="key">FK</span><span data-edit>client_id</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key"></span><span data-edit>event_time</span><span class="dtype" data-edit>timestamp</span></div><div class="entity-field"><span class="key"></span><span data-edit>amount / currency</span><span class="dtype" data-edit>float / int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>event_type / event_subtype</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>src_type11/12/21/22/31/32</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>dst_type11 / dst_type12</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>fold</span><span class="dtype" data-edit>integer</span></div></article><article class="entity entity-geo"><h3 class="geo" data-edit>GEO</h3><div class="entity-field"><span class="key">FK</span><span data-edit>client_id</span><span class="dtype" data-edit>string</span></div><div class="entity-field"><span class="key"></span><span data-edit>event_time</span><span class="dtype" data-edit>timestamp</span></div><div class="entity-field"><span class="key"></span><span data-edit>geohash_4 / 5 / 6</span><span class="dtype" data-edit>int32</span></div><div class="entity-field"><span class="key"></span><span data-edit>fold</span><span class="dtype" data-edit>integer</span></div></article></div></div>
+<footer class="deck-footer"><span>MBD-mini · Dataset Understanding &amp; EDA</span><span class="slide-number"></span></footer>
+<aside class="notes"><p data-edit>CLIENT_SPLIT chứa một dòng cho mỗi khách hàng, với client_id làm khóa. TARGETS có một dòng cho mỗi cặp client_id và mon. Các bảng TRX, DIALOG và GEO ghi nhận sự kiện nên một khách có thể liên quan đến nhiều dòng, hoặc chưa có sự kiện được ghi nhận ở một nguồn. Sơ đồ thể hiện quan hệ logic dùng để đọc dữ liệu. PK là khóa định danh logic và FK thể hiện trường dùng liên kết tới khách hàng. Các nhãn src_type và dst_type được nhóm để sơ đồ dễ đọc. Không giả định event_time là khóa duy nhất của bảng sự kiện.</p></aside>
+</section>
+<section class="slide" data-title="Độ phủ ba nguồn hành vi">
+<p class="kicker" data-edit>03 · DATASET AT A GLANCE</p>
+<h2 class="h2" data-edit>Ba nguồn hành vi có độ phủ khác nhau</h2>
+<p class="subtitle" data-edit>100.224 khách hàng · 1.202.688 khách–tháng · 12 tháng nhãn</p>
+<div class="content">
+<div class="behavior-grid"><article class="behavior">
+      <h3 data-edit>TRX</h3><p class="behavior-type" data-edit>Giao dịch</p>
+      <div class="donut" role="img" aria-label="TRX: 98,50% khách có quan sát" style="--coverage:98.50035920">
+        <div class="donut-center"><strong data-edit data-percent>98,50%</strong><span data-edit>khách có
+quan sát</span></div>
+      </div><strong class="behavior-total" data-edit>38.764.930</strong><p class="behavior-total-label" data-edit>Tổng giao dịch</p>
+    </article><article class="behavior">
+      <h3 data-edit>DIALOG</h3><p class="behavior-type" data-edit>Tương tác</p>
+      <div class="donut" role="img" aria-label="DIALOG: 46,22% khách có quan sát" style="--coverage:46.21647510">
+        <div class="donut-center"><strong data-edit data-percent>46,22%</strong><span data-edit>khách có
+quan sát</span></div>
+      </div><strong class="behavior-total" data-edit>217.205</strong><p class="behavior-total-label" data-edit>Tổng tương tác</p>
+    </article><article class="behavior">
+      <h3 data-edit>GEO</h3><p class="behavior-type" data-edit>Quan sát địa lý</p>
+      <div class="donut" role="img" aria-label="GEO: 72,41% khách có quan sát" style="--coverage:72.41079981">
+        <div class="donut-center"><strong data-edit data-percent>72,41%</strong><span data-edit>khách có
+quan sát</span></div>
+      </div><strong class="behavior-total" data-edit>66.295.724</strong><p class="behavior-total-label" data-edit>Tổng quan sát địa lý</p>
+    </article></div>
+<div class="donut-legend"><span><i class="observed"></i><span data-edit>Có quan sát</span></span><span><i class="unobserved"></i><span data-edit>Chưa có quan sát</span></span></div>
+<p class="coverage-note" data-edit>Tỷ lệ trên tổng 100.224 khách hàng. Một khách có thể có nhiều loại hành vi.</p>
+</div><footer class="deck-footer"><span>MBD-mini · Dataset Understanding &amp; EDA</span><span class="slide-number"></span></footer>
+<aside class="notes"><p data-edit>Mỗi vòng tròn dùng cùng mẫu số là 100.224 khách hàng. Phần đậm biểu diễn tỷ lệ khách có ít nhất một sự kiện trong toàn bộ lịch sử của nguồn tương ứng, phần nhạt biểu diễn khách chưa có sự kiện được ghi nhận trong nguồn đó. TRX có độ phủ 98,50%, DIALOG 46,22% và GEO 72,41%. Con số phía dưới là tổng số sự kiện của từng loại hành vi, không phải số khách. Các nhóm khách giữa nguồn có thể giao nhau. Chưa có quan sát trong dữ liệu không tự chứng minh khách không có hoạt động thực tế. Tổng ba nguồn detail là 105.277.859 sự kiện.</p></aside>
+</section>
+<section class="slide" data-title="Lịch sử và tháng cần dự đoán">
+<p class="kicker" data-edit>04 · LỊCH SỬ VÀ KỲ DỰ ĐOÁN</p>
+<h2 class="h2" data-edit>Dùng lịch sử để dự đoán khả năng mua ở tháng sau</h2>
+<div class="content">
+<div class="range-table">
+  <div class="range-head"><span>Hành vi / nhãn</span><span>Bắt đầu</span><div class="range-axis"><span style="left:0%">12/2020</span><span style="left:46.15%">12/2021</span><span style="left:92.31%">12/2022</span><span style="left:100%">02/2023</span></div><span>Kết thúc</span></div>
+  <div class="range-row trx"><b data-edit>TRX</b><strong data-edit>31/12/2020</strong><div class="range-track"><i style="left:3.77%;right:3.85%"></i></div><strong data-edit>31/12/2022</strong></div>
+  <div class="range-row dialog"><b data-edit>DIALOG</b><strong data-edit>10/02/2021</strong><div class="range-track"><i style="left:8.96%;right:3.85%"></i></div><strong data-edit>31/12/2022</strong></div>
+  <div class="range-row geo"><b data-edit>GEO</b><strong data-edit>11/12/2021</strong><div class="range-track"><i style="left:47.5%;right:3.85%"></i></div><strong data-edit>31/12/2022</strong></div>
+  <div class="range-row target"><b data-edit>TARGETS</b><strong data-edit>02/2022</strong><div class="range-track"><i style="left:53.85%;right:0%"></i></div><strong data-edit>01/2023</strong></div>
+</div>
+<div class="prediction-flow"><div class="history-period"><span data-edit>LỊCH SỬ ĐÃ QUAN SÁT</span><strong data-edit>Đến hết tháng t</strong><p data-edit>TRX · DIALOG · GEO</p></div><span class="prediction-arrow" aria-hidden="true">→</span><div class="outcome-period"><span data-edit>KỲ CẦN DỰ ĐOÁN</span><strong data-edit>Tháng t+1</strong><p data-edit>Khả năng mua sản phẩm</p></div></div>
+</div><footer class="deck-footer"><span>MBD-mini · Dataset Understanding &amp; EDA</span><span class="slide-number"></span></footer>
+<aside class="notes"><p data-edit>Bài toán sử dụng lịch sử đã có đến hết tháng t để dự đoán khả năng mua sản phẩm trong tháng t+1. Hai cột ngày ở hai đầu giúp so sánh thời gian bắt đầu và kết thúc giữa các nguồn. Các thanh dùng chung trục thời gian. TARGETS biểu diễn khoảng tháng nhãn, còn ba nguồn hành vi biểu diễn ngày đầu và ngày cuối có sự kiện được ghi nhận. Sơ đồ phía dưới giải thích chiều dự đoán theo thời gian, không bổ sung một khẳng định mới về cách mã hóa mon.</p></aside>
+</section>
+</main>
+<nav class="editor-bar" aria-label="Điều khiển bài trình bày">
+  <button id="prev" aria-label="Slide trước">←</button><span id="page-status" aria-live="polite">1 / 4</span><button id="next" aria-label="Slide tiếp theo">→</button>
+  <button id="edit-toggle" aria-pressed="false">Chỉnh sửa</button><button id="download" class="primary">Tải bản HTML</button>
+  <button id="notes-toggle" class="optional">Ghi chú</button><button id="fullscreen" class="optional" title="Phím F">Toàn màn hình</button>
+  <span id="edit-status" class="edit-status" role="status">← → để chuyển slide</span>
+</nav>
+<script id="editor-runtime">
+(() => {
+  'use strict';
+  const deck=document.querySelector('.deck');
+  const editable=[...deck.querySelectorAll('[data-edit]')];
+  editable.forEach((el,i)=>el.dataset.editId=String(i));
+  const totalSlides=deck.querySelectorAll(':scope > .slide').length;
+  const storageKey='mbd-mini-phan-a:v2:'+location.pathname;
+  let editing=false, storageAvailable=true;
+  const status=document.getElementById('edit-status');
+  try {const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved&&saved.texts){editable.forEach(el=>{const text=saved.texts[el.dataset.editId];if(typeof text==='string')el.textContent=text;});status.textContent='Đã khôi phục bản sửa trên trình duyệt';}}catch{storageAvailable=false;}
+  function syncDonuts(){deck.querySelectorAll('.donut').forEach(el=>{const label=el.querySelector('[data-percent]');const raw=label.textContent.trim().replace('%','').replace(',','.');const n=Number(raw);if(raw!==''&&Number.isFinite(n)&&n>=0&&n<=100){el.style.setProperty('--coverage',String(n));el.setAttribute('aria-label',el.closest('.behavior').querySelector('h3').textContent+': '+label.textContent+' khách có quan sát');}});}
+  syncDonuts();
+  function persist(){syncDonuts();const texts={};editable.forEach(el=>texts[el.dataset.editId]=el.innerText);try{localStorage.setItem(storageKey,JSON.stringify({texts,updated:new Date().toISOString()}));status.textContent='Đã lưu trên trình duyệt';}catch{storageAvailable=false;status.textContent='Dùng Tải bản HTML để lưu';}}
+  function setEditing(value){editing=value;document.body.classList.toggle('editing',value);editable.forEach(el=>{el.contentEditable=value?'plaintext-only':'false';el.spellcheck=false;});const button=document.getElementById('edit-toggle');button.setAttribute('aria-pressed',String(value));button.textContent=value?'Xong':'Chỉnh sửa';if(value){document.querySelector('.overview')?.classList.remove('open');status.textContent='Bấm vào chữ để sửa';}else {document.activeElement?.blur();persist();}}
+  function download(){persist();const copy=document.documentElement.cloneNode(true);copy.querySelector('body').classList.remove('editing','preview-mode');copy.querySelectorAll('[data-edit]').forEach(el=>{el.removeAttribute('contenteditable');el.removeAttribute('spellcheck');});copy.querySelectorAll('.overview,.notes-overlay,.progress-bar').forEach(el=>el.remove());copy.querySelector('.deck').removeAttribute('style');copy.querySelectorAll('.slide').forEach((el,i)=>{el.classList.toggle('is-active',i===0);el.classList.remove('is-prev');el.removeAttribute('aria-hidden');});copy.querySelector('#edit-toggle').textContent='Chỉnh sửa';copy.querySelector('#edit-toggle').setAttribute('aria-pressed','false');copy.querySelector('#edit-status').textContent='← → để chuyển slide';copy.querySelector('#page-status').textContent='1 / '+totalSlides;const url=URL.createObjectURL(new Blob(['<!DOCTYPE html>\n'+copy.outerHTML],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='MBD-mini_Phan-A.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);status.textContent='Đã tải bản HTML chứa nội dung sửa';}
+  const sendKey=key=>document.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+  document.getElementById('edit-toggle').onclick=()=>setEditing(!editing);
+  document.getElementById('download').onclick=download;
+  document.getElementById('prev').onclick=()=>sendKey('ArrowLeft');
+  document.getElementById('next').onclick=()=>sendKey('ArrowRight');
+  document.getElementById('notes-toggle').onclick=()=>sendKey('n');
+  document.getElementById('fullscreen').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{status.textContent='Dùng nút toàn màn hình của trình duyệt';});};
+  document.addEventListener('input',e=>{if(e.target.closest('[data-edit]'))persist();});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();e.stopImmediatePropagation();download();return;}if(editing&&e.target.isContentEditable){if(e.key==='Escape'){e.preventDefault();setEditing(false);}e.stopImmediatePropagation();}},true);
+  function updatePage(){const active=[...deck.querySelectorAll(':scope > .slide')].findIndex(el=>el.classList.contains('is-active'));document.getElementById('page-status').textContent=(active+1)+' / '+totalSlides;}
+  new MutationObserver(updatePage).observe(deck,{attributes:true,subtree:true,attributeFilter:['class']});
+  if(new URLSearchParams(location.search).has('preview'))document.body.classList.add('preview-mode');
+})();
+</script>
+<script id="studio-runtime">/* html-ppt :: runtime.js
+ * Keyboard-driven deck runtime. Zero dependencies.
+ *
+ * Features:
+ *   ← → / space / PgUp PgDn / Home End  navigation
+ *   F  fullscreen
+ *   S  presenter mode (opens a NEW WINDOW with current/next slide preview + notes + timer)
+ *       The original window stays as audience view, synced via BroadcastChannel.
+ *       Slide previews use CSS transform:scale() at design resolution for pixel-perfect layout.
+ *   N  quick notes overlay (bottom drawer)
+ *   O  slide overview grid
+ *   T  cycle themes (reads data-themes on <html> or <body>)
+ *   A  cycle demo animation on current slide
+ *   URL hash #/N  deep-link to slide N (1-based)
+ *   Progress bar auto-managed
+ */
+(function () {
+  'use strict';
+
+  const ANIMS = ['fade-up','fade-down','fade-left','fade-right','rise-in','drop-in',
+    'zoom-pop','blur-in','glitch-in','typewriter','neon-glow','shimmer-sweep',
+    'gradient-flow','stagger-list','counter-up','path-draw','parallax-tilt',
+    'card-flip-3d','cube-rotate-3d','page-turn-3d','perspective-zoom',
+    'marquee-scroll','kenburns','confetti-burst','spotlight','morph-shape','ripple-reveal'];
+
+  /* Every class the runtime treats as speaker notes. base.css hides the same
+   * set from the audience — if you add one here, add it there too. */
+  const NOTE_SEL = '.notes, aside.notes, .speaker-notes';
+
+  function ready(fn){ if(document.readyState!='loading')fn(); else document.addEventListener('DOMContentLoaded',fn);}
+
+  /* ========== Parse URL for preview-only mode ==========
+   * When loaded as iframe.src = "index.html?preview=3", runtime enters a
+   * locked single-slide mode: only slide N is visible, no chrome, no keys,
+   * no hash updates. This is how the presenter window shows pixel-perfect
+   * previews — by loading the actual deck file in an iframe and telling it
+   * to display only a specific slide.
+   */
+  function getPreviewIdx() {
+    const m = /[?&]preview=(\d+)/.exec(location.search || '');
+    return m ? parseInt(m[1], 10) - 1 : -1;
+  }
+
+  /* ========== Design-canvas fit (issue #20) ==========
+   * Slides are authored against a fixed canvas (1920x1080 by default). The
+   * canvas is scaled — never reflowed — to fit whatever viewport it lands in,
+   * so the browser view, the presenter preview, the overview thumbnail and a
+   * headless PNG render are all the same picture.
+   *
+   * Opt out with <body data-fit="fluid">. Override the canvas per deck with
+   * <div class="deck" data-w="1080" data-h="1440"> (e.g. a 3:4 小红书 post).
+   */
+  function initCanvasFit(deck) {
+    if (document.body.getAttribute('data-fit') === 'fluid') return;
+
+    const w = parseInt(deck.getAttribute('data-w'), 10) || 1920;
+    const h = parseInt(deck.getAttribute('data-h'), 10) || 1080;
+    deck.style.setProperty('--deck-w', w + 'px');
+    deck.style.setProperty('--deck-h', h + 'px');
+
+    function fit() {
+      const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+      deck.style.setProperty('--deck-scale', String(scale));
+    }
+    fit();
+    window.addEventListener('resize', fit);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+    /* Webfonts can land after first paint; re-fit once they do. */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit).catch(function(){});
+  }
+
+  ready(function () {
+    const deck = document.querySelector('.deck');
+    if (!deck) return;
+    const slides = Array.from(deck.querySelectorAll('.slide'));
+    if (!slides.length) return;
+
+    initCanvasFit(deck);
+
+    /* ===== custom logo (issue #11) =====
+     * Deliberately initialised BEFORE the preview-mode branch below: the
+     * presenter's "pixel-perfect" preview is the audience view, so it has to
+     * carry the logo too. A hand-authored <img class="deck-logo"> is left
+     * exactly where it is — base.css styles both paths identically, so a deck
+     * can have a logo with runtime.js absent entirely.
+     */
+    const logoEl = (function initLogo(){
+      const attr = (n) => document.body.getAttribute(n) || document.documentElement.getAttribute(n);
+      let el = deck.querySelector(':scope > .deck-logo');
+      if (!el) {
+        const src = attr('data-logo');
+        if (!src) return null;
+        el = document.createElement('img');
+        el.className = 'deck-logo';
+        el.src = src;
+        el.alt = attr('data-logo-alt') || '';
+        deck.appendChild(el);
+      }
+      if (!el.hasAttribute('data-pos')) {
+        el.setAttribute('data-pos', attr('data-logo-position') || 'top-right');
+      }
+      /* Custom props go on .deck, not on the element: the element inherits
+         them, and the print rules (which paint the logo per page on
+         .slide::after) can read them too. An inline --logo-* on a
+         hand-authored element wins for the element, so mirror it up. */
+      const mirror = (attrName, prop) => {
+        const v = (attrName && attr(attrName)) || el.style.getPropertyValue(prop);
+        if (v) deck.style.setProperty(prop, v.trim());
+      };
+      mirror('data-logo-size', '--logo-size');
+      mirror('data-logo-opacity', '--logo-opacity');
+      mirror(null, '--logo-inset-x');
+      mirror(null, '--logo-inset-y');
+
+      /* Print can't use the element itself — see the @media print note in
+         base.css. Hand the URL and the corner to the per-page painter.
+         Use el.src, not getAttribute('src'): a relative url() inside a custom
+         property is resolved against the stylesheet that *uses* the var()
+         (assets/base.css), not against the deck, so it must be absolute. */
+      const src = el.src;
+      if (src) {
+        deck.style.setProperty('--logo-print', 'url("' + src.replace(/["\\]/g, '\\$&') + '")');
+        deck.setAttribute('data-logo-print', el.getAttribute('data-pos'));
+      }
+      return el;
+    })();
+
+    /* Per-slide opt-out: <section class="slide" data-no-logo> — covers and
+       full-bleed image slides usually carry their own branding. */
+    function syncLogo(slide){
+      if (!logoEl) return;
+      logoEl.style.display = (slide && slide.hasAttribute('data-no-logo')) ? 'none' : '';
+    }
+
+    const previewOnlyIdx = getPreviewIdx();
+    const isPreviewMode = previewOnlyIdx >= 0 && previewOnlyIdx < slides.length;
+
+    /* ===== Preview-only mode: show one slide, hide everything else ===== */
+    if (isPreviewMode) {
+      function showSlide(i) {
+        slides.forEach((s, j) => {
+          const active = (j === i);
+          s.classList.toggle('is-active', active);
+          s.style.display = active ? '' : 'none';
+          if (active) {
+            s.style.opacity = '1';
+            s.style.transform = 'none';
+            s.style.pointerEvents = 'auto';
+          }
+        });
+      }
+      showSlide(previewOnlyIdx);
+      syncLogo(slides[previewOnlyIdx]);
+      /* Hide chrome that the presenter shouldn't see in preview */
+      const hideSel = '.progress-bar, .notes-overlay, .overview, ' + NOTE_SEL;
+      document.querySelectorAll(hideSel).forEach(el => { el.style.display = 'none'; });
+      document.documentElement.setAttribute('data-preview', '1');
+      document.body.setAttribute('data-preview', '1');
+      /* Auto-detect theme base path for theme switching in preview mode */
+      function getPreviewThemeBase() {
+        const base = document.documentElement.getAttribute('data-theme-base');
+        if (base) return base;
+        const tl = document.getElementById('theme-link');
+        if (tl) {
+          const raw = tl.getAttribute('href') || '';
+          const ls = raw.lastIndexOf('/');
+          if (ls >= 0) return raw.substring(0, ls + 1);
+        }
+        return 'assets/themes/';
+      }
+      const previewThemeBase = getPreviewThemeBase();
+
+      /* Listen for postMessage from parent presenter window:
+       *  - preview-goto: switch visible slide WITHOUT reloading
+       *  - preview-theme: switch theme CSS link to match audience window */
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'preview-goto') {
+          const n = parseInt(e.data.idx, 10);
+          if (n >= 0 && n < slides.length) { showSlide(n); syncLogo(slides[n]); }
+        } else if (e.data.type === 'preview-theme' && e.data.name) {
+          let link = document.getElementById('theme-link');
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-link';
+            document.head.appendChild(link);
+          }
+          link.href = previewThemeBase + e.data.name + '.css';
+          document.documentElement.setAttribute('data-theme', e.data.name);
+        }
+      });
+      /* Signal to parent that preview iframe is ready */
+      try { window.parent && window.parent.postMessage({ type: 'preview-ready' }, '*'); } catch(e) {}
+      return;
+    }
+
+    let idx = 0;
+    const total = slides.length;
+
+    /* ===== BroadcastChannel for presenter sync ===== */
+    const CHANNEL_NAME = 'html-ppt-presenter-' + location.pathname;
+    let bc;
+    try { bc = new BroadcastChannel(CHANNEL_NAME); } catch(e) { bc = null; }
+
+    // Are we running inside the presenter popup? (legacy flag, now unused)
+    const isPresenterWindow = false;
+
+    /* ===== progress bar ===== */
+    let bar = document.querySelector('.progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'progress-bar';
+      bar.innerHTML = '<span></span>';
+      document.body.appendChild(bar);
+    }
+    const barFill = bar.querySelector('span');
+
+    /* ===== notes overlay (N key) ===== */
+    let notes = document.querySelector('.notes-overlay');
+    if (!notes) {
+      notes = document.createElement('div');
+      notes.className = 'notes-overlay';
+      document.body.appendChild(notes);
+    }
+
+    /* ===== overview grid (O key) ===== */
+    let overview = document.querySelector('.overview');
+    if (!overview) {
+      overview = document.createElement('div');
+      overview.className = 'overview';
+      slides.forEach((s, i) => {
+        const t = document.createElement('div');
+        t.className = 'thumb';
+        // Force 16:9 aspect ratio robustly
+        t.style.padding = '0 0 56.25% 0';
+        t.style.height = '0';
+        t.style.position = 'relative';
+        t.style.overflow = 'hidden';
+
+        const title = s.getAttribute('data-title') ||
+          (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1));
+        
+        // Create a container for the mini-slide
+        const mini = document.createElement('div');
+        mini.className = 'mini-slide';
+        mini.style.position = 'absolute';
+        mini.style.top = '0';
+        mini.style.left = '0';
+        mini.style.width = '1920px';
+        mini.style.height = '1080px';
+        mini.style.transformOrigin = 'top left';
+        mini.style.pointerEvents = 'none';
+        mini.style.background = 'var(--bg)';
+        
+        // Clone the slide content
+        const clone = s.cloneNode(true);
+        clone.className = 'slide is-active'; // force active styles
+        clone.style.position = 'absolute';
+        clone.style.inset = '0';
+        clone.style.transform = 'none';
+        clone.style.opacity = '1';
+        clone.style.padding = '72px 96px'; // ensure padding is kept
+        
+        mini.appendChild(clone);
+        t.appendChild(mini);
+
+        // Add the number and title overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.inset = '0';
+        overlay.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.8) 100%)';
+        overlay.style.color = '#fff';
+        overlay.style.zIndex = '10';
+        overlay.style.pointerEvents = 'none';
+        
+        const n = document.createElement('div');
+        n.className = 'n';
+        n.textContent = i + 1;
+        n.style.position = 'absolute';
+        n.style.top = '12px';
+        n.style.left = '16px';
+        n.style.fontWeight = '700';
+        n.style.fontSize = '16px';
+        n.style.color = '#fff';
+        n.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+        
+        const text = document.createElement('div');
+        text.className = 't';
+        text.textContent = title.trim().slice(0,80);
+        text.style.position = 'absolute';
+        text.style.bottom = '12px';
+        text.style.left = '16px';
+        text.style.right = '16px';
+        text.style.fontWeight = '600';
+        text.style.fontSize = '14px';
+        text.style.color = '#fff';
+        text.style.textShadow = '0 1px 4px rgba(0,0,0,0.8)';
+        
+        overlay.appendChild(n);
+        overlay.appendChild(text);
+        t.appendChild(overlay);
+
+        t.addEventListener('click', () => { go(i); toggleOverview(false); });
+        overview.appendChild(t);
+      });
+      document.body.appendChild(overview);
+    }
+
+    /* ===== navigation ===== */
+    function go(n, fromRemote){
+      n = Math.max(0, Math.min(total-1, n));
+      slides.forEach((s,i) => {
+        s.classList.toggle('is-active', i===n);
+        s.classList.toggle('is-prev', i<n);
+      });
+      idx = n;
+      syncLogo(slides[n]);
+      barFill.style.width = ((n+1)/total*100)+'%';
+      slides.forEach((slide,i) => { const numEl=slide.querySelector('.slide-number'); if(numEl){numEl.setAttribute('data-current',i+1);numEl.setAttribute('data-total',total);} });
+
+      // notes (bottom overlay)
+      const note = slides[n].querySelector(NOTE_SEL);
+      notes.innerHTML = note ? note.innerHTML : '';
+
+      // hash
+      const hashTarget = '#/'+(n+1);
+      if (location.hash !== hashTarget && !isPresenterWindow) {
+        history.replaceState(null,'', hashTarget);
+      }
+
+      // re-trigger entry animations
+      slides[n].querySelectorAll('[data-anim]').forEach(el => {
+        const a = el.getAttribute('data-anim');
+        el.classList.remove('anim-'+a);
+        void el.offsetWidth;
+        el.classList.add('anim-'+a);
+      });
+
+      // counter-up
+      slides[n].querySelectorAll('.counter').forEach(el => {
+        const target = parseFloat(el.getAttribute('data-to')||el.textContent);
+        const dur = parseInt(el.getAttribute('data-dur')||'1200',10);
+        const start = performance.now();
+        const from = 0;
+        function tick(now){
+          const t = Math.min(1,(now-start)/dur);
+          const v = from + (target-from)*(1-Math.pow(1-t,3));
+          el.textContent = (target % 1 === 0) ? Math.round(v) : v.toFixed(1);
+          if (t<1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+
+      // Broadcast to other window (audience ↔ presenter)
+      if (!fromRemote && bc) {
+        bc.postMessage({ type: 'go', idx: n });
+      }
+    }
+
+    /* ===== listen for remote navigation / theme changes ===== */
+    if (bc) {
+      bc.onmessage = function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'go' && typeof e.data.idx === 'number') {
+          go(e.data.idx, true);
+        } else if (e.data.type === 'theme' && e.data.name) {
+          /* Sync theme across windows */
+          const i = themes.indexOf(e.data.name);
+          if (i >= 0) themeIdx = i;
+          applyTheme(e.data.name);
+        }
+      };
+    }
+
+    function toggleNotes(force){ notes.classList.toggle('open', force!==undefined?force:!notes.classList.contains('open')); }
+    function toggleOverview(force){
+      const isOpen = force!==undefined ? force : !overview.classList.contains('open');
+      overview.classList.toggle('open', isOpen);
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          const thumbs = overview.querySelectorAll('.thumb');
+          if (thumbs.length) {
+            const scale = thumbs[0].clientWidth / 1920;
+            overview.querySelectorAll('.mini-slide').forEach(m => {
+              m.style.transform = 'scale(' + scale + ')';
+            });
+          }
+        });
+      }
+    }
+
+    /* ========== PRESENTER MODE — Magnetic-card popup window ========== */
+    /* Opens a new window with 4 draggable, resizable cards:
+     *   CURRENT  — iframe(?preview=N)   pixel-perfect preview of current slide
+     *   NEXT     — iframe(?preview=N+1) pixel-perfect preview of next slide
+     *   SCRIPT   — large speaker notes (逐字稿)
+     *   TIMER    — elapsed timer + page counter + controls
+     * Cards remember position/size in localStorage.
+     * Two windows sync via BroadcastChannel.
+     */
+    let presenterWin = null;
+
+    function openPresenterWindow() {
+      if (presenterWin && !presenterWin.closed) {
+        presenterWin.focus();
+        return;
+      }
+
+      // Build absolute URL of THIS deck file (without hash/query)
+      const deckUrl = location.protocol + '//' + location.host + location.pathname;
+
+      // Collect slide titles + notes (HTML strings)
+      const slideMeta = slides.map((s, i) => {
+        const note = s.querySelector(NOTE_SEL);
+        return {
+          title: s.getAttribute('data-title') ||
+            (s.querySelector('h1,h2,h3')||{}).textContent || ('Slide '+(i+1)),
+          notes: note ? note.innerHTML : ''
+        };
+      });
+
+      /* Capture current theme so presenter previews match the audience */
+      const currentTheme = root.getAttribute('data-theme') || (themes[themeIdx] || '');
+      const presenterHTML = buildPresenterHTML(deckUrl, slideMeta, total, idx, CHANNEL_NAME, currentTheme);
+
+      presenterWin = window.open('', 'html-ppt-presenter', 'width=1280,height=820,menubar=no,toolbar=no');
+      if (!presenterWin) {
+        alert('请允许弹出窗口以使用演讲者视图');
+        return;
+      }
+      presenterWin.document.open();
+      presenterWin.document.write(presenterHTML);
+      presenterWin.document.close();
+    }
+
+    function buildPresenterHTML(deckUrl, slideMeta, total, startIdx, channelName, currentTheme) {
+      /* Notes are authored HTML. Escaping "<" keeps a literal <\/script> in a
+         slide's notes from closing the inline script that carries this JSON —
+         which would kill the whole presenter init. */
+      const embed = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+      const metaJSON = embed(slideMeta);
+      const deckUrlJSON = embed(deckUrl);
+      const channelJSON = embed(channelName);
+      const themeJSON = embed(currentTheme || '');
+      const storageKey = 'html-ppt-presenter:' + location.pathname;
+
+      // Build the document as a single template string for clarity
+      return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Presenter View</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #1a1d24;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(88,166,255,.04), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(188,140,255,.04), transparent 50%);
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+  }
+  /* Stage: positioned area where cards live */
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+
+  /* Magnetic card */
+  .pcard {
+    position: absolute;
+    background: #0d1117;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.02);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    min-width: 180px; min-height: 100px;
+    transition: box-shadow .2s, border-color .2s;
+  }
+
+  /* Default geometry. The cards used to get position and size ONLY from
+     applyLayout(), which runs at the very end of the init — so anything that
+     stopped that script (a blocked inline script under CSP, a stale layout in
+     localStorage, any throw in the wiring above it) left four cards collapsed
+     on top of each other and just the hint bar visible (#14). These rules make
+     the presenter usable with zero JS; applyLayout() overrides them with px. */
+  #card-cur   { left: 16px; top: 16px;
+                width: calc(55% - 24px);  height: calc((100% - 36px) * 0.62 - 16px); }
+  #card-nxt   { left: calc(55% + 8px); top: 16px;
+                width: calc(45% - 24px);  height: calc((100% - 36px) * 0.42 - 16px); }
+  #card-notes { left: calc(55% + 8px); top: calc((100% - 36px) * 0.42 + 8px);
+                width: calc(45% - 24px);  height: calc((100% - 36px) * 0.58 - 16px); }
+  #card-timer { left: 16px; top: calc((100% - 36px) * 0.62 + 8px);
+                width: calc(55% - 24px);  height: calc((100% - 36px) * 0.38 - 16px); }
+
+  .pcard.dragging { box-shadow: 0 16px 48px rgba(0,0,0,.6), 0 0 0 2px rgba(88,166,255,.5); border-color: #58a6ff; transition: none; z-index: 9999; }
+  .pcard.resizing { box-shadow: 0 16px 48px rgba(0,0,0,.6), 0 0 0 2px rgba(63,185,80,.5); border-color: #3fb950; transition: none; z-index: 9999; }
+  .pcard:hover { border-color: rgba(88,166,255,.3); }
+
+  /* Card header (drag handle) */
+  .pcard-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.04);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    cursor: move;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .pcard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-color, #58a6ff); flex-shrink: 0; }
+  .pcard-title {
+    font-size: 11px; letter-spacing: .15em; text-transform: uppercase;
+    font-weight: 700; color: #8b949e; flex: 1;
+  }
+  .pcard-meta { font-size: 11px; color: #6e7681; }
+
+  /* Card body */
+  .pcard-body { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+
+  /* Preview cards (CURRENT/NEXT) — iframe-based pixel-perfect render */
+  .pcard-preview .pcard-body { background: #000; }
+  .pcard-preview iframe {
+    position: absolute; top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    border: none;
+    transform-origin: top left;
+    pointer-events: none;
+    background: transparent;
+  }
+  .pcard-preview .preview-end {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #484f58; font-size: 14px; letter-spacing: .12em;
+  }
+
+  /* Notes card */
+  .pcard-notes .pcard-body {
+    padding: 14px 18px;
+    overflow-y: auto;
+    font-size: 18px; line-height: 1.75;
+    color: #d0d7de;
+    font-family: "Noto Sans SC", -apple-system, sans-serif;
+  }
+  .pcard-notes .pcard-body p { margin: 0 0 .7em 0; }
+  .pcard-notes .pcard-body strong { color: #f0883e; }
+  .pcard-notes .pcard-body em { color: #58a6ff; font-style: normal; }
+  .pcard-notes .pcard-body code {
+    font-family: "SF Mono", monospace; font-size: .9em;
+    background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 4px;
+  }
+  .pcard-notes .empty { color: #484f58; font-style: italic; }
+
+  /* Timer card */
+  .pcard-timer .pcard-body {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 18px 20px; justify-content: center;
+  }
+  .timer-display {
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 42px; font-weight: 700;
+    color: #3fb950;
+    letter-spacing: .04em;
+    line-height: 1;
+  }
+  .timer-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; color: #8b949e;
+  }
+  .timer-row .label { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #6e7681; }
+  .timer-row .val { color: #e6edf3; font-weight: 600; font-family: "SF Mono", monospace; }
+  .timer-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .timer-btn {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    color: #e6edf3;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .timer-btn:hover { background: rgba(88,166,255,.15); border-color: #58a6ff; }
+  .timer-btn:active { transform: translateY(1px); }
+
+  /* Resize handle */
+  .pcard-resize {
+    position: absolute; right: 0; bottom: 0;
+    width: 18px; height: 18px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 60%, transparent 60%, transparent 70%, rgba(255,255,255,.25) 70%, rgba(255,255,255,.25) 80%, transparent 80%);
+    z-index: 5;
+  }
+  .pcard-resize:hover { background: linear-gradient(135deg, transparent 50%, #58a6ff 50%, #58a6ff 60%, transparent 60%, transparent 70%, #58a6ff 70%, #58a6ff 80%, transparent 80%); }
+
+  /* Bottom hint bar */
+  .hint-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 6px 16px;
+    font-size: 11px; color: #8b949e;
+    display: flex; gap: 18px; align-items: center;
+    z-index: 1000;
+  }
+  .hint-bar kbd {
+    background: rgba(255,255,255,.08);
+    padding: 1px 6px; border-radius: 3px;
+    font-family: "SF Mono", monospace;
+    font-size: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    color: #e6edf3;
+  }
+  .hint-bar .reset-layout {
+    margin-left: auto;
+    background: transparent; border: 1px solid rgba(255,255,255,.15);
+    color: #8b949e; padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
+  }
+  .hint-bar .reset-layout:hover { background: rgba(248,81,73,.15); border-color: #f85149; color: #f85149; }
+
+  body.is-dragging-card * { user-select: none !important; }
+  body.is-dragging-card iframe { pointer-events: none !important; }
+</style>
+
+<style id="revision-v2">
+:root{--observed:#101010;--unobserved:#c8d1da;--history-bg:#edf4fb;--outcome-bg:#fbf2e9}
+.erd{position:relative;width:1704px;height:660px;margin:12px auto 0;flex:none}.erd-links{position:absolute;inset:0;width:100%;height:100%;color:var(--text-3)}.erd-cardinality{font:22px var(--font-sans);fill:var(--text-2)}.entity{position:absolute;border:2px solid var(--border-strong);background:var(--bg);border-radius:5px;overflow:hidden}.entity h3{font:700 26px var(--font-mono);margin:0;padding:13px 20px;border-bottom:2px solid var(--border-strong);background:var(--bg-soft)}.entity-field{display:grid;grid-template-columns:72px 1fr auto;align-items:baseline;gap:8px;padding:6px 17px;line-height:1.35;font:20px var(--font-mono)}.entity-field .key{font:700 15px var(--font-sans);color:var(--text-3)}.entity-field .dtype{font-size:17px;color:var(--text-2)}.entity-field:first-of-type{padding-top:12px}.entity-field:last-child{padding-bottom:15px}.entity-clients{left:660px;top:20px;width:380px;height:170px}.entity-targets{left:0;top:0;width:480px}.entity-dialog{left:1230px;top:0;width:474px}.entity-trx{left:210px;top:355px;width:570px}.entity-geo{left:990px;top:355px;width:510px}.entity-trx .entity-field{font-size:18px;padding:4px 17px}
+.behavior-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:80px;margin:15px 0 25px}.behavior{text-align:center}.behavior h3{font-size:32px;letter-spacing:.04em;margin:0 0 4px}.behavior-type{font-size:23px;color:var(--text-2);margin:0 0 22px}.donut{width:310px;height:310px;margin:auto;position:relative;border-radius:50%;background:conic-gradient(var(--observed) calc(var(--coverage)*1%),var(--unobserved) 0);display:grid;place-items:center}.donut:before{content:'';position:absolute;inset:48px;background:var(--bg);border-radius:50%}.donut-center{position:relative;text-align:center;z-index:1}.donut-center strong{display:block;font-size:49px;line-height:1.15;font-weight:700;letter-spacing:-.035em;color:var(--observed)}.donut-center span{display:block;white-space:pre-line;font-size:22px;line-height:1.3;color:var(--text-2);margin-top:10px}.behavior-total{display:block;font-size:42px;line-height:1.2;margin:26px 0 7px;letter-spacing:-.03em}.behavior-total-label{font-size:24px;color:var(--text-2);margin:0}.donut-legend{display:flex;justify-content:center;gap:45px;margin:10px 0 0;font-size:22px;color:var(--text-2)}.donut-legend>span{display:flex;align-items:center;gap:12px}.donut-legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--observed)}.donut-legend .unobserved{background:var(--unobserved)}.coverage-note{font-size:22px;text-align:center;color:var(--text-2);margin:20px 0 0}
+.range-table{margin:0 0 38px}.range-head,.range-row{display:grid;grid-template-columns:185px 225px 1fr 225px;column-gap:30px;align-items:center}.range-head{height:64px;font-size:19px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em}.range-head>span:last-child,.range-row>strong:last-child{text-align:right}.range-row{height:84px;border-bottom:1px solid var(--border)}.range-row b{font-size:27px}.range-row strong{font-size:27px;font-weight:600;font-variant-numeric:tabular-nums}.range-axis{position:relative;height:24px;font-size:16px;letter-spacing:0;text-transform:none}.range-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}.range-axis span:first-child{transform:none}.range-axis span:last-child{transform:translateX(-100%);top:-22px}.range-track{height:40px;position:relative;background:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:7.6923% 100%}.range-track i{position:absolute;top:16px;height:10px;background:currentColor}.prediction-flow{display:grid;grid-template-columns:1fr 110px .82fr;gap:28px;align-items:stretch}.prediction-flow>div{padding:25px 32px;border-top:4px solid var(--accent);background:var(--history-bg)}.prediction-flow>div>span{font-size:19px;letter-spacing:.09em;font-weight:600}.prediction-flow strong{display:block;font-size:39px;margin:8px 0;line-height:1.2}.prediction-flow p{font-size:24px;margin:0;color:var(--text-2)}.prediction-flow .outcome-period{border-color:var(--target);background:var(--outcome-bg)}.prediction-arrow{display:grid;place-items:center;font-size:62px;color:var(--text-3)}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="pcard pcard-preview" id="card-cur" style="--dot-color:#58a6ff">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">CURRENT</span>
+      <span class="pcard-meta" id="cur-meta">—</span>
+    </div>
+    <div class="pcard-body"><iframe id="iframe-cur"></iframe></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-preview" id="card-nxt" style="--dot-color:#bc8cff">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">NEXT</span>
+      <span class="pcard-meta" id="nxt-meta">—</span>
+    </div>
+    <div class="pcard-body"><iframe id="iframe-nxt"></iframe></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-notes" id="card-notes" style="--dot-color:#f0883e">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">SPEAKER SCRIPT · 逐字稿</span>
+    </div>
+    <div class="pcard-body" id="notes-body"></div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+
+  <div class="pcard pcard-timer" id="card-timer" style="--dot-color:#3fb950">
+    <div class="pcard-head" data-drag>
+      <span class="pcard-dot"></span>
+      <span class="pcard-title">TIMER</span>
+    </div>
+    <div class="pcard-body">
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div class="timer-row">
+        <span class="label">Slide</span>
+        <span class="val" id="timer-count">1 / ${total}</span>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn" id="btn-prev">← Prev</button>
+        <button class="timer-btn" id="btn-next">Next →</button>
+        <button class="timer-btn" id="btn-reset">⏱ Reset</button>
+      </div>
+    </div>
+    <div class="pcard-resize" data-resize></div>
+  </div>
+</div>
+
+<div class="hint-bar">
+  <span><kbd>← →</kbd> 翻页</span>
+  <span><kbd>R</kbd> 重置计时</span>
+  <span><kbd>Esc</kbd> 关闭</span>
+  <span style="color:#6e7681">拖动卡片头部移动 · 拖动右下角调整大小</span>
+  <button class="reset-layout" id="reset-layout">重置布局</button>
+</div>
+
+<script>
+(function(){
+  var slideMeta = ${metaJSON};
+  var total = ${total};
+  var idx = ${startIdx};
+  var deckUrl = ${deckUrlJSON};
+  var STORAGE_KEY = ${embed(storageKey)};
+  var bc;
+  try { bc = new BroadcastChannel(${channelJSON}); } catch(e) {}
+
+  var iframeCur = document.getElementById('iframe-cur');
+  var iframeNxt = document.getElementById('iframe-nxt');
+  var notesBody = document.getElementById('notes-body');
+  var curMeta = document.getElementById('cur-meta');
+  var nxtMeta = document.getElementById('nxt-meta');
+  var timerDisplay = document.getElementById('timer-display');
+  var timerCount = document.getElementById('timer-count');
+
+  /* Lay the cards out before anything else. This used to be the LAST statement
+     of the init, so every line below it was a single point of failure for the
+     whole presenter's visibility (#14). Function declarations hoist, so this is
+     safe here. */
+  applyLayout(readLayout());
+
+  /* ===== Default card layout ===== */
+  var CARD_IDS = ['card-cur','card-nxt','card-notes','card-timer'];
+  var MIN_W = 180, MIN_H = 100;
+
+  function defaultLayout() {
+    /* A popup that opened minimised or in a background tab can report 0 here;
+       the old code turned that into negative widths, which CSS discards. */
+    var w = Math.max(640, window.innerWidth || 0);
+    var h = Math.max(400, (window.innerHeight || 0) - 36); /* room for hint bar */
+    return {
+      'card-cur':   { x: 16,        y: 16,            w: Math.round(w*0.55) - 24, h: Math.round(h*0.62) - 16 },
+      'card-nxt':   { x: Math.round(w*0.55) + 8, y: 16, w: w - Math.round(w*0.55) - 24, h: Math.round(h*0.42) - 16 },
+      'card-notes': { x: Math.round(w*0.55) + 8, y: Math.round(h*0.42) + 8, w: w - Math.round(w*0.55) - 24, h: h - Math.round(h*0.42) - 16 },
+      'card-timer': { x: 16,        y: Math.round(h*0.62) + 8, w: Math.round(w*0.55) - 24, h: h - Math.round(h*0.62) - 16 }
+    };
+  }
+
+  /* ===== Apply / save / restore layout ===== */
+  function applyLayout(layout) {
+    Object.keys(layout).forEach(function(id){
+      var el = document.getElementById(id);
+      var l = layout[id];
+      if (el && l) {
+        el.style.left = l.x + 'px';
+        el.style.top = l.y + 'px';
+        el.style.width = l.w + 'px';
+        el.style.height = l.h + 'px';
+      }
+    });
+    rescaleAll();
+  }
+  /* A layout restored from localStorage was written against whatever window
+     size the deck was last presented at. Replayed in a smaller window it puts
+     every card off-screen, and there is no way back because the layout is
+     sticky — so clamp it into view and reject anything malformed. */
+  function sanitizeLayout(layout) {
+    if (!layout || typeof layout !== 'object') return null;
+    var vw = Math.max(MIN_W, window.innerWidth || 0);
+    var vh = Math.max(MIN_H, window.innerHeight || 0);
+    var out = {};
+    for (var i = 0; i < CARD_IDS.length; i++) {
+      var l = layout[CARD_IDS[i]];
+      if (!l) return null;
+      var cw = Math.min(Math.max(+l.w || 0, MIN_W), vw);
+      var ch = Math.min(Math.max(+l.h || 0, MIN_H), vh);
+      var cx = Math.min(Math.max(+l.x || 0, 0), Math.max(0, vw - MIN_W));
+      var cy = Math.min(Math.max(+l.y || 0, 0), Math.max(0, vh - 40));
+      if (!isFinite(cw) || !isFinite(ch) || !isFinite(cx) || !isFinite(cy)) return null;
+      out[CARD_IDS[i]] = { x: cx, y: cy, w: cw, h: ch };
+    }
+    return out;
+  }
+  function readLayout() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+    return sanitizeLayout(saved) || defaultLayout();
+  }
+  function saveLayout() {
+    var layout = {};
+    CARD_IDS.forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) {
+        layout[id] = {
+          x: parseInt(el.style.left,10) || 0,
+          y: parseInt(el.style.top,10) || 0,
+          w: parseInt(el.style.width,10) || 300,
+          h: parseInt(el.style.height,10) || 200
+        };
+      }
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(layout)); } catch(e) {}
+  }
+
+  /* ===== iframe rescale to fit card body ===== */
+  function rescaleIframe(iframe) {
+    if (!iframe || iframe.style.display === 'none') return;
+    var body = iframe.parentElement;
+    var cw = body.clientWidth, ch = body.clientHeight;
+    if (!cw || !ch) return;
+    var s = Math.min(cw / 1920, ch / 1080);
+    iframe.style.transform = 'scale(' + s + ')';
+    /* Center the scaled iframe in the body */
+    var sw = 1920 * s, sh = 1080 * s;
+    iframe.style.left = Math.max(0, (cw - sw) / 2) + 'px';
+    iframe.style.top = Math.max(0, (ch - sh) / 2) + 'px';
+  }
+  function rescaleAll() {
+    rescaleIframe(iframeCur);
+    rescaleIframe(iframeNxt);
+  }
+  window.addEventListener('resize', rescaleAll);
+
+  /* ===== Drag (move card by header) ===== */
+  document.querySelectorAll('[data-drag]').forEach(function(handle){
+    handle.addEventListener('mousedown', function(e){
+      if (e.button !== 0) return;
+      var card = handle.closest('.pcard');
+      if (!card) return;
+      e.preventDefault();
+      card.classList.add('dragging');
+      document.body.classList.add('is-dragging-card');
+      var startX = e.clientX, startY = e.clientY;
+      var startL = parseInt(card.style.left,10) || 0;
+      var startT = parseInt(card.style.top,10)  || 0;
+      function onMove(ev){
+        var nx = Math.max(0, Math.min(window.innerWidth - 100, startL + ev.clientX - startX));
+        var ny = Math.max(0, Math.min(window.innerHeight - 50, startT + ev.clientY - startY));
+        card.style.left = nx + 'px';
+        card.style.top = ny + 'px';
+      }
+      function onUp(){
+        card.classList.remove('dragging');
+        document.body.classList.remove('is-dragging-card');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        saveLayout();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+
+  /* ===== Resize (drag bottom-right corner) ===== */
+  document.querySelectorAll('[data-resize]').forEach(function(handle){
+    handle.addEventListener('mousedown', function(e){
+      if (e.button !== 0) return;
+      var card = handle.closest('.pcard');
+      if (!card) return;
+      e.preventDefault(); e.stopPropagation();
+      card.classList.add('resizing');
+      document.body.classList.add('is-dragging-card');
+      var startX = e.clientX, startY = e.clientY;
+      var startW = parseInt(card.style.width,10)  || card.offsetWidth;
+      var startH = parseInt(card.style.height,10) || card.offsetHeight;
+      function onMove(ev){
+        var nw = Math.max(180, startW + ev.clientX - startX);
+        var nh = Math.max(100, startH + ev.clientY - startY);
+        card.style.width = nw + 'px';
+        card.style.height = nh + 'px';
+        if (card.querySelector('iframe')) rescaleIframe(card.querySelector('iframe'));
+      }
+      function onUp(){
+        card.classList.remove('resizing');
+        document.body.classList.remove('is-dragging-card');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        rescaleAll();
+        saveLayout();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+
+  /* ===== Preview iframe ready tracking =====
+   * Each iframe loads the deck ONCE with ?preview=1 on init. Subsequent
+   * slide changes are sent via postMessage('preview-goto') so the iframe
+   * just toggles visibility of a different .slide — no reload, no flicker.
+   */
+  var iframeReady = { cur: false, nxt: false };
+  var currentTheme = ${themeJSON};
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'preview-ready') return;
+    var iframe = null;
+    if (e.source === iframeCur.contentWindow) {
+      iframeReady.cur = true;
+      iframe = iframeCur;
+      postPreviewGoto(iframeCur, idx);
+    } else if (e.source === iframeNxt.contentWindow) {
+      iframeReady.nxt = true;
+      iframe = iframeNxt;
+      postPreviewGoto(iframeNxt, idx + 1 < total ? idx + 1 : idx);
+    }
+    /* Sync current theme to the iframe */
+    if (iframe && currentTheme) {
+      try { iframe.contentWindow.postMessage({ type: 'preview-theme', name: currentTheme }, '*'); } catch(err) {}
+    }
+    if (iframe) rescaleIframe(iframe);
+  });
+
+  function postPreviewGoto(iframe, n) {
+    try {
+      iframe.contentWindow.postMessage({ type: 'preview-goto', idx: n }, '*');
+    } catch(e) {}
+  }
+
+  /* ===== Update content =====
+   * Smooth (no-reload) navigation: send postMessage to iframes instead of
+   * resetting src. Iframes stay loaded, just switch visible .slide.
+   */
+  function update(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    idx = n;
+
+    /* Current preview — postMessage (smooth) */
+    if (iframeReady.cur) postPreviewGoto(iframeCur, n);
+    curMeta.textContent = (n + 1) + '/' + total;
+
+    /* Next preview */
+    if (n + 1 < total) {
+      iframeNxt.style.display = '';
+      var endEl = document.querySelector('#card-nxt .preview-end');
+      if (endEl) endEl.remove();
+      if (iframeReady.nxt) postPreviewGoto(iframeNxt, n + 1);
+      nxtMeta.textContent = (n + 2) + '/' + total;
+    } else {
+      iframeNxt.style.display = 'none';
+      var body = document.querySelector('#card-nxt .pcard-body');
+      if (body && !body.querySelector('.preview-end')) {
+        var end = document.createElement('div');
+        end.className = 'preview-end';
+        end.textContent = '— END OF DECK —';
+        body.appendChild(end);
+      }
+      nxtMeta.textContent = 'END';
+    }
+
+    /* Notes */
+    var note = slideMeta[n].notes;
+    notesBody.innerHTML = note || '<span class="empty">（这一页还没有逐字稿）</span>';
+
+    /* Timer count */
+    timerCount.textContent = (n + 1) + ' / ' + total;
+  }
+
+  /* ===== Timer ===== */
+  var tStart = Date.now();
+  setInterval(function(){
+    var s = Math.floor((Date.now() - tStart) / 1000);
+    var mm = String(Math.floor(s/60)).padStart(2,'0');
+    var ss = String(s%60).padStart(2,'0');
+    timerDisplay.textContent = mm + ':' + ss;
+  }, 1000);
+  function resetTimer(){ tStart = Date.now(); timerDisplay.textContent = '00:00'; }
+
+  /* ===== BroadcastChannel sync ===== */
+  if (bc) {
+    bc.onmessage = function(e){
+      if (!e.data) return;
+      if (e.data.type === 'go') update(e.data.idx);
+      else if (e.data.type === 'theme' && e.data.name) {
+        currentTheme = e.data.name;
+        /* Forward theme change to preview iframes */
+        [iframeCur, iframeNxt].forEach(function(iframe){
+          try {
+            iframe.contentWindow.postMessage({ type: 'preview-theme', name: e.data.name }, '*');
+          } catch(err) {}
+        });
+      }
+    };
+  }
+  function go(n) {
+    update(n);
+    if (bc) bc.postMessage({ type: 'go', idx: idx });
+  }
+
+  /* ===== Buttons ===== */
+  document.getElementById('btn-prev').addEventListener('click', function(){ go(idx - 1); });
+  document.getElementById('btn-next').addEventListener('click', function(){ go(idx + 1); });
+  document.getElementById('btn-reset').addEventListener('click', resetTimer);
+  document.getElementById('reset-layout').addEventListener('click', function(){
+    if (confirm('恢复默认卡片布局？')) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+      applyLayout(defaultLayout());
+    }
+  });
+
+  /* ===== Keyboard ===== */
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch(e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': go(idx + 1); e.preventDefault(); break;
+      case 'ArrowLeft':  case 'PageUp':   go(idx - 1); e.preventDefault(); break;
+      case 'Home': go(0); break;
+      case 'End':  go(total - 1); break;
+      case 'r': case 'R': resetTimer(); break;
+      case 'Escape': window.close(); break;
+    }
+  });
+
+  /* ===== Iframe load → rescale (catches initial size) ===== */
+  iframeCur.addEventListener('load', function(){ rescaleIframe(iframeCur); });
+  iframeNxt.addEventListener('load', function(){ rescaleIframe(iframeNxt); });
+
+  /* ===== Init =====
+   * Load each iframe ONCE with the deck file. After they post
+   * 'preview-ready', all subsequent navigation is via postMessage
+   * (smooth, no reload, no flicker).
+   */
+  try {
+    iframeCur.src = deckUrl + '?preview=' + (idx + 1);
+    if (idx + 1 < total) iframeNxt.src = deckUrl + '?preview=' + (idx + 2);
+    /* Initialize notes/timer/count without touching iframes */
+    var m = slideMeta[idx] || {};
+    notesBody.innerHTML = m.notes || '<span class="empty">（这一页还没有逐字稿）</span>';
+    curMeta.textContent = (idx + 1) + '/' + total;
+    nxtMeta.textContent = (idx + 2) + '/' + total;
+    timerCount.textContent = (idx + 1) + ' / ' + total;
+  } catch (e) {
+    /* Report it, but never let it blank the cards. */
+    if (window.console && console.error) console.error('[html-ppt] presenter init:', e);
+  }
+})();
+</` + `script>
+</body></html>`;
+    }
+
+    function fullscreen(){ const el=document.documentElement;
+      if (!document.fullscreenElement) el.requestFullscreen&&el.requestFullscreen();
+      else document.exitFullscreen&&document.exitFullscreen();
+    }
+
+    // theme cycling
+    const root = document.documentElement;
+    const themesAttr = root.getAttribute('data-themes') || document.body.getAttribute('data-themes');
+    const themes = themesAttr ? themesAttr.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    let themeIdx = 0;
+
+    // Auto-detect theme base path from existing <link id="theme-link">
+    let themeBase = root.getAttribute('data-theme-base');
+    if (!themeBase) {
+      const existingLink = document.getElementById('theme-link');
+      if (existingLink) {
+        // el.getAttribute('href') gives the raw relative path written in HTML
+        const rawHref = existingLink.getAttribute('href') || '';
+        const lastSlash = rawHref.lastIndexOf('/');
+        themeBase = lastSlash >= 0 ? rawHref.substring(0, lastSlash + 1) : 'assets/themes/';
+      } else {
+        themeBase = 'assets/themes/';
+      }
+    }
+
+    function applyTheme(name) {
+      let link = document.getElementById('theme-link');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.id = 'theme-link';
+        document.head.appendChild(link);
+      }
+      link.href = themeBase + name + '.css';
+      root.setAttribute('data-theme', name);
+      const ind = document.querySelector('.theme-indicator');
+      if (ind) ind.textContent = name;
+    }
+    function cycleTheme(fromRemote){
+      if (!themes.length) return;
+      themeIdx = (themeIdx+1) % themes.length;
+      const name = themes[themeIdx];
+      applyTheme(name);
+      /* Broadcast to other window (audience ↔ presenter) */
+      if (!fromRemote && bc) bc.postMessage({ type: 'theme', name: name });
+    }
+
+    // animation cycling on current slide
+    let animIdx = 0;
+    function cycleAnim(){
+      animIdx = (animIdx+1) % ANIMS.length;
+      const a = ANIMS[animIdx];
+      const target = slides[idx].querySelector('[data-anim-target]') || slides[idx];
+      ANIMS.forEach(x => target.classList.remove('anim-'+x));
+      void target.offsetWidth;
+      target.classList.add('anim-'+a);
+      target.setAttribute('data-anim', a);
+      const ind = document.querySelector('.anim-indicator');
+      if (ind) ind.textContent = a;
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
+        case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
+        case 'Home': go(0); break;
+        case 'End': go(total-1); break;
+        case 'f': case 'F': fullscreen(); break;
+        case 's': case 'S': openPresenterWindow(); break;
+        case 'n': case 'N': toggleNotes(); break;
+        case 'o': case 'O': toggleOverview(); break;
+        case 't': case 'T': cycleTheme(); break;
+        case 'a': case 'A': cycleAnim(); break;
+        case 'Escape': toggleOverview(false); toggleNotes(false); break;
+      }
+    });
+
+    /* ===== Touch navigation =====
+     * Phones have no arrow keys (#15). Swipe left for next, right for prev.
+     *
+     * Deliberately passive: we never call preventDefault, so pinch-zoom and
+     * any native scrolling keep working and the browser is free to scroll
+     * while we are still deciding. A gesture only counts as a swipe if it is
+     * single-finger, clearly horizontal, long enough and quick enough —
+     * otherwise it falls through untouched.
+     */
+    (function initTouchNav(){
+      /* No capability sniffing on purpose. Touch listeners cost nothing on a
+         device that never fires them, and `ontouchstart in window` /
+         maxTouchPoints both misreport on touchscreen laptops and some
+         tablets — a guard here would silently remove the feature on exactly
+         the devices that need it. */
+      var SWIPE_MIN_PX = 50;    // shorter than this is a tap or a wobble
+      var SWIPE_RATIO  = 1.5;   // must be this much more horizontal than vertical
+      var SWIPE_MAX_MS = 800;   // slower than this is a drag, not a swipe
+
+      var x0 = 0, y0 = 0, t0 = 0, tracking = false;
+
+      function interactive(target) {
+        if (!target || !target.closest) return false;
+        /* Don't steal the gesture from the overview grid, the notes drawer,
+           or anything the author made scrollable or tappable. */
+        return !!target.closest('.overview, .notes-overlay, a, button, input, textarea, select, [data-no-swipe]');
+      }
+
+      document.addEventListener('touchstart', function(e){
+        if (e.touches.length !== 1 || interactive(e.target)) { tracking = false; return; }
+        x0 = e.touches[0].clientX;
+        y0 = e.touches[0].clientY;
+        t0 = Date.now();
+        tracking = true;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function(e){
+        /* A second finger means pinch-zoom — abandon the swipe. */
+        if (e.touches.length > 1) tracking = false;
+      }, { passive: true });
+
+      document.addEventListener('touchend', function(e){
+        if (!tracking) return;
+        tracking = false;
+        var t = e.changedTouches && e.changedTouches[0];
+        if (!t) return;
+        if (Date.now() - t0 > SWIPE_MAX_MS) return;
+        var dx = t.clientX - x0, dy = t.clientY - y0;
+        if (Math.abs(dx) < SWIPE_MIN_PX) return;
+        if (Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return;
+        go(dx < 0 ? idx + 1 : idx - 1);
+      }, { passive: true });
+
+      document.addEventListener('touchcancel', function(){ tracking = false; }, { passive: true });
+    })();
+
+    // hash deep-link
+    function fromHash(){
+      const m = /^#\/(\d+)/.exec(location.hash||'');
+      if (m) go(Math.max(0, parseInt(m[1],10)-1));
+    }
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+    go(idx);
+  });
+})();
+</script>
+</body></html>
