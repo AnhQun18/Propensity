@@ -24,7 +24,12 @@ configs/*.local.json
 /outputs/behavior_coverage/
 
 # Persistent scan caches and local reports.
-/outputs/
+/outputs/*
+!/outputs/eda_insights_20261119/
+/outputs/eda_insights_20261119/*
+!/outputs/eda_insights_20261119/MBD_MINI_DEEP_INSIGHTS_DECK.pdf
+!/outputs/eda_insights_20261119/slides_clean/
+!/outputs/eda_insights_20261119/slides_clean/*.png
 /.codex-remote-attachments/
 *.duckdb
 *.duckdb.wal
@@ -38,6 +43,3 @@ configs/*.local.json
 
 # Local report exports; published copies live in deliverables/.
 /output/
-
-# Redundant bundles and copied presentation templates.
-/MBD-mini_propensity_sample_report.zip
