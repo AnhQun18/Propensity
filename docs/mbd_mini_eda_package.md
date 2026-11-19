@@ -97,7 +97,7 @@ vẫn đọc toàn bộ. Không dùng prefix để kết luận về quần th�
 Mỗi nguồn ghi số dòng, batch, thời gian quét trong `metadata.json`. Mỗi bước
 cũng ghi `duration_seconds`; thời gian bước chất lượng bao gồm lần quét chung.
 Terminal báo số dòng sau mỗi 10 batch và khi hoàn tất nguồn. Tổng thời gian
-phân tích chưa gồm xuất bảng/biểu đồ. Xem [phép đo giới hạn](performance_16gb.md).
+phân tích chưa gồm xuất bảng/biểu đồ.
 
 ## API và đầu ra
 

@@ -134,5 +134,12 @@ eda.close()
 nb.cells = cells
 nb.metadata = {"kernelspec": {"display_name": "Python (propensity .venv)", "language": "python", "name": "python3"},
                "language_info": {"name": "python"}}
-nbf.write(nb, ROOT / "notebooks/eda.ipynb")
-print("Built notebooks/eda.ipynb")
+nb.cells[0].source = (
+    "**Lưu ý phương pháp cũ:** Notebook này dùng quy ước UTC và một số phép lấy mẫu "
+    "trong phân tích. Chỉ giữ để đối chiếu; không dùng như kết quả EDA tuân thủ "
+    "quy tắc Moscow/toàn bộ khách hàng.\n\n" + nb.cells[0].source
+)
+legacy_path = ROOT / "outputs/eda_execution/legacy_seven_step_eda.ipynb"
+legacy_path.parent.mkdir(parents=True, exist_ok=True)
+nbf.write(nb, legacy_path)
+print("Built outputs/eda_execution/legacy_seven_step_eda.ipynb")

@@ -1,4 +1,4 @@
-"""Update visible helper cells as text; never execute a notebook or read raw."""
+"""Update visible helper cells as text while preserving executed results."""
 import argparse
 import ast
 import json
@@ -39,19 +39,14 @@ def synchronize(path, *, check=False):
             if "".join(cell["source"]) != expected:
                 stale.append(cell["id"])
             cell["source"] = expected.splitlines(keepends=True)
-        if cell.get("execution_count") is not None or cell.get("outputs"):
-            stale.append(cell["id"] + ": output")
-        cell["execution_count"] = None
-        cell["outputs"] = []
-        cell["metadata"].pop("execution", None)
     if check:
         if stale:
             raise SystemExit(f"{path.name} needs synchronization: " + ", ".join(stale))
-        print(f"{path.name}: source cells match; no execution outputs.")
+        print(f"{path.name}: source cells match; execution outputs preserved.")
         return
-    notebook["metadata"]["workflow"]["execution_status"] = "not_run"
+    notebook["metadata"]["workflow"]["execution_status"] = "source_synced"
     path.write_text(json.dumps(notebook, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"Updated {path}; no notebook code was executed.")
+    print(f"Updated {path}; execution outputs preserved.")
 
 
 def main(argv=None):

@@ -1,6 +1,6 @@
 # Kiểm đếm biến và quan sát MBD-mini
 
-Thời điểm: 2026-11-05T21:32:09.730703+07:00. Quét đủ 3,820 file Parquet; kiểm tra schema của từng file và số dòng trong footer. Đọc toàn bộ khóa khách hàng–tháng để kiểm tra số khách, tháng và trùng khóa.
+Thời điểm: 2026-11-19T14:42:17.064818+07:00. Quét đủ 3,820 file Parquet; kiểm tra schema của từng file và số dòng trong footer. Đọc toàn bộ khóa khách hàng–tháng để kiểm tra số khách, tháng và trùng khóa.
 
 | Bảng | Quan sát (dòng) | Đơn vị quan sát | Cột trong file | Cột khi gồm partition |
 |---|---:|---|---:|---:|

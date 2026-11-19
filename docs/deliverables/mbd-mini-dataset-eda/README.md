@@ -1,3 +1,3 @@
 # Bảng nguồn EDA
 
-Chỉ giữ tables/ và metadata phân tích còn cần để tái lập docs/report/ và các biểu đồ hiện hành. Các deck/report cũ đã xóa; xem [CURRENT_REPORT.md](../../CURRENT_REPORT.md).
+Giữ bảng và metadata của bản xuất EDA cũ để đối chiếu. Xem [đánh giá phạm vi](../../eda_two_lists_audit_20261118.md) trước khi dùng kết quả.

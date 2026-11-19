@@ -10,5 +10,5 @@
 | `plot_behavior_coverage.py`, `behavior_coverage_viewer.html` | Tạo cache độ phủ và viewer; cache còn được audit đọc |
 
 Các renderer/plot phiên bản cũ trùng với ảnh mới đã được xóa.
-Danh mục code mới nhất ở [CURRENT_REPORT.md](../docs/CURRENT_REPORT.md).
+Xem [mục lục tài liệu](../docs/README.md) và [danh mục notebook](../notebooks/README.md).
 Dùng notebook 03 cho chuẩn bị, notebook 04 nếu cần hợp nhất dữ liệu.

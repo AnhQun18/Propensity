@@ -17,7 +17,7 @@ Quy ước áp dụng: AGENTS.md yêu cầu toàn bộ lịch sử trước cuto
 2. `docs/report/brief_audit.csv` đánh dấu 45 yêu cầu của brief cũ đã có artifact (GEO encoding là audited_unverified). Đây không phải xác nhận hoàn thành 30 mục trong hội thoại hoặc tuân thủ Moscow. `docs/report/methods/EDA_METHODS.md` vẫn ghi UTC và cửa sổ chính T−1.
 3. GEO đã có nghiên cứu mới tại `outputs/geo_spatial_purchase_moscow_20261117/`: lịch sử đầy đủ, cutoff Moscow 01/11/2022, cùng cohort cho H=1/2/3, phân tầng TRX và kiểm định. Chỉ một cutoff; không có đánh giá top-K hoặc mô hình.
 4. `outputs/geo_trend_purchase/` có H=1/2/3 trên 10 cutoff chung, nhưng dùng đặc trưng 7/30 ngày từ cache cũ; chưa phải bộ phân tích toàn lịch sử theo Moscow.
-5. Workflow baseline đã xóa theo `docs/cleanup_20261116/README.md`. Những metric baseline còn được nhắc trong văn bản cũ không được tính là thí nghiệm hiện còn đủ artifact để kiểm chứng.
+5. Workflow baseline đã xóa trong đợt dọn ngày 16/11/2026. Những metric baseline còn được nhắc trong văn bản cũ không được tính là thí nghiệm hiện còn đủ artifact để kiểm chứng.
 6. Khoảng thiếu lớn nhất cho báo cáo kinh doanh: phân rã đóng góp tăng/giảm theo phân khúc, hành vi thay đổi trước mua trên cả ba nguồn, hành trình bán chéo, thẻ phân khúc thống nhất và ưu tiên khách được kiểm chứng ngoài thời gian.
 
 ## A. Đối soát 20 mục EDA kỹ thuật
@@ -78,7 +78,7 @@ Các trường n, tỷ lệ mua, lift và CI đã có rải rác trong nhiều b
 
 - `AGENTS.md`; `docs/dict/mbd_mini.md`; `docs/mbd_mini_eda_audit.md`; `docs/mbd_mini_eda/data_catalog.md`.
 - `docs/report/README.md`; `docs/report/methods/EDA_METHODS.md`; `docs/report/brief_audit.csv`; `docs/report/checks/validation.json`; danh mục bảng trong `docs/report/tables/`.
-- `docs/cleanup_20261116/README.md`; `configs/eda_analysis.json`.
+- `configs/eda_analysis.json`; lịch sử thay đổi Git của đợt dọn 16/11/2026.
 - `outputs/geo_spatial_purchase_moscow_20261117/REPORT.md`, `validation.json`; `docs/report/trx_geo_linkage_moscow.md`.
 - `outputs/amount11_target_quantiles_20261116/RESULTS.md`; `outputs/trx_outliers_20261116/RESULTS.md`; `outputs/repeat_purchase_review/purchase_history_feature_decision.md`.
 - `outputs/dialog_temporal_audit/README.md`; `outputs/dialog_charts/semantic_exploration_config.json`; `outputs/source_presence_target/method.json`; `outputs/ptls_detail_value_audit/matched_event_examples.json`.

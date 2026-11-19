@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-05T21:32:09.730703+07:00",
+  "checked_at": "2026-11-19T14:42:17.064818+07:00",
   "scope": "Every Parquet footer and top-level schema; full client_split IDs and target client-month keys",
   "tables": {
     "client_split": {

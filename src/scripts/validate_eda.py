@@ -25,7 +25,7 @@ class ReportParser(HTMLParser):
 
 
 def validate():
-    nb=nbformat.read(ROOT/"notebooks/eda.ipynb",as_version=4)
+    nb=nbformat.read(ROOT/"outputs/eda_execution/legacy_seven_step_eda.ipynb",as_version=4)
     nbformat.validate(nb)
     assert nb.metadata["eda_execution"]["status"]=="ready"
     code=[c for c in nb.cells if c.cell_type=="code"]

@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import time
 import traceback
 
@@ -20,7 +21,9 @@ os.environ["JUPYTER_RUNTIME_DIR"]=str(run/"runtime")
 kernel=run/"kernels/eda-local"
 kernel.mkdir(parents=True,exist_ok=True)
 (kernel/"kernel.json").write_text(json.dumps({"argv":[sys.executable,"-B","-m","ipykernel_launcher","-f","{connection_file}"],"display_name":"EDA local","language":"python"}),encoding="utf-8")
-source=ROOT/"notebooks/eda.ipynb"
+source=run/"legacy_seven_step_eda.ipynb"
+if not source.exists():
+    subprocess.run([sys.executable, str(ROOT/"src/scripts/build_eda_notebook.py")], check=True)
 nb=nbformat.read(source,as_version=4)
 nb.metadata["eda_execution"]={"status":"running"}
 started={}
