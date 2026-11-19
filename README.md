@@ -1,5 +1,5 @@
 # MBD-mini: khám phá dữ liệu và chuẩn bị dữ liệu propensity
-
+LINK CANVA: [PROPENSITY](https://canva.link/yq4zss72ntwfh2v)
 Repo chứa notebook, mã nguồn và tài liệu để tìm hiểu bộ dữ liệu ngân hàng MBD-mini, kiểm tra chất lượng dữ liệu và chuẩn bị bảng khách hàng–tháng cho nghiên cứu khả năng mua sản phẩm. Repo hiện chưa có quy trình huấn luyện mô hình propensity hoàn chỉnh.
 
 **Bắt đầu đọc:** [danh sách notebook](notebooks/README.md) · [từ điển dữ liệu MBD-mini](docs/dict/mbd_mini.md) · [nguồn và cấu trúc dữ liệu](docs/DATASETS.md)
