@@ -51,5 +51,5 @@ trống; workflow của bản code mới đã chạy trên fixture tổng hợp.
 - Không tái tạo feature từ raw. File Parquet và bằng chứng thực thi cũ được giữ
   nguyên; script chỉ ghi metadata schema/contract và kết quả kiểm tra.
 
-`scripts/validate_prepared_data.py` hỗ trợ kiểm tra output đã chuẩn bị; xem
+`src/scripts/validate_prepared_data.py` hỗ trợ kiểm tra output đã chuẩn bị; xem
 [cách dùng](propensity_data_preparation.md). Output lỗi vẫn không được dùng để fit.

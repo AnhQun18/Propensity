@@ -1,0 +1,138 @@
+MBD mini
+Dataset Understanding & Exploratory Data Analysis
+Multumodal dataset banking
+100.224 khách hàng
+12 tháng nhãn
+3 nguồn hành vi
+Bộ số liệu MBD-mini được lấy trên huggingfaceKích thước bằng 10% bộ số liệu gốc
+ERD DATABASE
+BÁO CÁO SƠ BỘ · 06.11.2026
+Lượng khách hàng có hành vi
+Có giao dịch
+98.5%
+Có vị trí
+72.41%
+Có hội thoại
+46.22%
+Thiếu nguồn cần trở thành thông tin cho mô hình.
+Trong 1.503 khách không có trx:Có geo hoặc dialog: 1.035 khách (1,03%)Không có cả 3 log: 468 khách (0,47%)
+Tỷ lệ khách-tháng có log
+Có ≥1 log trong tháng T–1 · Cùng mẫu số: 1.202.688 khách-tháng
+925.679 / 1.202.688 khách-tháng
+697.171 / 1.202.688 khách-tháng
+0%
+20%
+40%
+60%
+80%
+100%
+Tỷ lệ khách-tháng có log
+73.455 / 1.202.688 khách-tháng
+76,97%
+57,97%
+6,11%
+dialog
+trx
+geo
+Các nguồn bắt đầu ở các thời điểm khác nhau
+Target chỉ xuất hiện từ cuối tháng 2
+Phân vị số log trên mỗi khách
+Toàn lịch sử · 100.224 khách, gồm cả khách có 0 log
+trx: TB 386,78, max 1.020.773 · geo: TB 661,48, max 39.487 · dialog: TB 2,17, max 114
+TARGETGhi nhận sử dụng sản phẩm của ngân hàng
+0%
+Null targets
+10,043%    NaN  diff_trans_date
+Time difference between transactions
+Ưu tiên AP/PR-AUC và Precision, Recall, Lift theo ngân sách
+Tỷ lệ mua thay đổi theo tháng. Accuracy đơn thuần không đủ để đánh giá.
+y_anyPhát sinh sử dụng bất kì sản phẩm nào trong tháng
+
+một tháng phù hợp với thiết kế nhãn và mục tiêu tiếp cận ngắn hạn, chưa có bằng chứng đó là kỳ hạn tối ưu cho mọi mục tiêu kinh doanh.
+
+89,61% khách không có tháng nào mua.Trong nhóm từng mua, 81,60% chỉ mua ở đúng 1 tháng (8.496/10.411 khách).Chỉ 18,40% người từng mua có mua ở từ 2 tháng trở lên.
+Mô hình cần nhận diện chủ yếu nhóm người chưa mua trong lịch sử dữ liệu
+
+Chỉ dùng nhãn mua tháng trước sẽ bỏ sót lịch sử mua xa hơn. Nên thử thêm đã từng mua, số tháng từ lần mua gần nhất và số tháng có mua trước cutoff
+
+
+99.8%
+
+
+0%
+
+
+13
+
+
+
+
+
+
+Dữ liệu đầy đủ 
+Trùng lặp
+Loại tiền tệ
+$
+amount null 0%currency là 0,000304% (118 dòng).
+có 1 trường hợp trùng client_id + event_time
+ko kể null
+TRXghi nhận giao dịch qua app ngân hàng
+1.5%
+Client_id không có log
+1.503 client_id không ghi nhận trx
+
+Amount lớn nhất: 1.370.187.366.400 (currency mã 11)Khách sở hữu có 56 giao dịch, trung vị amount khoảng 164,54 tỷ
+
+Độ phủ ổn định theo thời gian, đủ lịch sử xây dựng Customer-month
+
+Hoạt động giao dịch phân hóa rõ giữa các khách hàng, với một nhóm nhỏ khách tích cực đóng góp tỷ trọng giao dịch lớn.
+
+Nhóm mua có giao dịch gần hơn, thường xuyên hơn và khối lượng lớn hơn
+
+nên giữ thông tin loại giao dịch khi tạo đặc trưng thay vì chỉ dùng tổng số giao dịch
+
+GEOGhi nhận vị trí mở app
+null
+duplicate
+0
+
+Trên 72.573 khách có log GEO, toàn bộ lịch sử:Min: 1 log/khách.Max: 39.487 log/khách.
+Trung bình: 913,50 log/khách.Trung vị: 507 log/khách.
+
+Dù lift tăng dần khi tăng số vị trí nhưng nhìn chung giữa nhóm không mua và có mua không có quá nhiều sự khác biệt về tín hiệu GEO
+DIALOGGhi nhận hội thoại
+1
+cột embedding 768 chiều 
+0
+Null
+Vector bằng 0
+vector sai số chiều
+Technical support.Sales calls.Service callsNegotiations with managers.
+
+
+
+Trong 10 411 khách từng phát sinh mua
+81,66%
+18,34%
+90%
+L2 là cách đo độ dài của một vector:                 ||v||₂ = √(v₁² + v₂² + ⋯ + v₇₆₈²)
+
+
+
+
+Bộ số liệu có bao nhiêu bảng, tỉ lệ null mỗi bảng
+thời gian thu thập 3 bộ dữ liệu
+Bảng Target có gì:
+Null
+Lí do null
+Các cột trong bảng, tỉ lệ dương
+cách tính y_any
+biến động qua các tháng
+thời gian thu thập
+Phân phối số lần mua/khách, tính đuôi dài (heavy tail)
+P(mua T | mua T-1) so với P(mua T | không mua T-1)                     (mẫu là mua T-1) (tỉ trọng người mua)
+Chỉ tiêu|Mục đíchReturning buyers share|Đo tỷ trọng khách hàng mua lạiFirst-time buyers share|Đo tỷ trọng khách hàng lần đầu muaRepeat purchase rate|Đo khả năng duy trì mua hàngPurchase rate of non-buyers|Đo khả năng phát sinh mua hàng ở nhóm không mua tháng trước
+Rút ra có nên đưa tín hiệu đã mua hàng tháng trước hoặc lịch sử từng mua hàng vào mô hình hay không
+Bảng trx có gì
+Bài toán: sử dụng lịch sử hành vi tháng trước để dự đoán xác suất mua hàng trong tháng sau
+y_any = 1 : phát sinh mua bất kì sản phẩm nào

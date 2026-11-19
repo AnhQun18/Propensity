@@ -104,6 +104,6 @@ def validate(output,sample,cache):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir',type=Path,default=ROOT/'docs/mbd_mini_eda')
-    parser.add_argument('--sample-dir',type=Path,default=ROOT/'sampledata/mbd_mini')
+    parser.add_argument('--sample-dir',type=Path,default=ROOT/'sample_data/mbd_mini')
     parser.add_argument('--cache-dir',type=Path,default=ROOT/'outputs/mbd_review_cache')
     args=parser.parse_args();validate(args.output_dir,args.sample_dir,args.cache_dir)

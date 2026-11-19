@@ -22,7 +22,7 @@ Tùy chọn đường dẫn và kích thước mẫu:
 
 Chạy cùng lệnh để vẽ lại. Không cần chạy lại pipeline cơ bản hoặc bổ sung cũ.
 Script vẫn đọc footer Parquet để xác nhận inventory và đọc các dòng mẫu khi
-xuất sampledata, nhưng dùng cache cho duplicate, tổng hợp khách–tháng/ngày,
+xuất sample_data, nhưng dùng cache cho duplicate, tổng hợp khách–tháng/ngày,
 null và phân vị đã tính. Không quảng cáo chế độ hoàn toàn offline với raw:
 raw vẫn phải tồn tại. Thay seed/size chỉ thay mẫu; thống kê chính vẫn trên
 toàn bộ 105.277.859 log.
@@ -50,7 +50,7 @@ thể tiếp tục bằng cùng lệnh. Câu SQL thay đổi sẽ chỉ tính l�
 
 ## Mẫu và các giới hạn đã kiểm tra
 
-[sampledata](../sampledata/README.md) được version trên Git: 1.000 khách phân
+[sample_data](../sample_data/README.md) được version trên Git: 1.000 khách phân
 tầng, đủ lịch sử detail, nhãn và ptls liên kết. Các tầng hiếm có thể không
 được lấy mẫu, và cực trị không được bảo toàn chính xác. Đây là mẫu EDA;
 không dùng các tầng dựa trên toàn lịch sử để tạo split mô hình quá khứ.

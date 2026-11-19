@@ -38,7 +38,7 @@ class MergeTests(unittest.TestCase):
     def test_notebook_merge_preserves_every_column_row_and_unknown_label(self):
         notebook = nbformat.read(ROOT / 'notebooks/04_merge_processed.ipynb', as_version=4)
         nbformat.validate(notebook)
-        spec = importlib.util.spec_from_file_location('sync_merge', ROOT / 'scripts/sync_preparation_notebook.py')
+        spec = importlib.util.spec_from_file_location('sync_merge', ROOT / 'src/scripts/sync_preparation_notebook.py')
         sync = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(sync)
         out = self.root / 'notebook_merged'

@@ -3,7 +3,7 @@
 Từ phiên bản 0.2.0, `mbd_mini_eda` thực hiện đúng **7 bước** theo khung đã chốt.
 
 Phiên bản 0.2.1 giữ mã nguyên có null nhất quán giữa các batch và sửa trục tháng
-theo lịch. Các script trong `deliverables/mbd_mini_eda_fixes/` bổ sung thống kê
+theo lịch. Các script trong `src/mbd_mini_eda_fixes/` bổ sung thống kê
 toàn bộ cho những đầu ra còn dùng mẫu ở package cơ bản. Xem
 [hướng dẫn chạy đầy đủ](run_complete_other_machine.md).
 Các bước dùng chung một lần quét Parquet và các bảng tổng hợp trên toàn lịch sử.
@@ -121,7 +121,7 @@ docs/mbd_mini_eda/
 
 Chỉ xuất bảng tổng hợp; exporter từ chối cột `client_id` và output/work_dir
 trong data_root. Manifest liệt kê file của lần xuất hiện tại. Khi dùng lại
-thư mục kết quả cũ, chỉ đọc các file được report/manifest mới liên kết.
+thư mục kết quả cũ, chỉ đọc các file được docs/report/manifest mới liên kết.
 
 ## Kiểm chứng
 

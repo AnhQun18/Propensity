@@ -20,7 +20,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "deliverables/mbd_mini_eda_fixes"))
+sys.path.insert(0, str(ROOT / "src/mbd_mini_eda_fixes"))
 from complete_mbd_statistics import normalized_expression, qi, sql_literal
 from mbd_mini_eda.statistics import numeric_summary
 
@@ -403,7 +403,7 @@ def main():
     parser.add_argument('--data-root',type=Path,default=ROOT/'data/MBD-mini')
     parser.add_argument('--output-dir',type=Path,default=ROOT/'docs/mbd_mini_eda')
     parser.add_argument('--cache-dir',type=Path,default=ROOT/'outputs/mbd_review_cache')
-    parser.add_argument('--sample-dir',type=Path,default=ROOT/'sampledata/mbd_mini')
+    parser.add_argument('--sample-dir',type=Path,default=ROOT/'sample_data/mbd_mini')
     parser.add_argument('--sample-size',type=int,default=1000)
     parser.add_argument('--seed',type=int,default=42)
     parser.add_argument('--memory-limit',default='3GB')

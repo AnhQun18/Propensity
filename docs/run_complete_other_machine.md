@@ -57,7 +57,7 @@ activate nếu gọi đường dẫn Python trực tiếp. Chỉ khi chưa có v
 >=3.11 chạy `python -m venv .venv` một lần rồi cài như trên.
 
 Sau mỗi lần cập nhật repo, cài lại `".[plots,supplement]"` để venv nhận mã mới.
-Giữ hai script trong `deliverables/mbd_mini_eda_fixes/` cạnh nhau vì chúng import
+Giữ hai script trong `src/mbd_mini_eda_fixes/` cạnh nhau vì chúng import
 lẫn nhau. Tải cả repo thì không cần giải nén ZIP hai script lần nữa.
 
 ## 3. Đặt đúng đường dẫn data
@@ -152,7 +152,7 @@ chỉ từ bước này.
 Sau khi bước 5 thành công, trong cùng cửa sổ PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe -u -X utf8 deliverables/mbd_mini_eda_fixes/complete_mbd_statistics.py --export $baseExport --config configs/mbd_mini_eda.local.json --output-dir $finalExport --work-dir build/mbd_supp_work --memory-limit 4GB --threads 2 --temp-limit 40GB
+.\.venv\Scripts\python.exe -u -X utf8 src/mbd_mini_eda_fixes/complete_mbd_statistics.py --export $baseExport --config configs/mbd_mini_eda.local.json --output-dir $finalExport --work-dir build/mbd_supp_work --memory-limit 4GB --threads 2 --temp-limit 40GB
 if ($LASTEXITCODE -ne 0) { throw 'Bổ sung thất bại; chưa có kết quả cuối hoàn chỉnh.' }
 ```
 
@@ -177,7 +177,7 @@ thái `completed_except_duplicates`, vẫn thiếu kiểm tra trùng toàn bộ.
 Chỉ sửa hình/bảng sẵn có mà không đọc raw là chế độ riêng:
 
 ```powershell
-.\.venv\Scripts\python.exe -X utf8 deliverables/mbd_mini_eda_fixes/repair_mbd_export.py --export 'C:/Downloads/docs.zip' --output-dir build/mbd_export_repaired
+.\.venv\Scripts\python.exe -X utf8 src/mbd_mini_eda_fixes/repair_mbd_export.py --export 'C:/Downloads/docs.zip' --output-dir build/mbd_export_repaired
 ```
 
 Sửa nhanh không khôi phục được đuôi tần suất đã cắt top 20 hoặc phân vị toàn bộ
@@ -250,7 +250,7 @@ Tải mã và sửa JSON tương tự, dùng Python của venv trên hệ điề
 .venv/bin/python -m pip check
 .venv/bin/python -X utf8 -m unittest discover -s tests -v
 .venv/bin/python -X utf8 -m mbd_mini_eda run --config configs/mbd_mini_eda.local.json --output-dir build/mbd_base_run1 --plots
-.venv/bin/python -u -X utf8 deliverables/mbd_mini_eda_fixes/complete_mbd_statistics.py --export build/mbd_base_run1 --config configs/mbd_mini_eda.local.json --output-dir docs/mbd_mini_eda_local_run1 --work-dir build/mbd_supp_work --memory-limit 4GB --threads 2 --temp-limit 40GB
+.venv/bin/python -u -X utf8 src/mbd_mini_eda_fixes/complete_mbd_statistics.py --export build/mbd_base_run1 --config configs/mbd_mini_eda.local.json --output-dir docs/mbd_mini_eda_local_run1 --work-dir build/mbd_supp_work --memory-limit 4GB --threads 2 --temp-limit 40GB
 ```
 
 Chỉ chạy bổ sung sau khi cơ bản thành công. Đặt data_root theo máy, ví dụ

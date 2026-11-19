@@ -121,13 +121,13 @@ class ReviewTests(unittest.TestCase):
                 from mbd_eda_review_report import write_review
                 args=argparse.Namespace(output_dir=root/'report',cache_dir=root/'cache',sample_dir=root/'sample',seed=42)
                 write_review(args,cache,clients,cube,months,tables,sample,inventory,records,schemas,fingerprint,np.array([1,2]))
-                amount_csv=pd.read_csv(root/'report/tables/review/amount_full.csv')
+                amount_csv=pd.read_csv(root/'docs/report/tables/review/amount_full.csv')
                 self.assertEqual(float(amount_csv['max'].iloc[0]),float(trx.amount.max()))
                 grid=pd.read_parquet(root/'sample/customer_month.parquet')
                 self.assertEqual(len(grid),len(clients)*len(months))
                 self.assertTrue(grid.loc[(grid.client_id=='c')&(grid.month=='2021-01'),'geo_events'].isna().all())
-                self.assertEqual(len(pd.read_csv(root/'report/tables/review/missing_values.csv')),len(tables['missing_values']))
-                self.assertTrue((root/'report/report.md').exists())
+                self.assertEqual(len(pd.read_csv(root/'docs/report/tables/review/missing_values.csv')),len(tables['missing_values']))
+                self.assertTrue((root/'docs/report/report.md').exists())
             finally:cache.db.close()
 
 

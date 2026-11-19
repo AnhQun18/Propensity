@@ -20,7 +20,7 @@ except ImportError:
     duckdb = None
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT/'deliverables/mbd_mini_eda_fixes'
+SCRIPTS = ROOT/'src/mbd_mini_eda_fixes'
 sys.path.insert(0,str(SCRIPTS))
 import repair_mbd_export as fix
 import complete_mbd_statistics as complete

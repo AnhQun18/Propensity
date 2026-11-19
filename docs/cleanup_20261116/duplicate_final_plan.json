@@ -1,0 +1,73 @@
+{
+  "workspace": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity",
+  "status": "complete",
+  "mode": "permanent deletion explicitly requested; final duplicate pass",
+  "items": [
+    {
+      "path": "outputs/trx_charts/plot_buyers_by_horizon.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\trx_charts\\plot_buyers_by_horizon.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/trx_charts/buyers_by_horizon.png",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\trx_charts\\buyers_by_horizon.png",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/trx_charts/buyers_by_horizon.csv",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\trx_charts\\buyers_by_horizon.csv",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/trx_charts/source_presence_purchase_rates.csv",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\trx_charts\\source_presence_purchase_rates.csv",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/dialog_charts/plot_dialog_monthly.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\dialog_charts\\plot_dialog_monthly.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/dialog_charts/dialog_monthly_volume.png",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\dialog_charts\\dialog_monthly_volume.png",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/dialog_charts/dialog_hour_weekday_heatmap.png",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\dialog_charts\\dialog_hour_weekday_heatmap.png",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/workspace_review_20261110",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\workspace_review_20261110",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/workspace_review_20261110_recheck",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\workspace_review_20261110_recheck",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/update_eda_only_workspace.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\update_eda_only_workspace.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/update_eda_only_docs.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\update_eda_only_docs.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/plan_eda_only_cleanup.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\plan_eda_only_cleanup.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    },
+    {
+      "path": "outputs/verify_eda_only_workspace.py",
+      "absolute_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\verify_eda_only_workspace.py",
+      "reason": "Superseded EDA chart or retired one-off review/migration helper"
+    }
+  ],
+  "deleted_targets": 13
+}

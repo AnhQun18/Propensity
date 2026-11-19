@@ -1,0 +1,17 @@
+{
+  "timezone": "UTC",
+  "label_month_rule": "Calendar month containing mon",
+  "cutoff": "First day of label month at 00:00 UTC",
+  "feature_rule": "event_time < cutoff",
+  "monthly_window": "[start of T-1, start of T)",
+  "analysis_months": [
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08"
+  ],
+  "scope": "Fixed historical cohort for descriptive feature-correlation EDA; no model training or evaluation"
+}

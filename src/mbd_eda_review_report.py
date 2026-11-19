@@ -347,7 +347,7 @@ TABLE_DESCRIPTIONS={
  'sampling_strata':'Phân bổ mẫu theo fold, mask nguồn, band tổng log; chênh lệch đơn vị điểm phần trăm',
  'sampling_validation':'So sánh phân phối tổng log từng nguồn trên population và mẫu, gồm khoảng cách KS',
  'sampling_labels':'Đối chiếu nhãn trong mẫu và population; không stratify theo nhãn tương lai',
- 'sample_inventory':'Số dòng từng bảng con liên kết trong sampledata; chỉ lưu số tổng hợp trên Git',
+ 'sample_inventory':'Số dòng từng bảng con liên kết trong sample_data; chỉ lưu số tổng hợp trên Git',
  'target_monthly':'Đếm dương/mẫu số và tỷ lệ phần trăm mỗi nhãn theo tháng; cộng fold trước khi chia',
  'table_inventory':'Quy mô và grain các bảng đầu vào detail',
  'column_roles':'Kiểu dữ liệu và vai trò từng cột đầu vào detail',
@@ -412,7 +412,7 @@ def write_report(args,clients,months,t,groups,fingerprint,cuts,reconciled):
       'trong khi detail có khách tới 1.020.773 log. Đây là dấu hiệu có giới hạn chiều dài chuỗi; chưa xác minh cách chọn phần được giữ. '
       'Geo và dialog có tổng phần tử và số log theo khách khớp. Vì vậy, toàn bộ EDA, biểu đồ và '
       'lịch sử trong mẫu dùng **detail** làm nguồn chuẩn; không thay bằng ptls hoặc cộng hai dạng. '
-      'Các bảng ptls trong sampledata được giữ đúng như nguồn để đối chiếu, không bảo đảm có mọi sự kiện detail.','',
+      'Các bảng ptls trong sample_data được giữ đúng như nguồn để đối chiếu, không bảo đảm có mọi sự kiện detail.','',
       '## 2. Null có nghĩa gì, vì sao có null?','',
       'Null thuộc tính là thiếu giá trị trong **một sự kiện/dòng đã tồn tại**. Không có dòng sự kiện ở một tháng là trường hợp khác. '
       'Nguyên nhân thu thập chính xác không có trong dữ liệu; phần dưới phân biệt số đếm đã kiểm chứng và cách diễn giải cần xác minh.','',
@@ -444,7 +444,7 @@ def write_report(args,clients,months,t,groups,fingerprint,cuts,reconciled):
       '`missing_reason=unobserved_early_source`; ô có log vẫn giữ số đếm gốc. Từ 01/2022, 0 nghĩa là không ghi nhận log, '
       'không chứng minh khách thực sự không hoạt động hoặc nguồn được thu thập liên tục. '
       'Các cột `*_raw_events` bảo toàn số đếm để đối chiếu; các thuộc tính raw không bị impute.','',
-      'Lưới đầy đủ 25 tháng cho mẫu nằm tại `sampledata/mbd_mini/customer_month.parquet`. '
+      'Lưới đầy đủ 25 tháng cho mẫu nằm tại `sample_data/mbd_mini/customer_month.parquet`. '
       'Cache ma trận toàn dân số chứa toàn lịch sử. '
       + ('Đã đối chiếu chính xác mọi ô với cache matrix.npz trước đó.' if reconciled else 'Không có cache ma trận cũ để đối chiếu.'),'',
       '## 5. Ma trận độ phủ theo nhóm có chủ đích','',
@@ -489,14 +489,14 @@ def write_report(args,clients,months,t,groups,fingerprint,cuts,reconciled):
       'Y không bắt buộc bắt đầu từ 0 và không so biên độ thị giác giữa các panel. '
       'Tỷ lệ = tổng số dương các fold / tổng dòng có nhãn; số cạnh điểm là số dương thực tế. '
       'Dữ liệu chi tiết: [target_monthly.csv](tables/review/target_monthly.csv).','',
-      '## 11. Resample theo phân phối và sampledata','',
+      '## 11. Resample theo phân phối và sample_data','',
       f'Lấy **{len(sample_inventory_ids(args.sample_dir)):,} khách không lặp**, seed={args.seed}, '
       'phân tầng đồng thời theo fold × tổ hợp nguồn toàn lịch sử × band tổng log. '
       'Phân bổ tỷ lệ bằng phần nguyên và phần dư lớn nhất (Hamilton), sau đó lấy ngẫu nhiên trong tầng. '
       'Không ép mọi tầng hiếm xuất hiện: tầng nhận 0 mẫu được công khai, không coi weight bù được tầng vắng. '
       'Giữ toàn bộ sự kiện, 12 tháng nhãn và chuỗi ptls của khách đã chọn.','',
       md(t['sample_inventory']),'',
-      'Mẫu đã ẩn danh từ MBD-mini nằm tại [sampledata/mbd_mini](../../sampledata/mbd_mini/), được đưa lên Git cùng mã tái tạo và bảng kiểm chứng tổng hợp. '
+      'Mẫu đã ẩn danh từ MBD-mini nằm tại [sample_data/mbd_mini](../../sample_data/mbd_mini/), được đưa lên Git cùng mã tái tạo và bảng kiểm chứng tổng hợp. '
       '`selection.parquet` chứa tầng và weight = population_n/sample_n. '
       '`customer_month.parquet` chứa đầy đủ tháng và null nguồn sớm. '
       'Đây là mẫu EDA theo toàn lịch sử; khi làm mô hình phải lấy mẫu bằng lịch sử trước cutoff để tránh dùng tương lai.','',

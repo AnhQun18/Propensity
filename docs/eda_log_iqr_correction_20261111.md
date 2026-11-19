@@ -32,9 +32,9 @@ Mẫu số: 38.724.240 giao dịch, tất cả hữu hạn và dương trong sna
 
 Kết quả tham chiếu được lưu trong
 [CSV ngày 09/11](propensity_feasibility/tail_review/amount_log_iqr_by_currency.csv).
-`scripts/validate_eda.py` đối soát lại cả hai đuôi, tổng log1p và tổng ln với CSV này
+`src/scripts/validate_eda.py` đối soát lại cả hai đuôi, tổng log1p và tổng ln với CSV này
 sau khi notebook thực thi trên raw. Bảng so sánh mới được xuất tại
-`deliverables/eda/tables/amount_iqr_scale_comparison_currency11.csv`.
+`docs/deliverables/eda/tables/amount_iqr_scale_comparison_currency11.csv`.
 
 ## Giới hạn sử dụng
 

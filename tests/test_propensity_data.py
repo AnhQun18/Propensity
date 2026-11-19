@@ -228,7 +228,7 @@ class PreparationTests(unittest.TestCase):
             'protocol': json.loads((self.config.output_dir / 'protocol.json').read_text())}))
         feature_path = self.config.output_dir / 'features/month=2022-12/part.parquet'
         before = feature_path.read_bytes()
-        script = Path(__file__).resolve().parents[1] / 'scripts/validate_prepared_data.py'
+        script = Path(__file__).resolve().parents[1] / 'src/scripts/validate_prepared_data.py'
         spec = importlib.util.spec_from_file_location('validate_prepared', script)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -250,7 +250,7 @@ class PreparationTests(unittest.TestCase):
         import pandas as pd
         import pyarrow.compute as pc
         root = Path(__file__).resolve().parents[1]
-        for filename in ('02_data_preparation.ipynb', '03_data_processing.ipynb'):
+        for filename in ('03_data_processing.ipynb',):
             with self.subTest(notebook=filename):
                 output = self.config.output_dir.parent / filename.removesuffix('.ipynb')
                 scope = dict(__name__=__name__, config=replace(self.config, output_dir=output),

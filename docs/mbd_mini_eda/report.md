@@ -29,7 +29,7 @@ Kiểu lưu của từng biến: [source_schema.csv](tables/review/source_schema
 | geo | 66,295,724 | 66,295,724 | 39,487 | 39,487 | 0 | 0 | 0 |
 | dialog | 217,205 | 217,205 | 114 | 114 | 0 | 0 | 0 |
 
-`ptls/trx` thiếu **2.020.020 phần tử ở 13 khách** so với detail/trx; chuỗi dài nhất có 10.000 phần tử, trong khi detail có khách tới 1.020.773 log. Đây là dấu hiệu có giới hạn chiều dài chuỗi; chưa xác minh cách chọn phần được giữ. Geo và dialog có tổng phần tử và số log theo khách khớp. Vì vậy, toàn bộ EDA, biểu đồ và lịch sử trong mẫu dùng **detail** làm nguồn chuẩn; không thay bằng ptls hoặc cộng hai dạng. Các bảng ptls trong sampledata được giữ đúng như nguồn để đối chiếu, không bảo đảm có mọi sự kiện detail.
+`ptls/trx` thiếu **2.020.020 phần tử ở 13 khách** so với detail/trx; chuỗi dài nhất có 10.000 phần tử, trong khi detail có khách tới 1.020.773 log. Đây là dấu hiệu có giới hạn chiều dài chuỗi; chưa xác minh cách chọn phần được giữ. Geo và dialog có tổng phần tử và số log theo khách khớp. Vì vậy, toàn bộ EDA, biểu đồ và lịch sử trong mẫu dùng **detail** làm nguồn chuẩn; không thay bằng ptls hoặc cộng hai dạng. Các bảng ptls trong sample_data được giữ đúng như nguồn để đối chiếu, không bảo đảm có mọi sự kiện detail.
 
 ## 2. Null có nghĩa gì, vì sao có null?
 
@@ -99,7 +99,7 @@ Sự thiếu đồng thời gợi ý cấu trúc cấp cha/con hoặc cơ chế 
 
 Mọi giao dịch, geo và hội thoại trước 01/2022 vẫn được giữ. Không cắt về giao của ba nguồn. Trong bảng khách–tháng, trước 01/2022, geo/dialog không có log được đặt `null` kèm `missing_reason=unobserved_early_source`; ô có log vẫn giữ số đếm gốc. Từ 01/2022, 0 nghĩa là không ghi nhận log, không chứng minh khách thực sự không hoạt động hoặc nguồn được thu thập liên tục. Các cột `*_raw_events` bảo toàn số đếm để đối chiếu; các thuộc tính raw không bị impute.
 
-Lưới đầy đủ 25 tháng cho mẫu nằm tại `sampledata/mbd_mini/customer_month.parquet`. Cache ma trận toàn dân số chứa toàn lịch sử. Đã đối chiếu chính xác mọi ô với cache matrix.npz trước đó.
+Lưới đầy đủ 25 tháng cho mẫu nằm tại `sample_data/mbd_mini/customer_month.parquet`. Cache ma trận toàn dân số chứa toàn lịch sử. Đã đối chiếu chính xác mọi ô với cache matrix.npz trước đó.
 
 ## 5. Ma trận độ phủ theo nhóm có chủ đích
 
@@ -183,7 +183,7 @@ Biểu đồ đầy đủ dùng **số lượng trên bin** với nhãn khoảng
 
 Bốn panel dùng trục tuyến tính với giới hạn Y riêng, có đường tỷ lệ toàn kỳ để đối chiếu. Y không bắt buộc bắt đầu từ 0 và không so biên độ thị giác giữa các panel. Tỷ lệ = tổng số dương các fold / tổng dòng có nhãn; số cạnh điểm là số dương thực tế. Dữ liệu chi tiết: [target_monthly.csv](tables/review/target_monthly.csv).
 
-## 11. Resample theo phân phối và sampledata
+## 11. Resample theo phân phối và sample_data
 
 Lấy **1,000 khách không lặp**, seed=42, phân tầng đồng thời theo fold × tổ hợp nguồn toàn lịch sử × band tổng log. Phân bổ tỷ lệ bằng phần nguyên và phần dư lớn nhất (Hamilton), sau đó lấy ngẫu nhiên trong tầng. Không ép mọi tầng hiếm xuất hiện: tầng nhận 0 mẫu được công khai, không coi weight bù được tầng vắng. Giữ toàn bộ sự kiện, 12 tháng nhãn và chuỗi ptls của khách đã chọn.
 
@@ -198,7 +198,7 @@ Lấy **1,000 khách không lặp**, seed=42, phân tầng đồng thời theo f
 | ptls_geo | 724 | ptls_geo.parquet |
 | ptls_dialog | 460 | ptls_dialog.parquet |
 
-Mẫu đã ẩn danh từ MBD-mini nằm tại [sampledata/mbd_mini](../../sampledata/mbd_mini/), được đưa lên Git cùng mã tái tạo và bảng kiểm chứng tổng hợp. `selection.parquet` chứa tầng và weight = population_n/sample_n. `customer_month.parquet` chứa đầy đủ tháng và null nguồn sớm. Đây là mẫu EDA theo toàn lịch sử; khi làm mô hình phải lấy mẫu bằng lịch sử trước cutoff để tránh dùng tương lai.
+Mẫu đã ẩn danh từ MBD-mini nằm tại [sample_data/mbd_mini](../../sample_data/mbd_mini/), được đưa lên Git cùng mã tái tạo và bảng kiểm chứng tổng hợp. `selection.parquet` chứa tầng và weight = population_n/sample_n. `customer_month.parquet` chứa đầy đủ tháng và null nguồn sớm. Đây là mẫu EDA theo toàn lịch sử; khi làm mô hình phải lấy mẫu bằng lịch sử trước cutoff để tránh dùng tương lai.
 
 | source | metric | population_value | sample_value |
 | --- | --- | --- | --- |

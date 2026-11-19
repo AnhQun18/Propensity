@@ -1,4 +1,4 @@
-include README.md DATASETS.md
+include README.md docs/DATASETS.md
 include docs/mbd_mini_eda_package.md
 include docs/setup_other_machine.md
 include docs/run_complete_other_machine.md
@@ -9,21 +9,13 @@ include src/review_mbd_eda.py src/mbd_eda_review_report.py src/validate_mbd_revi
 include src/plot_behavior_coverage.py src/behavior_coverage_viewer.html
 include docs/propensity_feasibility/mon_research.md
 include configs/mbd_mini_eda.json
-include configs/propensity_data.json
 include configs/propensity_processing.json
-include configs/propensity_calendar.json configs/propensity_baseline.json
-include docs/propensity_baseline_design.md
-include BASELINE_REPORT.md
-include docs/baseline_rule_comparison_20261110.md
 include docs/propensity_data_preparation.md
 include notebooks/README.md
-include notebooks/02_data_preparation.ipynb
 include notebooks/03_data_processing.ipynb
 include notebooks/04_merge_processed.ipynb
-include notebooks/05_calendar_baseline.ipynb
-include scripts/sync_preparation_notebook.py
-include scripts/report_baseline_rule.py
-include scripts/review_baseline.py
-recursive-include docs/baseline_diagnostics_20261110 *.md *.csv *.json *.png
+include src/scripts/sync_preparation_notebook.py
 recursive-include tests *.py
-recursive-include deliverables/mbd_mini_eda_fixes *.py
+recursive-include src/mbd_mini_eda_fixes *.py
+include configs/propensity_processing.json configs/eda_analysis.json
+include docs/CURRENT_REPORT.md

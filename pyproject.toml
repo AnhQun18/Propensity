@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "new-propensity"
 version = "0.2.1"
 requires-python = ">=3.10"
-description = "Dự án phân tích dữ liệu và mô hình propensity."
+description = "Phân tích EDA và chuẩn bị dữ liệu MBD-mini."
 readme = "README.md"
 dependencies = [
     "pandas>=2.2",
@@ -17,17 +17,17 @@ dependencies = [
 [project.scripts]
 mbd-mini-eda = "mbd_mini_eda.cli:main"
 propensity-data = "propensity_data.cli:main"
-propensity-baseline = "propensity_baseline.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mbd_mini_eda*", "propensity_data*", "propensity_baseline*"]
+include = ["mbd_mini_eda*", "propensity_data*"]
 
 [project.optional-dependencies]
 eda = [
     "duckdb>=2.0,<3; python_version >= '3.11'",
     "matplotlib>=3.10",
     "scipy>=1.10",
+    "scikit-learn>=1.7,<2",
     "ipykernel>=6.0",
     "nbformat>=5.0",
     "nbclient>=0.10",
@@ -35,7 +35,6 @@ eda = [
 plots = ["matplotlib>=3.10"]
 supplement = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 prepare = ["duckdb>=2.0,<3; python_version >= '3.11'"]
-baseline = ["duckdb>=2.0,<3; python_version >= '3.11'", "catboost>=1.2.10,<2", "scikit-learn>=1.7,<2"]
 dev = ["build>=1.0"]
 notebook = [
     "ipykernel>=6.0",

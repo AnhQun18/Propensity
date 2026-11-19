@@ -322,7 +322,7 @@ Nội dung: Số log/tháng của nhóm minh họa cực đại, gần mean, g�
 
 ## [sample_inventory](tables/review/sample_inventory.csv)
 
-Nội dung: Số dòng từng bảng con liên kết trong sampledata; chỉ lưu số tổng hợp trên Git.
+Nội dung: Số dòng từng bảng con liên kết trong sample_data; chỉ lưu số tổng hợp trên Git.
 
 8 dòng. Các biến: `source`, `rows`, `path`.
 

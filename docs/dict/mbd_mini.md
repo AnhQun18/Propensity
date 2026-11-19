@@ -20,8 +20,9 @@ một sự kiện, và các bảng `ptls`, nơi mỗi dòng là một chuỗi c�
 - Giữ nguyên tên nhãn để tạo `y_any`; tên nghiệp vụ từng sản phẩm không còn là yêu cầu
   xác minh trong phạm vi đầu ra gộp theo quyết định người dùng.
 - Tháng lịch chứa `mon` là tháng nhãn theo quy ước đã đối chiếu với các bài báo;
-  lịch sử chỉ gồm sự kiện `event_time < cutoff`. Người dùng quyết định tạm dùng UTC
-  thống nhất; ví dụ `mon=2022-02-28` có cutoff `2022-02-01 00:00 UTC`, không dịch 3 giờ.
+  lịch sử chỉ gồm sự kiện `event_time < cutoff`. Cutoff là 00:00 ngày đầu tháng nhãn
+  theo giờ Moscow (`Europe/Moscow`, UTC+3). Ví dụ `mon=2022-02-28` có cutoff
+  `2022-02-01 00:00:00+03:00`, tương đương `2022-01-31 21:00:00Z`.
   Đây là quy ước nghiên cứu, không phải xác nhận timezone của ETL nhãn gốc. Xem
   [nghiên cứu `mon` và giới hạn về múi giờ](../propensity_feasibility/mon_research.md).
 

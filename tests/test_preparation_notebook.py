@@ -9,16 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PreparationNotebookTests(unittest.TestCase):
-    def test_structure_and_python_text(self):
-        self.check_notebook("02_data_preparation.ipynb", "prep-")
-
     def test_processing_notebook_structure_and_source_text(self):
         self.check_notebook("03_data_processing.ipynb", "processing-")
 
     def check_notebook(self, filename, prefix):
         notebook = json.loads((ROOT / "notebooks" / filename).read_text(encoding="utf-8"))
         self.assertEqual(notebook["nbformat"], 4)
-        spec = importlib.util.spec_from_file_location("notebook_sync", ROOT / "scripts/sync_preparation_notebook.py")
+        spec = importlib.util.spec_from_file_location("notebook_sync", ROOT / "src/scripts/sync_preparation_notebook.py")
         sync = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(sync)  # Only imports authoring helpers; no notebook execution.
         identifiers = []

@@ -2,7 +2,7 @@
 
 Kết quả hiện tại gồm **61 bảng CSV, 24 hình PNG**, report, danh mục bảng/biến,
 metadata và manifest. Có thêm mẫu liên kết **1.000 khách** ở
-[sampledata](../sampledata/README.md), giữ mọi sự kiện detail và nhãn của khách
+[sample_data](../sample_data/README.md), giữ mọi sự kiện detail và nhãn của khách
 được chọn. [Báo cáo đầy đủ](mbd_mini_eda/report.md) trình bày cả 12 yêu cầu;
 [kết quả xác nhận](mbd_mini_eda_validation.json) ghi **225 kiểm tra đạt**.
 
@@ -18,7 +18,7 @@ metadata và manifest. Có thêm mẫu liên kết **1.000 khách** ở
 | Nhịp hành vi không log | Theo ngày và tháng, 3 trục tuyến tính riêng theo nguồn, null ngoài khoảng quan sát |
 | Amount gốc | Bin giá trị gốc bao phủ toàn đuôi; zoom tuyến tính 0–P99 và ghi số quan sát ngoài zoom; phân vị gốc, không log |
 | Biến động target hiếm | 4 panel theo tháng, zoom Y riêng, đường tỷ lệ toàn kỳ, số dương thực tế ở từng điểm |
-| Resample và sampledata | Phân tầng fold × tổ hợp nguồn × band tổng log, Hamilton, seed 42; đối chiếu KS, mean/median/P95/zero và nhãn |
+| Resample và sample_data | Phân tầng fold × tổ hợp nguồn × band tổng log, Hamilton, seed 42; đối chiếu KS, mean/median/P95/zero và nhãn |
 | Nội dung và biến từng bảng | source_schema.csv liệt kê 8 bảng raw; data_catalog.md mô tả mọi CSV và các cột |
 | Mean/min/max mỗi người | Toàn lịch sử, tách dân số 100.224 khách và nhóm có log; có tứ phân vị/P95/P99 |
 | Outlier | Tukey 1,5 IQR theo currency, số log mỗi khách và số log mỗi ngày; giữ nguyên dữ liệu, không coi cờ là lỗi đã xác nhận |

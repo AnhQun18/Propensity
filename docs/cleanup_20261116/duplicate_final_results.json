@@ -1,0 +1,54 @@
+﻿[
+    {
+        "path":  "outputs/trx_charts/plot_buyers_by_horizon.py",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/trx_charts/buyers_by_horizon.png",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/trx_charts/buyers_by_horizon.csv",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/trx_charts/source_presence_purchase_rates.csv",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/dialog_charts/plot_dialog_monthly.py",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/dialog_charts/dialog_monthly_volume.png",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/dialog_charts/dialog_hour_weekday_heatmap.png",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/workspace_review_20261110",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/workspace_review_20261110_recheck",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/update_eda_only_workspace.py",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/update_eda_only_docs.py",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/plan_eda_only_cleanup.py",
+        "status":  "deleted"
+    },
+    {
+        "path":  "outputs/verify_eda_only_workspace.py",
+        "status":  "deleted"
+    }
+]

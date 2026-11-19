@@ -100,7 +100,7 @@ class EDA:
         self.root = Path(root)
         self.raw = self.root / "data/MBD-mini"
         self.prepared = self.root / "outputs/propensity_processing_v3"
-        self.out = self.root / "deliverables/eda"
+        self.out = self.root / "docs/deliverables/eda"
         for folder in ("tables", "figures"):
             (self.out / folder).mkdir(parents=True, exist_ok=True)
         self.started = time.time()

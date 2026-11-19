@@ -1,21 +1,13 @@
 # Chuẩn bị dữ liệu propensity any-product
 
-**Luồng baseline bổ sung 10/11/2026:** [đặc tả tháng lịch + lịch sử cũ](propensity_baseline_design.md)
-và [notebook 05](../notebooks/05_calendar_baseline.ipynb) tái sử dụng cache chuẩn
-hóa của notebook 03 để tạo schema v3/output mới, rồi tune/fit/calibration/test.
-Luồng cũ bên dưới giữ cửa sổ 30/84 ngày + all và schema v2. Notebook 04 chỉ hỗ
-trợ schema v2; trainer mới đọc trực tiếp các file tháng v3. Đã có validation
-thật trong [báo cáo baseline](../BASELINE_REPORT.md).
-
 Quy trình hiện tại để đọc và chạy từng bước nằm tại
 [`notebooks/03_data_processing.ipynb`](../notebooks/03_data_processing.ipynb),
 viết ngày 10/11/2026, có bảng mục tiêu/cách làm/đầu ra cho 12 bước.
-Notebook [02_data_preparation.ipynb](../notebooks/02_data_preparation.ipynb) giữ quy
-trình chuẩn bị trước đó; cả hai dùng cùng helper cho nhãn và feature.
+Notebook 03 là phiên bản hiện hành; notebook 02 đã xóa vì trùng quy trình.
 Notebook có đầy đủ mã xử lí và SQL, chia riêng cấu hình, nhãn, từng nguồn log,
 feature theo tháng và hoàn tất. Các cell định nghĩa đồng bộ với helper trong
 `src/propensity_data/`; package `mbd_mini_eda` tiếp tục
-phục vụ thống kê mô tả. **Ngày 10/11/2026, notebook 02 và 03 đã chạy raw thành công**:
+phục vụ thống kê mô tả. **Ngày 10/11/2026, notebook 03 đã chạy raw thành công**:
 mỗi bộ có 1.202.688 dòng, 12.854 nhãn dương và không thiếu nhãn; manifest ready.
 Đã kiểm thử tổng hợp schema v2/validation dùng chung và kiểm tra lại các file feature
 đã xuất. Chưa huấn luyện mô hình. Xem [kết quả sửa tồn đọng](preprocessing_fixes_20261110.md).
@@ -28,7 +20,7 @@ Dùng **Python >=3.11**, dữ liệu gốc có `client_split/`, `targets/`, `det
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[prepare,notebook]"
-Copy-Item configs/propensity_data.json configs/propensity_data.local.json
+Copy-Item configs/propensity_processing.json configs/propensity_data.local.json
 ```
 
 Với notebook 03, thay lệnh copy cấu hình bằng:
@@ -212,7 +204,7 @@ không được gộp sum của các mã thành cùng đơn vị tiền.
 Có thể kiểm tra output cũ mà không tạo lại feature, sau khi cài package:
 
 ```powershell
-.\.venv\Scripts\python.exe -B -X utf8 scripts/validate_prepared_data.py outputs/propensity_processing_v3
+.\.venv\Scripts\python.exe -B -X utf8 src/scripts/validate_prepared_data.py outputs/propensity_processing_v3
 ```
 
 Với output schema cũ, thêm `--upgrade-contract` để kiểm tra toàn bộ rồi cập nhật
