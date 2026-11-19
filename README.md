@@ -1,5 +1,6 @@
 # MBD-mini: khám phá và chuẩn bị dữ liệu propensity
 
+LINK CANVA: [propensitymbdini](https://canva.link/yq4zss72ntwfh2v)
 Repo này dùng bộ dữ liệu MBD-mini để kiểm tra chất lượng dữ liệu, phân tích hành vi khách hàng và chuẩn bị bảng khách hàng–tháng cho bài toán dự báo mua sản phẩm. Dữ liệu có bốn nhãn sản phẩm; nhãn gộp `y_any` cho biết khách hàng có mua ít nhất một sản phẩm trong khoảng dự báo. Repo hiện tập trung vào EDA, audit và chuẩn bị dữ liệu, chưa có pipeline huấn luyện mô hình propensity.
 
 **Bắt đầu từ [từ điển dữ liệu MBD-mini](docs/dict/mbd_mini.md)** để xem ý nghĩa các bảng, cột, khóa nối, nhãn và những giới hạn diễn giải. [Danh mục dữ liệu](docs/DATASETS.md) mô tả nguồn và quy mô; [tài liệu MBD-mini](docs/MBD%20MINI%20UNDERSTANDING%20DATA%20%281%29.pdf) lưu bản PDF tham khảo; [báo cáo hiện hành](docs/CURRENT_REPORT.md) chỉ tới các kết quả và mã tạo biểu đồ.
@@ -44,4 +45,4 @@ python -m venv .venv
 - Một số artifact cũ được tạo theo quy ước UTC, cửa sổ lịch sử cố định hoặc mẫu khách. Chúng là kết quả phương pháp cũ cho tới khi được tính lại theo quy ước hiện hành; xem [nhật ký phạm vi EDA](docs/eda_two_lists_audit_20261118.md).
 - Timestamp nguồn thiếu timezone cần giả định nguồn được ghi rõ. Các mã `currency`, `geohash` và `event_type` chưa có ánh xạ nghiệp vụ đầy đủ, nên không tự suy ra đơn vị tiền hay tọa độ.
 
-Quy tắc chi tiết của dự án nằm trong [AGENTS.md](AGENTS.md).
+
