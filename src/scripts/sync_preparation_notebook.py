@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-NOTEBOOKS = (ROOT / "notebooks/03_data_processing.ipynb",
-             ROOT / "notebooks/04_merge_processed.ipynb")
+NOTEBOOKS = (ROOT / "notebooks/06_data_processing.ipynb",
+             ROOT / "notebooks/07_merge_processed.ipynb")
 
 
 def render_library_cell(root: Path, metadata: dict) -> str:

@@ -1,7 +1,7 @@
 # Hướng dẫn Đọc hiểu & Cách tính Toàn bộ Biểu đồ trong Báo cáo Phân tích Chuyên sâu (MBD-mini)
 
 Tài liệu này giải thích chi tiết **cách đọc hiểu ý nghĩa kinh doanh/thống kê** và **công thức tính toán chính xác (tử số, mẫu số, điều kiện lọc, nguồn dữ liệu)** của toàn bộ **14 biểu đồ & bảng tổng hợp** trên **8 trang slide** trong báo cáo:
-- **File báo cáo PDF:** [`outputs/eda_insights_20261119/MBD_MINI_DEEP_INSIGHTS_DECK.pdf`](outputs/eda_insights_20261119/MBD_MINI_DEEP_INSIGHTS_DECK.pdf)
+- **File báo cáo PDF:** [`MBD_MINI_DEEP_INSIGHTS_DECK.pdf`](MBD_MINI_DEEP_INSIGHTS_DECK.pdf)
 - **Thư mục ảnh từng trang slide (`slide_01.png` – `slide_08.png`):** [`outputs/eda_insights_20261119/slides_clean/`](outputs/eda_insights_20261119/slides_clean/)
 
 ---
@@ -170,16 +170,23 @@ File ảnh: [`outputs/eda_insights_20261119/slides_clean/slide_04.png`](outputs/
     1. **Dịch chuyển cơ cấu (`+0,21 điểm %`):** Cơ cấu khách hàng không hề xấu đi mà ngược lại còn tốt lên (vì tỷ lệ khách có `DIALOG` tăng hơn gấp đôi từ `3,61%` lên `7,86%`), giúp kéo tỷ lệ mua chung tăng `+0,21%`.
     2. **Tương tác pha loãng (`-0,30 điểm %`):** Khi độ phủ kênh `DIALOG` mở rộng gấp đôi, mức chênh lệch tuyệt đối của nhóm có `DIALOG` bị pha loãng nhẹ.
     3. **Giảm tỷ lệ mua nội nhóm (`-0,75 điểm %`, chiếm `90%` tổng mức giảm):** Cả nhóm có `DIALOG` lẫn nhóm không có `DIALOG` đều giảm tỷ lệ mua theo thời gian.
-- **Công thức Toán học của Phân rã Shift-Share:**
-  Chia tập khách hàng tại tháng $t \in \{\text{04/2022}, \text{11/2022}\}$ thành các phân khúc $g \in \{\text{Có DIALOG gần},\ \text{Không có DIALOG gần}\}$ với tỷ trọng dân số $w_{g, t}$ ($\sum_g w_{g, t} = 1$) và tỷ lệ mua nội nhóm $r_{g, t}$. Tỷ lệ mua toàn tệp tại tháng $t$ là $R_t = \sum_g w_{g, t} r_{g, t}$.
-  Chênh lệch giữa tháng 11 (`11`) và tháng 04 (`04`) được phân rã hằng đẳng thức:
-  $$\Delta R = R_{11} - R_{04} = \underbrace{\sum_g \left(w_{g, 11} - w_{g, 04}\right) r_{g, 04}}_{\text{1. Dịch chuyển cơ cấu } (+0,214\%)} + \underbrace{\sum_g w_{g, 04} \left(r_{g, 11} - r_{g, 04}\right)}_{\text{2. Giảm tỷ lệ nội nhóm } (-0,746\%)} + \underbrace{\sum_g \left(w_{g, 11} - w_{g, 04}\right)\left(r_{g, 11} - r_{g, 04}\right)}_{\text{3. Tương tác pha loãng } (-0,297\%)}$$
+- **Công thức Toán học của Phân rã Shift-Share (trên `6` phân khúc rời nhau):**
+  Tại hai thời điểm tháng `04/2022` (ký hiệu `0`) và tháng `11/2022` (ký hiệu `1`), chia toàn bộ `100.224` khách hàng thành **6 phân khúc không giao nhau** là tổ hợp của:
+  - **3 trạng thái `TRX`:** `no_trx_history` (chưa có lịch sử `TRX`), `trx_active_prev_month` (có `TRX` ở tháng $T-1$), `trx_older_history` (từng có `TRX` trước đó nhưng `0 TRX` ở tháng $T-1$).
+  - **2 trạng thái `DIALOG`:** `dialog_False` (`0 DIALOG` ở tháng $T-1$) và `dialog_True` ($\ge 1$ `DIALOG` ở tháng $T-1$).
+  Gọi $w_{g, 0}, w_{g, 1}$ là tỷ trọng dân số của phân khúc $g$ ($\sum_{g=1}^6 w_{g, t} = 1$) và $r_{g, 0}, r_{g, 1}$ là tỷ lệ mua `H=1` của phân khúc $g$ tại tháng `04/2022` và `11/2022`. Tỷ lệ mua toàn tệp tại tháng $t$ là $R_t = \sum_{g=1}^6 w_{g, t} r_{g, t}$.
+  Chênh lệch giữa tháng `11/2022` và tháng `04/2022` được phân rã hằng đẳng thức chính xác:
+  $$\Delta R = R_1 - R_0 = \underbrace{\sum_{g=1}^6 \left(w_{g, 1} - w_{g, 0}\right) r_{g, 0}}_{\text{1. Dịch chuyển cơ cấu } (+0,214\%)} + \underbrace{\sum_{g=1}^6 w_{g, 0} \left(r_{g, 1} - r_{g, 0}\right)}_{\text{2. Giảm tỷ lệ nội nhóm } (-0,746\%)} + \underbrace{\sum_{g=1}^6 \left(w_{g, 1} - w_{g, 0}\right)\left(r_{g, 1} - r_{g, 0}\right)}_{\text{3. Tương tác pha loãng } (-0,297\%)}$$
 
-| Phân khúc $g$ | Tỷ trọng tháng 04 ($w_{g, 04}$) | Tỷ lệ mua tháng 04 ($r_{g, 04}$) | Tỷ trọng tháng 11 ($w_{g, 11}$) | Tỷ lệ mua tháng 11 ($r_{g, 11}$) | Thay đổi tỷ trọng ($\Delta w_g$) | Thay đổi tỷ lệ mua ($\Delta r_g$) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Có `DIALOG` ở $T-1$** | `3,610%` | `6,468%` | `7,858%` | `2,792%` | **`+4,249%`** | `-3,676%` |
-| **Không có `DIALOG` ở $T-1$** | `96,390%` | `1,515%` | `92,142%` | `0,701%` | `-4,249%` | `-0,815%` |
-| **Toàn tệp ($R_t = \sum w_{g,t} r_{g,t}$)** | **`100,00%`** | **`1,694%`** | **`100,00%`** | **`0,865%`** | `0,00%` | **`-0,829%`** |
+| Phân khúc $g$ (`TRX × DIALOG tháng T−1`) | Tháng 04: $w_{g,0}$ ($n_0$) | Tháng 04: $r_{g,0}$ ($b_0$) | Tháng 11: $w_{g,1}$ ($n_1$) | Tháng 11: $r_{g,1}$ ($b_1$) | 1. Dịch chuyển cơ cấu $(w_1-w_0)r_0$ | 2. Giảm tỷ lệ nội nhóm $w_0(r_1-r_0)$ | 3. Tương tác $(w_1-w_0)(r_1-r_0)$ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| `0 TRX` \| `0 DIALOG` | `10,86%` (`10.888`) | `1,00%` (`109`) | `3,32%` (`3.328`) | `2,58%` (`86`) | `-0,076%` | `+0,172%` | `-0,119%` |
+| `0 TRX` \| `≥1 DIALOG` | `0,30%` (`298`) | `8,39%` (`25`) | `0,23%` (`232`) | `8,19%` (`19`) | `-0,006%` | `-0,001%` | `+0,000%` |
+| `Có TRX ở T−1` \| `0 DIALOG` | `73,31%` (`73.474`) | `1,74%` (`1.278`) | `71,06%` (`71.224`) | `0,73%` (`520`) | `-0,039%` | **`-0,740%`** | `+0,023%` |
+| `Có TRX ở T−1` \| `≥1 DIALOG` | `3,09%` (`3.095`) | `7,37%` (`228`) | `7,25%` (`7.264`) | `3,07%` (`223`) | **`+0,306%`** | `-0,133%` | **`-0,179%`** |
+| `TRX cũ (0 ở T−1)` \| `0 DIALOG` | `12,21%` (`12.239`) | `0,39%` (`48`) | `17,77%` (`17.809`) | `0,09%` (`16`) | `+0,022%` | `-0,037%` | `-0,017%` |
+| `TRX cũ (0 ở T−1)` \| `≥1 DIALOG` | `0,23%` (`230`) | `4,35%` (`10`) | `0,37%` (`367`) | `0,82%` (`3`) | `+0,006%` | `-0,008%` | `-0,005%` |
+| **Tổng cộng 6 phân khúc** | **`100,00%` (`100.224`)** | **`1,694%` (`1.698`)** | **`100,00%` (`100.224`)** | **`0,865%` (`867`)** | **`+0,214%` (`+0,21%`)** | **`-0,746%` (`-0,75%`)** | **`-0,297%` (`-0,30%`)** |
 
 ### 2. Biểu đồ Phải: *Độ phủ `DIALOG` tăng gấp đôi từ `06/22` nhưng `Lift` vẫn bền*
 - **Cách đọc hiểu & Cách tính:**
@@ -288,7 +295,7 @@ Nguồn dữ liệu: [`outputs/eda_figures_moscow/event_type_monthly_profiles.pa
 
 ---
 
-## Slide G (`slide_07.png`): Mối liên hệ `TRX × GEO` — Hai chiều mở rộng độc lập giúp phân tách người mua gấp `8,2 lần`
+## Slide G (`slide_07.png`): Mối liên hệ `TRX × GEO` — Hai chiều mở rộng độc lập phân tách người mua gấp `10,6 lần`
 
 File ảnh: [`outputs/eda_insights_20261119/slides_clean/slide_07.png`](outputs/eda_insights_20261119/slides_clean/slide_07.png)
 Nguồn dữ liệu: [`outputs/eda_figures_moscow/geohash_4_monthly_profiles.parquet`](outputs/eda_figures_moscow/geohash_4_monthly_profiles.parquet) kết hợp với `event_type_monthly_profiles.parquet`.
@@ -307,27 +314,30 @@ Nguồn dữ liệu: [`outputs/eda_figures_moscow/geohash_4_monthly_profiles.par
 | **`5 – 9 vùng`** (`5 – 9 ô geohash_4`) | `151.429` | `15,11%` | `2.065` | `2.065 / 151.429 = 1,36%` | `1,20×` | `1,35×` |
 | **`≥ 10 vùng`** (`≥ 10 ô geohash_4`) | `47.582` | `4,75%` | `686` | `686 / 47.582 = 1,44%` | **`1,27×`** | **`2,17×`** |
 
-### 2. Biểu đồ Phải: *Tương tác Số loại `TRX` × Số vùng `geohash_4` (ở $T-1$)*
+### 2. Biểu đồ Phải: *Tương tác Số mã `TRX` mới × Số vùng `geohash_4` (ở $T-1$)*
 - **Cách đọc hiểu:**
   - Khi kiểm tra tương quan hạng Spearman trên `460.028` dòng khách–tháng có mặt ở cả hai nguồn `TRX` và `GEO` trong tháng $T-1$:
     - $\rho_{\text{Spearman}}(\text{Số lượng TRX}_{T-1},\ \text{Số lượng GEO}_{T-1}) = 0,0160$
-    - $\rho_{\text{Spearman}}(\text{Số loại event\_type}_{T-1},\ \text{Số vùng geohash\_4}_{T-1}) = 0,0267$
+    - $\rho_{\text{Spearman}}(\text{Số mã event\_type mới}_{T-1},\ \text{Số vùng geohash\_4}_{T-1}) = 0,0241$
     - $\rho_{\text{Spearman}}(\text{Số mã event\_type mới}_{T-1},\ \text{Số vùng geohash\_4 mới}_{T-1}) = 0,0160$
-  - Hệ số tương quan $r \approx 0,02$ chứng minh **`TRX` và `GEO` hoàn toàn độc lập (trực giao)**: `TRX` đo độ phức tạp/mở rộng về mặt **tài chính**, còn `GEO` đo độ mở rộng về mặt **địa bàn hoạt động vật lý**.
-  - Do hai chiều này độc lập, khi ghép chéo **3 nhóm `TRX` ở tháng $T-1$** trên trục hoành với **3 nhóm số vùng `GEO` ở tháng $T-1$** (3 màu cột: Xám = `0 vùng GEO`, Xanh dương = `1 – 3 vùng GEO`, Xanh ngọc = `≥ 4 vùng GEO`), tỷ lệ mua tăng bậc thang theo cả hai chiều từ **`0,42%`** lên tới **`3,44%`** (**chênh lệch gấp `8,2 lần`**):
-- **Cách tính & Bảng số liệu đối chiếu (`3 × 3` tổ hợp trên toàn bộ `768.910` dòng có giao dịch `TRX` ở $T-1$):**
+  - Hệ số tương quan $r \approx 0,02$ chứng minh **`TRX` và `GEO` hoàn toàn độc lập (trực giao)**: `TRX` đo độ mở rộng loại nghiệp vụ **tài chính**, còn `GEO` đo độ mở rộng về mặt **địa bàn hoạt động vật lý**.
+  - Trục hoành đồng nhất theo **4 tầng mở rộng mã `TRX` mới ở tháng $T-1$** (`0 TRX ở T−1`, `0 mã mới`, `1 mã mới`, `≥ 2 mã mới` — khớp hoàn toàn với Biểu đồ Trái Slide F và phủ `100%` tập `1.002.240` dòng), ghép chéo với **3 nhóm số vùng `GEO` ở tháng $T-1$** (Xám = `0 vùng GEO`, Xanh dương = `1 – 3 vùng GEO`, Xanh ngọc = `≥ 4 vùng GEO`). Tỷ lệ mua **tăng đơn điệu 100% theo cả hai chiều** từ **`0,61%`** lên tới **`6,47%`** (**chênh lệch gấp `10,6 lần`**):
+- **Cách tính & Bảng số liệu đối chiếu (`4 × 3` tổ hợp trên toàn bộ `1.002.240` dòng):**
 
-| Nhóm Giao dịch `TRX` ở tháng $T-1$ | Nhóm Vị trí `GEO` ở tháng $T-1$ | Số dòng ($N_G$) | Số ca mua ($B_G$) | Cách tính Tỷ lệ mua (`H=1`) | Hệ số `Lift` (`H=1`) | Tỷ lệ mua 3 tháng (`H=3`) |
+| Nhóm Số mã `TRX` mới ở tháng $T-1$ | Nhóm Vị trí `GEO` ở tháng $T-1$ | Số dòng ($N_G$) | Số ca mua ($B_G$) | Cách tính Tỷ lệ mua (`H=1`) | Hệ số `Lift` (`H=1`) | Tỷ lệ mua 3 tháng (`H=3`) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **1. `1 – 3 loại TRX (0 mã mới)`** | **`0 vùng GEO`** | `187.848` | `787` | `787 / 187.848 = 0,42%` | `0,37×` | `1,27%` |
-| **1. `1 – 3 loại TRX (0 mã mới)`** | **`1 – 3 vùng GEO`** | `134.497` | `736` | `736 / 134.497 = 0,55%` | `0,48×` | `1,62%` |
-| **1. `1 – 3 loại TRX (0 mã mới)`** | **`≥ 4 vùng GEO`** | `112.818` | `672` | `672 / 112.818 = 0,60%` | `0,52×` | `1,78%` |
-| **2. `≥ 4 loại TRX (0 mã mới)`** | **`0 vùng GEO`** | `81.280` | `1.515` | `1.515 / 81.280 = 1,86%` | `1,64×` | `4,91%` |
-| **2. `≥ 4 loại TRX (0 mã mới)`** | **`1 – 3 vùng GEO`** | `78.959` | `1.607` | `1.607 / 78.959 = 2,04%` | `1,79×` | `5,52%` |
-| **2. `≥ 4 loại TRX (0 mã mới)`** | **`≥ 4 vùng GEO`** | `69.430` | `1.483` | `1.483 / 69.430 = 2,14%` | `1,87×` | `5,84%` |
-| **3. `≥ 1 mã TRX mới ở tháng T−1`** | **`0 vùng GEO`** | `39.754` | `1.009` | `1.009 / 39.754 = 2,54%` | `2,23×` | `5,29%` |
-| **3. `≥ 1 mã TRX mới ở tháng T−1`** | **`1 – 3 vùng GEO`** | `32.854` | `963` | `963 / 32.854 = 2,93%` | `2,57×` | `6,39%` |
-| **3. `≥ 1 mã TRX mới ở tháng T−1`** | **`≥ 4 vùng GEO`** | `31.470` | `1.084` | `1.084 / 31.470 = 3,44%` | **`3,02×`** | **`6,89%`** |
+| **1. `0 TRX ở T−1`** (`23,3%`) | **`0 vùng GEO`** | `110.792` | `676` | `676 / 110.792 = 0,61%` | `0,54×` | `2,10%` |
+| **1. `0 TRX ở T−1`** | **`1 – 3 vùng GEO`** | `66.367` | `451` | `451 / 66.367 = 0,68%` | `0,60×` | `2,40%` |
+| **1. `0 TRX ở T−1`** | **`≥ 4 vùng GEO`** | `56.171` | `437` | `437 / 56.171 = 0,78%` | `0,68×` | `2,61%` |
+| **2. `0 mã mới`** (`66,3%`) | **`0 vùng GEO`** | `269.128` | `2.302` | `2.302 / 269.128 = 0,86%` | `0,75×` | `2,37%` |
+| **2. `0 mã mới`** | **`1 – 3 vùng GEO`** | `213.456` | `2.343` | `2.343 / 213.456 = 1,10%` | `0,96×` | `3,07%` |
+| **2. `0 mã mới`** | **`≥ 4 vùng GEO`** | `182.248` | `2.155` | `2.155 / 182.248 = 1,18%` | `1,04×` | `3,32%` |
+| **3. `1 mã mới`** (`8,1%`) | **`0 vùng GEO`** | `31.091` | `583` | `583 / 31.091 = 1,88%` | `1,65×` | `4,37%` |
+| **3. `1 mã mới`** | **`1 – 3 vùng GEO`** | `25.844` | `587` | `587 / 25.844 = 2,27%` | `1,99×` | `5,31%` |
+| **3. `1 mã mới`** | **`≥ 4 vùng GEO`** | `24.159` | `611` | `611 / 24.159 = 2,53%` | `2,22×` | `5,77%` |
+| **4. `≥ 2 mã mới`** (`2,3%`) | **`0 vùng GEO`** | `8.663` | `426` | `426 / 8.663 = 4,92%` | `4,32×` | `8,61%` |
+| **4. `≥ 2 mã mới`** | **`1 – 3 vùng GEO`** | `7.010` | `376` | `376 / 7.010 = 5,36%` | `4,71×` | `10,36%` |
+| **4. `≥ 2 mã mới`** | **`≥ 4 vùng GEO`** | `7.311` | `473` | `473 / 7.311 = 6,47%` | **`5,68×`** | **`10,57%`** |
 
 ---
 

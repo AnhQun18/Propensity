@@ -1,0 +1,151 @@
+{
+  "run_name": "baseline_full252_v1",
+  "processed_dir": "../processed",
+  "output_dir": "../outputs/baseline_full252_v1",
+  "burn_in_months": ["2022-02", "2022-03", "2022-04"],
+  "h1_validation_folds": [
+    {
+      "name": "h1_val_2022_09",
+      "train_months": ["2022-05", "2022-06", "2022-07", "2022-08"],
+      "eval_month": "2022-09"
+    },
+    {
+      "name": "h1_val_2022_10",
+      "train_months": ["2022-05", "2022-06", "2022-07", "2022-08", "2022-09"],
+      "eval_month": "2022-10"
+    },
+    {
+      "name": "h1_val_2022_11",
+      "train_months": ["2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10"],
+      "eval_month": "2022-11"
+    }
+  ],
+  "h3_validation_folds": [
+    {
+      "name": "h3_val_2022_08",
+      "train_months": ["2022-05"],
+      "eval_month": "2022-08"
+    },
+    {
+      "name": "h3_val_2022_09",
+      "train_months": ["2022-05", "2022-06"],
+      "eval_month": "2022-09"
+    },
+    {
+      "name": "h3_val_2022_10",
+      "train_months": ["2022-05", "2022-06", "2022-07"],
+      "eval_month": "2022-10"
+    }
+  ],
+  "h1_final_train_months": ["2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11"],
+  "h1_calibration_month": "2022-12",
+  "h1_test_month": "2023-01",
+  "h3_final_monthly_train_months": ["2022-05", "2022-06", "2022-07", "2022-08"],
+  "h3_final_quarterly_train_months": ["2022-05", "2022-08"],
+  "h3_test_month": "2022-11",
+  "experiments": [
+    {
+      "experiment_id": "B0_prevalence",
+      "model_type": "prevalence",
+      "feature_set": "none",
+      "stage": "M2",
+      "description": "Train positive rate constant with SHA-256 deterministic tie-break"
+    },
+    {
+      "experiment_id": "B1_heuristic_rf",
+      "model_type": "heuristic_rf",
+      "feature_set": "heuristic_rf",
+      "stage": "M2",
+      "description": "Recency/Frequency ranking rule on trx_84d"
+    },
+    {
+      "experiment_id": "B2_logreg_trx_full",
+      "model_type": "ridge_logreg",
+      "feature_set": "trx",
+      "stage": "M2",
+      "description": "Train-only median imputer + indicator + StandardScaler + L2 Logistic on 148 TRX cols"
+    },
+    {
+      "experiment_id": "M2_cb_trx_84d",
+      "model_type": "catboost",
+      "feature_set": "trx_84d",
+      "stage": "M2",
+      "description": "CatBoost on 49 trx_84d features (short window)"
+    },
+    {
+      "experiment_id": "M2_cb_trx_full",
+      "model_type": "catboost",
+      "feature_set": "trx",
+      "stage": "M2",
+      "description": "CatBoost on all 148 TRX features (30d + 84d + all from 2021)"
+    },
+    {
+      "experiment_id": "M3_cb_trx_meta",
+      "model_type": "catboost",
+      "feature_set": "trx_meta",
+      "stage": "M3",
+      "description": "CatBoost on 199 features (TRX + GEO/DIALOG metadata)"
+    },
+    {
+      "experiment_id": "M3_cb_all_221",
+      "model_type": "catboost",
+      "feature_set": "all_221",
+      "stage": "M3",
+      "description": "CatBoost on all 221 processed schema-v2 features (+ geo_content + cold_start)"
+    },
+    {
+      "experiment_id": "M3_cb_all_prior",
+      "model_type": "catboost",
+      "feature_set": "all_prior",
+      "stage": "M3",
+      "description": "CatBoost on 238 features (221 + 17 prior_purchase from m < T)"
+    },
+    {
+      "experiment_id": "M3_cb_all_prior_derived",
+      "model_type": "catboost",
+      "feature_set": "all_prior_derived",
+      "stage": "M3",
+      "description": "CatBoost on all 252 features (238 + 14 Report 2 Slides A-H behavioral features)"
+    },
+    {
+      "experiment_id": "M3_cb_full_cold_fallback",
+      "model_type": "catboost_cold_fallback",
+      "feature_set": "all_prior_derived",
+      "stage": "M3",
+      "description": "CatBoost (cold_start==0) + Empirical-Bayes shrunk prior (alpha=20) on all 252 features"
+    }
+  ],
+  "paired_comparisons": [
+    ["B1_heuristic_rf", "M2_cb_trx_84d"],
+    ["M2_cb_trx_84d", "M2_cb_trx_full"],
+    ["B2_logreg_trx_full", "M2_cb_trx_full"],
+    ["M2_cb_trx_full", "M3_cb_trx_meta"],
+    ["M3_cb_trx_meta", "M3_cb_all_221"],
+    ["M3_cb_all_221", "M3_cb_all_prior"],
+    ["M3_cb_all_prior", "M3_cb_all_prior_derived"],
+    ["M3_cb_all_prior_derived", "M3_cb_full_cold_fallback"]
+  ],
+  "budget_fractions": [0.005, 0.01, 0.05],
+  "primary_budget_fraction": 0.01,
+  "seed": 42,
+  "bootstrap_replicates": 1000,
+  "cold_start_alpha": 20.0,
+  "duckdb_memory_limit": "2GB",
+  "duckdb_threads": 2,
+  "catboost_params": {
+    "iterations": 400,
+    "learning_rate": 0.05,
+    "depth": 6,
+    "l2_leaf_reg": 10.0,
+    "rsm": 0.6,
+    "border_count": 128,
+    "thread_count": 4,
+    "used_ram_limit": "3gb",
+    "loss_function": "Logloss",
+    "eval_metric": "Logloss",
+    "verbose": false
+  },
+  "learning_curve_checkpoints": [50, 100, 200, 300, 400],
+  "logreg_c": 1.0,
+  "logreg_max_iter": 300
+}

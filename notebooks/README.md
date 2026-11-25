@@ -1,35 +1,27 @@
 # Notebook của dự án
 
-Chọn kernel Python của `.venv` và mở notebook từ repo này. Các notebook EDA được đánh số theo thứ tự đọc, chia theo một chủ đề; chúng chứa bản sao mã phân tích từ `src/` và ghi SHA-256 của file nguồn trong metadata `eda_sources`. Script và thư viện EDA trong `src/` được giữ lại theo yêu cầu. Tạo lại các bản sao bằng:
+Thư mục gồm **10 notebook** bám sát 2 file báo cáo (`MBD MINI UNDERSTANDING DATA.pdf` và `MBD_MINI_DEEP_INSIGHTS_DECK.pdf`), quy trình chuẩn bị dữ liệu và bộ baseline mô hình song song $H=1$ & $H=3$. Mở notebook bằng kernel Python của `.venv` tại thư mục gốc dự án.
 
-```powershell
-.venv/Scripts/python.exe src/scripts/build_eda_workflow_notebooks.py
-```
-
-| Số | Chủ đề |
+| Notebook | Phạm vi & Đối chiếu Báo cáo |
 | --- | --- |
-| 01–04 | Xem dữ liệu mẫu, kiểm kê dữ liệu, chuẩn bị và ghép dữ liệu |
-| 05–07 | Nhãn mua và thống kê targets, độ phủ thời gian, missingness toàn lịch sử |
-| 08–10 | Chất lượng, biểu đồ, thời điểm và amount giao dịch TRX |
-| 11–13 | Chất lượng, hoạt động, liên hệ nhãn và biểu đồ GEO |
-| 14 | Thời gian, hình học và phân cụm DIALOG |
-| 15–17 | Quan hệ đa nguồn, vòng đời khách hàng và biểu đồ EDA theo Moscow |
-| [18](18_join_quality_audit.ipynb) | Audit join từ raw, đối soát cache/panel, kiểm tra nhãn và độ phủ nguồn |
-| [19](19_univariate_distributions.ipynb) | Đơn biến: nhãn 12 tháng, phân vị amount theo currency và quy mô nhóm |
-| [20](20_multivariate_insights.ipynb) | Insight đa biến: tỷ lệ mua, đóng góp, lift theo tháng/horizon, tương tác TRX–DIALOG và lịch sử mua |
+| [`01_report1_overview_and_targets.ipynb`](01_report1_overview_and_targets.ipynb) | **Báo cáo 1 (Slides 1–7):** Tổng quan dữ liệu, ERD, kiểm kê khóa nối, độ phủ thời gian 4 nguồn, 4 nhãn sản phẩm (`target_1..4`), xu hướng `y_any`, tỷ lệ mua quay lại & số tháng có mua/khách |
+| [`02_report1_trx.ipynb`](02_report1_trx.ipynb) | **Báo cáo 1 (Slides 8–12):** Chất lượng dữ liệu TRX, cơ cấu `currency`, cặp thuộc tính null, phân vị số GD & amount mã 11, đường cong Lorenz, RFM (Mua vs Không mua), tỷ trọng & Lift theo `event_type` |
+| [`03_report1_geo.ipynb`](03_report1_geo.ipynb) | **Báo cáo 1 (Slides 13–16):** Tổng quan `geohash_4/5/6`, đa dạng ô `g4` & tỷ lệ ô chính (`70,6%`), GEO quanh tháng mua & quanh ngày nhãn (`±30 ngày` Moscow), tín hiệu GEO & Lift |
+| [`04_report1_dialog_and_cross_source.ipynb`](04_report1_dialog_and_cross_source.ipynb) | **Báo cáo 1 (Slides 17–24):** Tổng quan DIALOG (embedding 768 chiều, độ phủ), DIALOG quanh tháng mua & `±30 ngày` nhãn, đặc điểm tương tác, heatmap giờ × thứ, khám phá embedding (PCA + K-means), có nguồn hành vi (GEO/DIALOG) & tỷ lệ mua |
+| [`05_report2_deep_insights.ipynb`](05_report2_deep_insights.ipynb) | **Báo cáo 2 (Slides A–H):** Tái lập trọn vẹn 8 slide phân tích chuyên sâu (Đường cong chữ U & `0 TRX`, Tần suất × Số tháng lịch sử & Tỷ số `T-1`, Kiểm định đa tầng DIALOG bác bỏ Simpson, Shift-Share `04→11/2022`, Ma trận `A→B` & đồng mua `647` ca, `event_type` mới/đa dạng, `TRX × GEO` độc lập) |
+| [`06_data_processing.ipynb`](06_data_processing.ipynb) | Chuẩn bị dữ liệu trước cutoff (`src/propensity_data/`), không huấn luyện mô hình |
+| [`07_merge_processed.ipynb`](07_merge_processed.ipynb) | Hợp nhất các bảng đã xử lý vào `processed/` (`src/propensity_data/merge.py`) |
+| [`08_baseline_top50.ipynb`](08_baseline_top50.ipynb) | **Baseline Ưu tiên 1 (`50` biến tinh gọn, `H=1` & `H=3`):** Toàn lịch sử từ 2021, burn-in 3 tháng (`prior_purchase`), embargo 2 tháng cho `H=3`, Calibration tháng 12, Holdout `2023-01` & `2022-11` |
+| [`09_baseline_full252.ipynb`](09_baseline_full252.ipynb) | **Baseline Ưu tiên 2 (`252` biến đầy đủ, `H=1` & `H=3`):** Bậc thang ablation 10 cấu hình (`49 → 252`), kiểm định paired bootstrap **Top-50 vs Full-252** và phân tích đóng góp biến ngoài Top-50 |
+| [`10_baseline_benchmark_suite.ipynb`](10_baseline_benchmark_suite.ipynb) | **Bộ Đánh Giá Baseline Đa Tầng & Kiểm Chứng Out-of-Client (`H=1` & `H=3`):** Đầy đủ các tầng `Random → Rule RF / Rule EDA → LogReg Simple-10 / Top-50 → LightGBM/XGBoost Default (Raw 203 & Top-50) → CatBoost Final (+ Calibration)`, Brier Score + 1.000 Client-Clustered Bootstrap CI, Reliability Curve, chẩn đoán `B0` pooled artifact và kiểm chứng **5-fold `OOT + OOC` (0% trùng `client_id`)** |
 
-**Bộ notebook insight 18–20:** chạy theo thứ tự 18 → 19 → 20 bằng kernel `.venv`. Notebook 18 quét toàn bộ raw và làm mới audit; notebook 19–20 dùng các kết quả đó. Notebook 20 còn dùng hai bảng tương tác có sẵn trong `outputs/target_focused_moscow_20261119/`, ghi rõ nguồn ở cell tương ứng. Các notebook lưu bảng và biểu đồ inline, xuất PNG/SVG tại `outputs/eda_insights_20261119/charts/`. Tạo lại và chạy riêng bộ này bằng:
+## Tái tạo & kiểm tra đồng bộ
 
-```powershell
-.venv/Scripts/python.exe -B -X utf8 src/scripts/build_insight_notebooks.py --execute
-```
-
-Lệnh trên ghi lại ba notebook 18–20 từ mã nguồn sinh notebook. Không áp dụng `build_eda_workflow_notebooks.py` để tái tạo bộ này. Xem [sổ insight và checklist](../docs/eda_insights_checklist_20261119.md) để phân biệt kiểm tra đã chạy với phần nghiên cứu còn mở.
-
-`01_data_preview.ipynb` đọc `sample_data/`; mọi kết luận EDA chính phải kiểm kê toàn bộ khách hàng và ít nhất một năm nhãn. Một số mã nguồn được chép vào notebook là phương pháp cũ (UTC, cửa sổ cố định hoặc mẫu khách); việc đưa mã vào notebook **không** biến kết quả cũ thành kết quả tuân thủ Moscow. Xem [đánh giá phạm vi](../docs/eda_two_lists_audit_20261118.md) trước khi dùng các đầu ra này.
-
-Các notebook có thể quét raw và ghi `outputs/`; không chạy toàn bộ 17 notebook như một pipeline. Chọn notebook theo câu hỏi nghiên cứu, đọc phần mô tả và kiểm tra phạm vi dữ liệu trước khi chạy. Mã thư viện, kiểm tra, xuất báo cáo và notebook EDA cũ không được nhân bản tại đây; chúng vẫn có trong `src/` khi cần đối chiếu. Notebook 03 và 04 dùng cho chuẩn bị dữ liệu; kiểm tra mã nguồn được nhúng bằng:
-
-```powershell
-.venv/Scripts/python.exe src/scripts/sync_preparation_notebook.py --check
-```
+- Tạo lại 5 notebook báo cáo (`01`–`05`):
+  ```powershell
+  .venv/Scripts/python.exe src/scripts/build_report_notebooks.py
+  ```
+- Kiểm tra đồng bộ mã nguồn nhúng trong notebook `06` và `07`:
+  ```powershell
+  .venv/Scripts/python.exe src/scripts/sync_preparation_notebook.py --check
+  ```

@@ -6,10 +6,11 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-ROOT = Path(r"c:\Users\admin\Documents\Thực tập VSF\new propensity")
+ROOT = Path(__file__).resolve().parents[2]
 FIG_DIR = ROOT / "outputs/eda_figures_moscow"
 BASE_DIR = ROOT / "outputs/full_population_temporal_eda_20261118"
-OUT_DIR = Path(r"C:\Users\admin\.gemini\antigravity\brain\107d8803-f648-48d5-b352-6bed686594c4\scratch")
+OUT_DIR = ROOT / "outputs/eda_insights_20261119/deep_trx_geo"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 c = duckdb.connect()
 
@@ -218,19 +219,19 @@ for a, b in [
     v = active_both[[a, b]].dropna()
     print(f"Spearman({a}, {b}) [n={len(v):,}]: {spearmanr(v[a], v[b]).statistic:.4f}")
 
-# Test 7: Joint TRX x GEO Behavioral Matrix: (TRX Novelty / Diversity) x (GEO Mobility / Presence)
+# Test 7: Joint TRX Novelty (new event_types) x GEO Mobility (geohash_4 unique regions) in T-1
 cohort["trx_tier"] = np.select(
     [
         cohort["trx_prev"] == 0,
-        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) == 0) & (cohort["et_unique_cells_prev"].fillna(0) <= 3),
-        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) == 0) & (cohort["et_unique_cells_prev"].fillna(0) >= 4),
-        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) >= 1),
+        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) == 0),
+        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) == 1),
+        (cohort["trx_prev"] > 0) & (cohort["et_new_cells_prev"].fillna(0) >= 2),
     ],
     [
         "T0_No_TRX_prev",
-        "T1_Routine_narrow_TRX (1-3 types, 0 new)",
-        "T2_Routine_broad_TRX (4+ types, 0 new)",
-        "T3_Expanding_TRX (Tried NEW event_type)",
+        "T1_0_new_type",
+        "T2_1_new_type",
+        "T3_2plus_new_types",
     ],
     default="other"
 )

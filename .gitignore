@@ -30,6 +30,14 @@ configs/*.local.json
 !/outputs/eda_insights_20261119/MBD_MINI_DEEP_INSIGHTS_DECK.pdf
 !/outputs/eda_insights_20261119/slides_clean/
 !/outputs/eda_insights_20261119/slides_clean/*.png
+!/outputs/baseline_moscow_v1/
+/outputs/baseline_moscow_v1/*
+!/outputs/baseline_moscow_v1/moscow_audit.json
+!/outputs/baseline_moscow_v1/ladder_manifest.json
+!/outputs/baseline_moscow_v1/metrics/
+!/outputs/baseline_moscow_v1/metrics/*.csv
+/.tmp/
+/.mbd-pdf-*/
 /.codex-remote-attachments/
 *.duckdb
 *.duckdb.wal

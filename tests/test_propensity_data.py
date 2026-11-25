@@ -250,7 +250,7 @@ class PreparationTests(unittest.TestCase):
         import pandas as pd
         import pyarrow.compute as pc
         root = Path(__file__).resolve().parents[1]
-        for filename in ('03_data_processing.ipynb',):
+        for filename in ('06_data_processing.ipynb',):
             with self.subTest(notebook=filename):
                 output = self.config.output_dir.parent / filename.removesuffix('.ipynb')
                 scope = dict(__name__=__name__, config=replace(self.config, output_dir=output),

@@ -6,13 +6,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, Polygon
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.backends.backend_pdf import PdfPages
 
-ROOT = Path(r"c:\Users\admin\Documents\Thực tập VSF\new propensity")
+ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "outputs/eda_insights_20261119"
 SLIDE_DIR = OUT_DIR / "slides_clean"
 SLIDE_DIR.mkdir(parents=True, exist_ok=True)
-PDF_PATH = OUT_DIR / "MBD_MINI_DEEP_INSIGHTS_DECK.pdf"
+PDF_PATH = ROOT / "MBD_MINI_DEEP_INSIGHTS_DECK.pdf"
 
 # Palette matched to the user's reference template
 NAVY = "#0f294a"
@@ -167,34 +168,45 @@ def build_deck():
     slides.append(fig)
 
     # =========================================================================
-    # SLIDE 2: B. VAI TRÒ CỦA TUỔI LỊCH SỬ (TENURE) & TỐC ĐỘ GIAO DỊCH (QUOTE 2A)
+    # SLIDE 2: B. TÁCH BẠCH TẦN SUẤT (TRX/THÁNG) VÀ SỐ THÁNG LỊCH SỬ (TENURE)
     # =========================================================================
     fig, bg = new_clean_slide(
-        "B. Hiệu ứng Tuổi lịch sử (Tenure): Cùng số giao dịch nhưng ý nghĩa trái ngược",
-        "Giải mã sai lầm khi chỉ dùng tổng số đếm tích lũy (trx_hist) mà bỏ qua số tháng quan sát"
+        "B. Tách bạch hai hiệu ứng: Tần suất giao dịch (TRX/tháng) × Số tháng lịch sử",
+        "Cố định nhóm 0 lần mua trước & 0 DIALOG ở T−1 để đo riêng tác động của Tần suất trung bình/tháng và Số tháng lịch sử"
     )
 
-    # Left chart: Same TRX 10-99 band across 3 Tenure bands (0 prior buys, no recent dialog)
-    ax1 = fig.add_axes([0.07, 0.25, 0.38, 0.49])
-    style_clean_ax(ax1, "Cùng 10–99 giao dịch theo Số tháng lịch sử")
-    t_labels = ["1 – 6 tháng", "7 – 12 tháng", "≥ 13 tháng"]
-    t_rates = [1.14, 0.70, 0.31]
-    t_cols = [TEAL, BLUE_MID, SLATE_LIGHT]
-    bars1 = ax1.bar(range(3), t_rates, color=t_cols, width=0.46)
-    for b, val in zip(bars1, t_rates):
-        ax1.text(b.get_x() + b.get_width() / 2, val + 0.04, f"{val:.2f}%", ha="center", va="bottom", fontsize=12, fontweight="bold", color=NAVY)
-    ax1.set_xticks(range(3))
-    ax1.set_xticklabels(t_labels, fontsize=11, fontweight="bold")
-    ax1.set_xlabel("Số tháng lịch sử quan sát trước cutoff", fontsize=10.5, color=SLATE_DARK, labelpad=8)
-    ax1.set_ylim(0, 1.48)
+    # Left chart: Two-way breakdown (Velocity TRX/month x Tenure 1-6m, 7-12m, >=13m)
+    ax1 = fig.add_axes([0.06, 0.25, 0.42, 0.49])
+    style_clean_ax(ax1, "Tỷ lệ mua theo Tần suất (TRX/tháng) × Số tháng lịch sử")
+    v_labels = ["≤ 2\nTRX/tháng", "2 – 5\nTRX/tháng", "5 – 10\nTRX/tháng", "10 – 25\nTRX/tháng", "> 25\nTRX/tháng"]
+    r_1_6 = [0.86, 1.08, 1.09, 1.42, 2.44]
+    r_7_12 = [0.47, 0.65, 0.98, 1.64, 1.97]
+    r_13p = [0.21, 0.34, 0.50, 0.81, 1.84]
+    xv = np.arange(5)
+    wv = 0.26
+    b_t1 = ax1.bar(xv - wv, r_1_6, width=wv, color=TEAL, label="1 – 6 tháng", zorder=3)
+    b_t2 = ax1.bar(xv, r_7_12, width=wv, color=BLUE_MID, label="7 – 12 tháng", zorder=3)
+    b_t3 = ax1.bar(xv + wv, r_13p, width=wv, color=SLATE_LIGHT, label="≥ 13 tháng", zorder=3)
+    for bars_set, col_txt, dx in [(b_t1, TEAL, -0.02), (b_t2, BLUE_DARK, 0.0), (b_t3, SLATE_DARK, 0.03)]:
+        for b in bars_set:
+            v = b.get_height()
+            ax1.text(
+                b.get_x() + b.get_width() / 2 + dx, v + 0.05, f"{v:.2f}%",
+                ha="center", va="bottom", fontsize=7.8, fontweight="bold", color=col_txt, zorder=5,
+                bbox=dict(boxstyle="round,pad=0.06", facecolor=WHITE, edgecolor="none", alpha=0.85)
+            )
+    ax1.set_xticks(xv)
+    ax1.set_xticklabels(v_labels, fontsize=9.8, fontweight="bold")
+    ax1.set_xlabel("Tần suất giao dịch trung bình mỗi tháng (trx_hist / history_age_months)", fontsize=10.2, color=SLATE_DARK, labelpad=8)
+    ax1.set_ylim(0, 2.85)
     ax1.set_ylabel("Tỷ lệ mua tháng tới (%)", fontsize=11, color=SLATE_DARK)
-    ax1.text(0.50, 0.88, "Cố định: 0 lần mua trước & Không có DIALOG ở T−1\nChênh lệch 3,7 lần cho cùng mức 10–99 TRX", transform=ax1.transAxes, ha="center", fontsize=10, color=SLATE_MID)
+    ax1.legend(title="Số tháng lịch sử:", title_fontsize=9.5, frameon=False, loc="upper left", fontsize=9.8)
     ax1.grid(axis="y", alpha=0.25, linestyle=":")
 
-    bg.plot([0.49, 0.49], [0.22, 0.77], color="#e2e8f0", linewidth=1.5)
+    bg.plot([0.51, 0.51], [0.22, 0.77], color="#e2e8f0", linewidth=1.5)
 
     # Right chart: Short-term TRX ratio (T-1 TRX / personal historical monthly mean)
-    ax2 = fig.add_axes([0.55, 0.25, 0.38, 0.49])
+    ax2 = fig.add_axes([0.56, 0.25, 0.38, 0.49])
     style_clean_ax(ax2, "Tỷ số Giao dịch tháng T−1 / Trung bình tháng trước đó")
     m_labels = [
         "0×\n(14,8%)",
@@ -210,16 +222,16 @@ def build_deck():
     for b, val in zip(bars2, m_rates):
         ax2.text(b.get_x() + b.get_width() / 2, val + 0.12, f"{val:.2f}%", ha="center", va="bottom", fontsize=11, fontweight="bold", color=NAVY)
     ax2.set_xticks(range(5))
-    ax2.set_xticklabels(m_labels, fontsize=10, fontweight="bold")
-    ax2.set_xlabel("Tỷ số TRX(T−1) / Trung bình tháng giai đoạn trước (kèm % tổng tệp)", fontsize=10.5, color=SLATE_DARK, labelpad=8)
+    ax2.set_xticklabels(m_labels, fontsize=9.8, fontweight="bold")
+    ax2.set_xlabel("Tỷ số TRX(T−1) / Trung bình tháng giai đoạn trước (kèm % tổng tệp)", fontsize=10.2, color=SLATE_DARK, labelpad=8)
     ax2.set_ylim(0, 5.1)
     ax2.set_ylabel("Tỷ lệ mua tháng tới (%)", fontsize=11, color=SLATE_DARK)
     ax2.grid(axis="y", alpha=0.25, linestyle=":")
 
     add_bottom_pill(
         bg,
-        "Cùng 10–99 giao dịch nhưng tích lũy trong 1–6 tháng có tỷ lệ mua 1,14%, còn rải rác trong ≥13 tháng chỉ đạt 0,31%.",
-        "Bắt buộc phải đưa Số tháng lịch sử (history_age_months), Trung bình TRX/tháng và Tỷ số TRX(T−1) / TB trước đó vào mô hình."
+        "Hai quy luật độc lập: (1) Cùng tuổi lịch sử, tần suất TRX/tháng càng dày thì tỷ lệ mua càng cao (từ 0,21% lên 2,44%).",
+        "(2) Cùng một mức TRX/tháng, khách mới 1–6 tháng vẫn mua cao gấp 2,0 – 4,1 lần khách ≥13 tháng chưa từng mua → Cần đưa cả TRX/tháng và Số tháng lịch sử."
     )
     slides.append(fig)
 
@@ -335,65 +347,119 @@ def build_deck():
     slides.append(fig)
 
     # =========================================================================
-    # SLIDE 5: E. ĐA NHÃN: ĐỒNG MUA CÙNG THÁNG & HÀNH TRÌNH BÁN CHÉO A -> B (QUOTE 4)
+    # SLIDE 5: E. ĐA NHÃN: HÀNH TRÌNH CHUYỂN TIẾP A -> B & ĐỒNG MUA CÙNG THÁNG (QUOTE 4)
     # =========================================================================
     fig, bg = new_clean_slide(
-        "E. Phân tích Đa nhãn: Đồng mua cùng tháng & Hành trình Bán chéo tuần tự (A → B)",
+        "E. Phân tích Đa nhãn: Hành trình Chuyển tiếp (A → B) & Đồng mua cùng tháng",
         "Ma trận chuyển tiếp từ lịch sử mua quá khứ sang tháng hiện tại (1.102.464 quan sát · 03/2022 – 01/2023)"
     )
 
-    # Left chart: 4x4 Sequential Lift Heatmap (A prior -> B next)
-    ax1 = fig.add_axes([0.07, 0.25, 0.38, 0.49])
-    lift_mat = np.array([
-        [3.20, 4.06, 3.07, 2.89],
-        [4.37, 63.33, 3.82, 2.67],
-        [1.98, 3.75, 3.35, 2.97],
-        [2.00, 2.40, 2.23, 14.42],
+    def _fmt_pct_vi(v):
+        return f"{v:.2f}%".replace(".", ",")
+
+    # Left chart: Clean 4x4 Conversion Rate (%) Heatmap — 1 color scale, Target 1-4 only
+    bg.text(0.045, 0.768, "Tỷ lệ mua Target B khi đã từng mua Target A (%)", fontsize=13.5, fontweight="bold", color=NAVY, ha="left", va="center")
+
+    ax1 = fig.add_axes([0.130, 0.240, 0.385, 0.445])
+    ax1.set_xlim(-0.52, 3.52)
+    ax1.set_ylim(3.52, -0.52)
+    ax1.set_aspect("equal")
+    ax1.axis("off")
+
+    prod_names = ["Target 1", "Target 2", "Target 3", "Target 4"]
+    rate_mat = np.array([
+        [1.40, 0.20, 1.18, 0.74],
+        [1.90, 3.13, 1.47, 0.68],
+        [0.86, 0.18, 1.29, 0.76],
+        [0.87, 0.12, 0.86, 3.69],
     ])
-    # Cap color scale at 8x so off-diagonal 2x-4.4x differences show clearly
-    im = ax1.imshow(np.minimum(lift_mat, 8.0), cmap="YlGnBu", vmin=1.0, vmax=8.0, aspect="auto")
-    ax1.set_title("Hệ số Lift mua sản phẩm B khi đã từng mua A", fontsize=13.5, fontweight="bold", color=NAVY, pad=12)
-    p_short = ["SP 1\n(Thẻ DN)", "SP 2\n(Tín dụng)", "SP 3\n(Chi lương)", "SP 4\n(POS)"]
-    ax1.set_xticks(range(4))
-    ax1.set_xticklabels(p_short, fontsize=10, fontweight="bold")
-    ax1.set_yticks(range(4))
-    ax1.set_yticklabels([f"Đã mua {x.splitlines()[0]}" for x in p_short], fontsize=10, fontweight="bold")
-    ax1.set_xlabel("Sản phẩm mua ở tháng tiếp theo (B)", fontsize=10.5, color=SLATE_DARK)
-    ax1.set_ylabel("Sản phẩm đã mua trước đó (A)", fontsize=10.5, color=SLATE_DARK)
+
+    # Top column headers (clean Target 1-4, no baseline text)
+    ax1.text(1.5, -0.88, "Mua tháng tới  →", fontsize=9.8, fontweight="bold", color=SLATE_MID, ha="center", va="center", clip_on=False)
+    for j, name in enumerate(prod_names):
+        ax1.text(j, -0.60, name, fontsize=10.8, fontweight="bold", color=NAVY, ha="center", va="center", clip_on=False)
+
+    # Left row headers (clean Target 1-4, no n= text)
+    ax1.text(-0.62, -0.60, "Đã mua trước ↓", fontsize=9.5, fontweight="bold", color=SLATE_MID, ha="right", va="center", clip_on=False)
+    for i, name in enumerate(prod_names):
+        ax1.text(-0.62, i, name, fontsize=10.8, fontweight="bold", color=NAVY, ha="right", va="center", clip_on=False)
+
+    # Single unified sequential color scale (1 palette for all 16 cells, matching deck Navy/Blue)
+    cmap_single = LinearSegmentedColormap.from_list(
+        "deck_blue", ["#f0f6ff", "#cfe2ff", "#8cbef8", "#3b82f6", "#1d4ed8", "#0f294a"]
+    )
+
     for i in range(4):
         for j in range(4):
-            val = lift_mat[i, j]
-            tag = " (Tái mua)" if i == j else " (Bán chéo)"
-            txt_col = WHITE if min(val, 8.0) > 4.5 else NAVY
-            ax1.text(j, i, f"{val:.1f}×\n{tag}", ha="center", va="center", fontsize=9.8, fontweight="bold", color=txt_col)
+            val = rate_mat[i, j]
+            norm_v = np.clip((val / 3.75) ** 0.68, 0.04, 1.0)
+            cell_col = cmap_single(norm_v)
+            txt_col = WHITE if norm_v > 0.56 else NAVY
 
-    bg.plot([0.48, 0.48], [0.22, 0.77], color="#e2e8f0", linewidth=1.5)
+            tile = FancyBboxPatch(
+                (j - 0.44, i - 0.44), 0.88, 0.88,
+                boxstyle="round,pad=0.01,rounding_size=0.08",
+                facecolor=cell_col, edgecolor=WHITE,
+                linewidth=0.8, zorder=2
+            )
+            ax1.add_patch(tile)
+            ax1.text(
+                j, i, _fmt_pct_vi(val),
+                ha="center", va="center",
+                fontsize=12.2, fontweight="bold", color=txt_col, zorder=3
+            )
 
-    # Right chart: Top same-month co-purchase pairs (647 multi-product customer-months = 5.03% of positive months)
-    ax2 = fig.add_axes([0.63, 0.25, 0.31, 0.49])
-    style_clean_ax(ax2, "Các cặp sản phẩm mua gộp cùng tháng (647 ca)")
+    # Clean single-scale gradient bar legend at bottom of left panel
+    cax = fig.add_axes([0.115, 0.193, 0.20, 0.014])
+    grad = np.linspace(0, 1, 256).reshape(1, -1)
+    cax.imshow(grad, aspect="auto", cmap=cmap_single)
+    for sp in cax.spines.values():
+        sp.set_edgecolor("#cbd5e1")
+        sp.set_linewidth(0.6)
+    cax.set_xticks([])
+    cax.set_yticks([])
+    bg.text(0.107, 0.200, "0,1%", fontsize=9.0, fontweight="bold", color=SLATE_MID, ha="right", va="center")
+    bg.text(0.323, 0.200, "3,7%", fontsize=9.0, fontweight="bold", color=NAVY, ha="left", va="center")
+    bg.text(0.362, 0.200, "(Đậm hơn = Tỷ lệ mua cao hơn)", fontsize=8.8, color=SLATE_MID, ha="left", va="center")
+
+    divider_x = 0.545
+    bg.plot([divider_x, divider_x], [0.185, 0.78], color="#e2e8f0", linewidth=1.5)
+
+    # Right chart: Clean 1-line Target 1-4 labels, NO redundant x-axis ticks/numbers
+    bg.text(divider_x + 0.030, 0.768, "Đồng mua gộp cùng tháng (647 ca)", fontsize=13.5, fontweight="bold", color=NAVY, ha="left", va="center")
+    ax2 = fig.add_axes([divider_x + 0.145, 0.235, 0.945 - (divider_x + 0.145), 0.495])
     pair_names = [
-        "SP 2 + SP 4\n(Tín dụng + POS)",
-        "SP 2 + SP 3\n(Tín dụng + Chi lương)",
-        "SP 1 + SP 2\n(Thẻ DN + Tín dụng)",
-        "SP 3 + SP 4\n(Chi lương + POS)",
-        "SP 1 + SP 4\n(Thẻ DN + POS)",
-        "SP 1 + SP 3\n(Thẻ DN + Chi lương)"
+        "Target 2 + Target 4",
+        "Target 2 + Target 3",
+        "Target 1 + Target 2",
+        "Target 3 + Target 4",
+        "Target 1 + Target 4",
+        "Target 1 + Target 3",
     ]
     pair_counts = [24, 32, 49, 131, 205, 263]
     bars2 = ax2.barh(range(6), pair_counts, color=[BLUE_LIGHT, BLUE_LIGHT, BLUE_MID, BLUE_MAIN, TEAL, NAVY], height=0.54)
     for b, cnt in zip(bars2, pair_counts):
-        ax2.text(cnt + 6, b.get_y() + b.get_height() / 2, f"{cnt} lượt", va="center", ha="left", fontsize=10.5, fontweight="bold", color=NAVY)
+        ax2.text(cnt + 7, b.get_y() + b.get_height() / 2, f"{cnt} lượt", va="center", ha="left", fontsize=10.8, fontweight="bold", color=NAVY)
     ax2.set_yticks(range(6))
-    ax2.set_yticklabels(pair_names, fontsize=9.8, fontweight="bold")
-    ax2.set_xlim(0, 320)
-    ax2.set_xlabel("Số lượt khách–tháng đồng mua", fontsize=10.5, color=SLATE_DARK)
-    ax2.grid(axis="x", alpha=0.25, linestyle=":")
+    ax2.set_yticklabels(pair_names, fontsize=10.8, fontweight="bold", color=SLATE_DARK)
+    ax2.set_xlim(0, 340)
+    for sp in ["top", "right", "bottom"]:
+        ax2.spines[sp].set_visible(False)
+    ax2.spines["left"].set_color(SLATE_LIGHT)
+    ax2.spines["left"].set_linewidth(1.0)
+    ax2.tick_params(axis="x", bottom=False, labelbottom=False)
+    ax2.tick_params(axis="y", length=0, pad=10)
+
+    bg.text(
+        divider_x + 0.030, 0.198,
+        "Chiếm 5,03% tổng số tháng mua hàng (647 / 12.854 ca mua).",
+        fontsize=9.8, color=SLATE_MID, style="italic", ha="left", va="center"
+    )
 
     add_bottom_pill(
         bg,
-        "Khách đã mua bất kỳ 1 sản phẩm nào đều có xác suất mua chéo sang sản phẩm khác cao gấp 2,0 – 4,4 lần (và tái mua gấp 3,2 – 63,3 lần).",
-        "Bộ ba Thẻ doanh nghiệp (SP 1) – Chi lương (SP 3) – POS (SP 4) liên kết chặt chẽ cả khi mua gộp cùng tháng lẫn mua nối tiếp."
+        "Khách đã từng mua trước đạt tỷ lệ chuyển sang Target 1, Target 3, Target 4 từ 0,68% – 1,90%.",
+        "Tái mua cao nhất ở Target 4 (3,69%) và Target 2 (3,13%); bộ ba Target 1 – Target 3 – Target 4 cũng dẫn đầu đồng mua cùng tháng (131–263 lượt)."
     )
     slides.append(fig)
 
@@ -468,12 +534,12 @@ def build_deck():
     # SLIDE 7: G. PHÁT HIỆN MỚI VỀ GEO & MỐI LIÊN HỆ ĐỘC LẬP TRX × GEO
     # =========================================================================
     fig, bg = new_clean_slide(
-        "G. Mối liên hệ TRX × GEO: Hai chiều mở rộng độc lập giúp phân tách người mua gấp 8,2 lần",
-        "Tương quan giữa tần suất/đa dạng TRX và số vùng GEO chỉ là r = 0,02 → Bổ sung thông tin không trùng lặp"
+        "G. Mối liên hệ TRX × GEO: Hai chiều mở rộng độc lập phân tách người mua gấp 10,6 lần",
+        "Tương quan giữa số mã TRX mới và số vùng GEO chỉ là r = 0,02 → Bổ sung thông tin không trùng lặp"
     )
 
     # Left chart: GEO spatial mobility in T-1 & Credit lift
-    ax1 = fig.add_axes([0.07, 0.25, 0.38, 0.49])
+    ax1 = fig.add_axes([0.06, 0.25, 0.38, 0.49])
     style_clean_ax(ax1, "Tỷ lệ mua theo Số vùng geohash_4 ở tháng T−1")
     g_labels = ["0 vùng\n(41,9%)", "1 vùng\n(10,5%)", "2 – 4 vùng\n(27,8%)", "5 – 9 vùng\n(15,1%)", "≥ 10 vùng\n(4,7%)"]
     g_rates = [0.95, 1.12, 1.26, 1.36, 1.44]
@@ -490,40 +556,45 @@ def build_deck():
     ax1.text(0.50, 0.88, "Lưu ý: Với SP 2 (Tín dụng), nhóm ≥10 vùng geohash_4\ncó tỷ lệ mua cao gấp 2,17 lần mức nền!", transform=ax1.transAxes, ha="center", fontsize=9.8, fontweight="bold", color=TEAL)
     ax1.grid(axis="y", alpha=0.25, linestyle=":")
 
-    bg.plot([0.49, 0.49], [0.22, 0.77], color="#e2e8f0", linewidth=1.5)
+    bg.plot([0.48, 0.48], [0.22, 0.77], color="#e2e8f0", linewidth=1.5)
 
-    # Right chart: Joint TRX Tier x GEO Tier interaction (TEST 7)
-    ax2 = fig.add_axes([0.54, 0.25, 0.39, 0.49])
-    style_clean_ax(ax2, "Tương tác Số loại TRX × Số vùng geohash_4 (ở T−1)")
+    # Right chart: Uniform TRX Novelty (new event_types) x GEO Tier interaction (100% cohort)
+    ax2 = fig.add_axes([0.53, 0.25, 0.42, 0.49])
+    style_clean_ax(ax2, "Tương tác Số mã TRX mới × Số vùng geohash_4 (ở T−1)")
     trx_tiers = [
-        "1 – 3 loại TRX\n(0 mã mới)",
-        "≥ 4 loại TRX\n(0 mã mới)",
-        "≥ 1 mã TRX mới\nở tháng T−1"
+        "0 TRX ở T−1\n(23,3%)",
+        "0 mã mới\n(66,3%)",
+        "1 mã mới\n(8,1%)",
+        "≥ 2 mã mới\n(2,3%)"
     ]
-    g0_vals = [0.42, 1.86, 2.54]
-    g1_vals = [0.55, 2.04, 2.93]
-    g2_vals = [0.60, 2.14, 3.44]
-    xt = np.arange(3)
-    w = 0.25
-    b_g0 = ax2.bar(xt - w, g0_vals, width=w, color=SLATE_LIGHT, label="0 vùng GEO")
-    b_g1 = ax2.bar(xt, g1_vals, width=w, color=BLUE_MID, label="1 – 3 vùng GEO")
-    b_g2 = ax2.bar(xt + w, g2_vals, width=w, color=TEAL, label="≥ 4 vùng GEO")
-    for bars_set, col_txt in [(b_g0, SLATE_MID), (b_g1, BLUE_MAIN), (b_g2, TEAL)]:
+    g0_vals = [0.61, 0.86, 1.88, 4.92]
+    g1_vals = [0.68, 1.10, 2.27, 5.36]
+    g2_vals = [0.78, 1.18, 2.53, 6.47]
+    xt = np.arange(4)
+    w = 0.26
+    b_g0 = ax2.bar(xt - w, g0_vals, width=w, color=SLATE_LIGHT, label="0 vùng GEO", zorder=3)
+    b_g1 = ax2.bar(xt, g1_vals, width=w, color=BLUE_MID, label="1 – 3 vùng GEO", zorder=3)
+    b_g2 = ax2.bar(xt + w, g2_vals, width=w, color=TEAL, label="≥ 4 vùng GEO", zorder=3)
+    for bars_set, col_txt, dx in [(b_g0, SLATE_DARK, -0.02), (b_g1, BLUE_DARK, 0.0), (b_g2, TEAL, 0.03)]:
         for b in bars_set:
             v = b.get_height()
-            ax2.text(b.get_x() + b.get_width() / 2, v + 0.08, f"{v:.2f}%", ha="center", va="bottom", fontsize=9.2, fontweight="bold", color=col_txt)
+            ax2.text(
+                b.get_x() + b.get_width() / 2 + dx, v + 0.12, f"{v:.2f}%",
+                ha="center", va="bottom", fontsize=8.3, fontweight="bold", color=col_txt, zorder=5,
+                bbox=dict(boxstyle="round,pad=0.06", facecolor=WHITE, edgecolor="none", alpha=0.85)
+            )
     ax2.set_xticks(xt)
-    ax2.set_xticklabels(trx_tiers, fontsize=10, fontweight="bold")
-    ax2.set_xlabel("Nhóm giao dịch TRX ở tháng T−1", fontsize=10.5, color=SLATE_DARK, labelpad=8)
-    ax2.set_ylim(0, 4.15)
+    ax2.set_xticklabels(trx_tiers, fontsize=9.8, fontweight="bold")
+    ax2.set_xlabel("Số mã event_type mới xuất hiện ở tháng T−1 (kèm % tệp)", fontsize=10.3, color=SLATE_DARK, labelpad=8)
+    ax2.set_ylim(0, 7.55)
     ax2.set_ylabel("Tỷ lệ mua tháng tới (%)", fontsize=11, color=SLATE_DARK)
-    ax2.legend(frameon=False, loc="upper left", fontsize=9.8)
+    ax2.legend(title="Số vùng geohash_4 ở T−1:", title_fontsize=9.5, frameon=False, loc="upper left", fontsize=9.8)
     ax2.grid(axis="y", alpha=0.25, linestyle=":")
 
     add_bottom_pill(
         bg,
-        "TRX đo độ đa dạng loại giao dịch, GEO đo số vùng địa lý hoạt động (hai chiều độc lập với tương quan chỉ r = 0,02).",
-        "Ở mọi nhóm TRX, khách có ≥4 vùng GEO đều mua cao hơn; kết hợp (≥1 mã TRX mới) × (≥4 vùng GEO) nâng tỷ lệ mua gấp 8,2 lần (0,42% → 3,44%)."
+        "TRX đo mức mở rộng mã giao dịch mới, GEO đo số vùng địa lý hoạt động (hai chiều độc lập với tương quan chỉ r = 0,02).",
+        "Ở cả 4 nhóm TRX, tỷ lệ mua tăng đơn điệu theo số vùng GEO; (≥2 mã TRX mới) × (≥4 vùng GEO) nâng tỷ lệ mua gấp 10,6 lần (0,61% → 6,47%)."
     )
     slides.append(fig)
 
@@ -547,11 +618,11 @@ def build_deck():
         ("1. Cơ chế chữ U\n& Nhóm '0 TRX'",
          "• 85,4% nhóm 0 TRX (72.304 dòng) chỉ mua 0,56%;\n  14,6% còn lại (3,4% có DIALOG + 11,2% mới có TRX) tạo 66,2% ca mua.\n• Ở 0 TRX: ≥1 DIALOG ở T−1 mua 9,41%; ≥4 vùng GEO mua 1,66%.",
          "• Giữ cờ riêng cho trạng thái '0 TRX' (không ép đơn điệu).\n• Tạo biến tương tác: (TRX = 0) × (DIALOG ở T−1) và\n  (TRX = 0) × (Số vùng geohash_4 hoạt động)."),
-        ("2. Số tháng lịch sử\n& Tỷ số TRX(T−1)",
-         "• Cùng 10–99 TRX nhưng lịch sử 1–6 tháng mua 1,14%,\n  còn lịch sử ≥13 tháng chỉ mua 0,31% (lệch 3,7 lần).\n• Tỷ số TRX(T−1)/TB trước >1,5× mua 1,88% vs <0,5× mua 0,75%.",
-         "• Bắt buộc đưa Số tháng lịch sử (history_age_months).\n• Chuẩn hóa tổng đếm thành Trung bình/tháng (trx / tenure)\n  và Tỷ số ngắn hạn (trx_T1 / prior_monthly_mean)."),
+        ("2. Tần suất TRX/tháng\n× Số tháng lịch sử",
+         "• Tần suất TRX/tháng tăng (≤2 → >25) nâng tỷ lệ mua 0,21% → 2,44%.\n• Cùng một tần suất TRX/tháng, nhóm 1–6 tháng vẫn mua cao gấp\n  2,0–4,1× nhóm ≥13 tháng. Tỷ số TRX(T−1)/TB >1,5× mua 1,88%.",
+         "• Đưa đồng thời Tần suất trung bình (trx_hist / history_age_months),\n  Số tháng lịch sử (history_age_months) và Tỷ số ngắn hạn\n  (trx_T1 / prior_monthly_mean) vào mô hình."),
         ("3. Số mã TRX mới\n× Số vùng GEO",
-         "• Có ≥2 mã event_type mới ở T−1 vọt lên 5,55% (4,87×).\n• TRX và GEO độc lập (r = 0,02); kết hợp (≥1 mã TRX mới)\n  × (≥4 vùng geohash_4) nâng tỷ lệ mua từ 0,42% → 3,44%.",
+         "• Có ≥2 mã event_type mới ở T−1 vọt lên 5,55% (4,87×).\n• TRX và GEO độc lập (r = 0,02); kết hợp (≥2 mã TRX mới)\n  × (≥4 vùng geohash_4) nâng tỷ lệ mua 0,61% → 6,47% (10,6×).",
          "• Tạo biến Số mã event_type mới xuất hiện ở tháng T−1\n  và Số mã event_type khác nhau (unique event_types).\n• Kết hợp Số vùng geohash_4 × Số mã event_type mới."),
         ("4. Tương tác DIALOG,\nDrift & Bán chéo",
          "• ≥1 DIALOG ở T−1 tăng tỷ lệ mua gấp 10,6–16,6× ở nhóm\n  (0 mua, 1–99 TRX) và đạt 5,00% ở nhóm (≥1 mua, ≥100 TRX).\n• Đã mua 1 SP tăng mua chéo 2,0–4,4×; 90% mức giảm 2022 là nội nhóm.",
@@ -569,8 +640,8 @@ def build_deck():
 
     add_bottom_pill(
         bg,
-        "Kết luận: Thay vì chỉ đếm tổng số sự kiện thô, bộ đặc trưng thế hệ mới cần đo 'Tốc độ theo tuổi lịch sử', 'Sự xuất hiện mã giao dịch mới',",
-        "'Độ mở rộng vùng GEO' và 'Tương tác Hội thoại gần' — giúp phân tách các phân khúc mua hàng chênh lệch từ 8 đến 45 lần."
+        "Kết luận: Thay vì chỉ đếm tổng số sự kiện thô, bộ đặc trưng thế hệ mới cần đo 'Tần suất TRX/tháng × Số tháng lịch sử', 'Số mã giao dịch mới',",
+        "'Số vùng GEO' và 'Tương tác Hội thoại ở T−1' — giúp phân tách các phân khúc mua hàng chênh lệch từ 10 đến 45 lần."
     )
     slides.append(fig)
 

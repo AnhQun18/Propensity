@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class PreparationNotebookTests(unittest.TestCase):
     def test_processing_notebook_structure_and_source_text(self):
-        self.check_notebook("03_data_processing.ipynb", "processing-")
+        self.check_notebook("06_data_processing.ipynb", "processing-")
 
     def check_notebook(self, filename, prefix):
         notebook = json.loads((ROOT / "notebooks" / filename).read_text(encoding="utf-8"))

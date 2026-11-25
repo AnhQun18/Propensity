@@ -1,0 +1,73 @@
+{
+  "status": "ready",
+  "completed_at": "2026-11-24T18:13:00.161190+00:00",
+  "elapsed_seconds": 7736.4,
+  "timezone": "Europe/Moscow (UTC+3)",
+  "seed": 42,
+  "train_months_val": [
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08"
+  ],
+  "val_months": [
+    "2022-09",
+    "2022-10"
+  ],
+  "train_months_test": [
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-09",
+    "2022-10"
+  ],
+  "test_months": [
+    "2022-11",
+    "2022-12",
+    "2023-01"
+  ],
+  "client_split_protocol": "5-fold disjoint client_id (fold != k train, fold == k eval -> 0% client overlap)",
+  "budget_fractions": [
+    0.005,
+    0.01,
+    0.05
+  ],
+  "primary_budget": 0.01,
+  "bootstrap_replicates": 1000,
+  "pca_dims": {
+    "all": 16,
+    "90d": 8,
+    "norms_cos": 3
+  },
+  "feature_counts": {
+    "none": 0,
+    "rule_target_lag": 3,
+    "rule_trx_rfm": 6,
+    "rfm_small": 8,
+    "trx": 63,
+    "trx_geo_meta": 81,
+    "trx_geo_full": 93,
+    "trx_geo_dialog_meta": 112,
+    "trx_geo_dialog_emb": 112,
+    "ref_plus_target_lag": 125
+  },
+  "calibration_info": {
+    "L5d_cb_dialog_emb_cal": {
+      "base_exp": "L5d_cb_dialog_emb",
+      "slope": 1.0,
+      "intercept": -0.10047307153440137,
+      "val_obs_rate": 0.00938397988505747,
+      "val_raw_pred_mean": 0.010324150786684133
+    },
+    "L5d_lgbm_dialog_emb_cal": {
+      "base_exp": "L5d_lgbm_dialog_emb",
+      "slope": 1.0,
+      "intercept": -0.28995215045623157,
+      "val_obs_rate": 0.00938397988505747,
+      "val_raw_pred_mean": 0.012265105777694983
+    }
+  }
+}

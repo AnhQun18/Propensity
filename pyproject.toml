@@ -17,12 +17,29 @@ dependencies = [
 [project.scripts]
 mbd-mini-eda = "mbd_mini_eda.cli:main"
 propensity-data = "propensity_data.cli:main"
+propensity-model = "propensity_model.cli:main"
+data-io = "data_io.__main__:main"
+data-profiler = "data_profiler.__main__:main"
+data-audit = "data_audit.__main__:main"
+eda-advanced = "eda_advanced.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mbd_mini_eda*", "propensity_data*"]
+include = [
+    "data_io*",
+    "data_profiler*",
+    "data_audit*",
+    "eda_advanced*",
+    "eda_report*",
+    "mbd_mini_eda*",
+    "propensity_data*",
+    "propensity_model*",
+]
 
 [project.optional-dependencies]
+duckdb = ["duckdb>=2.0,<3; python_version >= '3.11'"]
+excel = ["openpyxl>=3.1"]
+stats = ["scipy>=1.10", "scikit-learn>=1.7,<2"]
 eda = [
     "duckdb>=2.0,<3; python_version >= '3.11'",
     "matplotlib>=3.10",
@@ -37,6 +54,26 @@ supplement = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 prepare = ["duckdb>=2.0,<3; python_version >= '3.11'"]
 dev = ["build>=1.0"]
 notebook = [
+    "ipykernel>=6.0",
+    "nbformat>=5.0",
+    "nbclient>=0.10",
+]
+model = [
+    "catboost>=1.2",
+    "lightgbm>=4.5",
+    "xgboost>=3.0",
+    "scikit-learn>=1.7,<2",
+    "duckdb>=2.0,<3; python_version >= '3.11'",
+    "joblib>=1.4",
+    "psutil>=6.0",
+    "matplotlib>=3.10",
+]
+all = [
+    "duckdb>=2.0,<3; python_version >= '3.11'",
+    "matplotlib>=3.10",
+    "scipy>=1.10",
+    "scikit-learn>=1.7,<2",
+    "openpyxl>=3.1",
     "ipykernel>=6.0",
     "nbformat>=5.0",
     "nbclient>=0.10",

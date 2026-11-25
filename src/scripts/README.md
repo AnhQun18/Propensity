@@ -1,21 +1,25 @@
-# Script EDA và công cụ đối chiếu
+# Script phục vụ 2 báo cáo & chuẩn bị dữ liệu
 
-- `analyze_dataset_eda.py`: tổng hợp raw, khách–tháng, thống kê nhãn và CI theo khách;
-  dùng quy ước UTC cũ, giữ để đối chiếu với bảng/cache đã xuất.
-- `complete_report_eda.py` và `publish_report_eda.ps1`: workflow báo cáo UTC cũ; cần tính lại theo Moscow trước khi dùng làm kết quả hiện hành.
-- `build_eda_notebook.py`, `execute_eda_notebook.py`: workflow EDA cũ; chỉ dùng khi cần tái tạo kết quả cũ để đối chiếu. Notebook tạo ra không nằm trong bộ notebook hiện hành.
-- `build_eda_workflow_notebooks.py`: đồng bộ mã EDA từ `src/` vào các notebook
-  theo chủ đề và số thứ tự; xem [`notebooks/README.md`](../../notebooks/README.md).
-- `sync_preparation_notebook.py --check`: kiểm tra đồng bộ notebook 03 và 04, không chạy raw.
-- `execute_data_notebooks.py`: chạy phiên bản chuẩn bị hiện tại (notebook 03).
-- `validate_prepared_data.py`, `validate_eda.py`, `validate_dataset_eda.py`: kiểm tra dữ liệu/EDA.
-- `plot_customer_month_log_coverage.py`: độ phủ khách–tháng TRX/GEO/dialog.
-- `plot_source_presence_target.py`: tỷ lệ mua theo nguồn, CI bootstrap, n, tỷ trọng và Lift.
-- `plot_spearman_heatmap.py`: tương quan đặc trưng, dùng cohort từ `configs/eda_analysis.json`.
-- `audit_trx_zero_negative.py`, `check_trans_count_target_history.py`: audit số liệu nguồn.
-- `remove_retired_workflows.ps1`: công cụ của đợt dọn workflow cũ; không phải công cụ tự phát hiện file lỗi thời.
+## Báo cáo 1 (`MBD MINI UNDERSTANDING DATA.pdf`)
+- `analyze_dataset_eda.py`: tạo `customer_month_snapshots.parquet` và bảng tổng hợp cho Báo cáo 1.
+- `check_trans_count_target_history.py`: kiểm chứng `diff_trans_date` NaN gắn với `trans_count = 0` (Slide 4).
+- `audit_trx_nulls.py`, `audit_trx_outliers.py`: kiểm tra chất lượng, cặp null và ngoại lai lớn nhất TRX (Slides 8–9).
+- `extend_eda_geo_population.py`, `plot_geo_g4_concentration.py`: đa dạng ô `geohash_4` & tỷ lệ tập trung ô chính `70,6%` (Slide 13).
+- `analyze_full_population_temporal_eda.py`: dựng panel `all_customer_months.parquet` & bảng trước/sau tháng mua theo giờ Moscow (Slides 14, 18 & nền cho Báo cáo 2).
+- `plot_geo_purchase_event_study.py`: biểu đồ GEO & DIALOG quanh tháng mua (Slides 14, 18).
+- `plot_dialog_label_date_transition.py`: biểu đồ GEO & DIALOG quanh ngày ghi nhận nhãn `±30 ngày` Moscow (Slides 15, 19).
+- `plot_source_presence_target.py`: tỷ lệ mua theo sự có mặt nguồn GEO / DIALOG ở tháng `T-1` kèm CI bootstrap (Slide 23).
 
-Code vẽ từng ảnh nằm trong các thư mục `outputs/*_charts/`; xem
-[đánh giá phạm vi EDA](../../docs/eda_two_lists_audit_20261118.md). Các script baseline, fit mô hình,
-đánh giá mô hình và deck cũ đã được xóa. PCA/K-means hội thoại là khám phá EDA,
-không phải baseline propensity.
+*(Các script vẽ từng biểu đồ lẻ cho TRX, GEO, DIALOG của Báo cáo 1 nằm trong `outputs/trx_charts/`, `outputs/geo_charts/`, `outputs/dialog_charts/`, `outputs/repeat_purchase_review/` và được gọi trực tiếp từ notebooks `01`–`04`.)*
+
+## Báo cáo 2 (`MBD_MINI_DEEP_INSIGHTS_DECK.pdf`)
+- `complete_eda_figures_moscow.py`, `extend_eda_monthly_features.py`: tạo hồ sơ hàng tháng `event_type_monthly_profiles.parquet` và `geohash_4_monthly_profiles.parquet` (Slides F–G).
+- `audit_insights_checklist.py`: đối soát raw, tạo `segment_cards.csv` và `monthly_segment_cards.csv` (Slide D).
+- `explore_geo_trx_deep.py`: tính toán kiểm định `event_type` mới/đa dạng, `trx_surge_ratio`, `geohash_4` mobility, tương quan Spearman (`r = 0,02`) và ma trận `TRX × GEO` (Slides B, F, G).
+- `build_clean_presentation.py`: xuất 8 slide PNG và file `MBD_MINI_DEEP_INSIGHTS_DECK.pdf` tại thư mục gốc.
+
+## Notebook, Chuẩn bị dữ liệu & Baseline
+- `build_report_notebooks.py`: sinh lại 5 notebook báo cáo (`01`–`05`).
+- `build_baseline_notebooks.py`: sinh 2 notebook mô hình baseline (`08`–`09`).
+- `sync_preparation_notebook.py`: kiểm tra/đồng bộ mã thư viện nhúng trong notebook `06_data_processing.ipynb` và `07_merge_processed.ipynb`.
+- `validate_prepared_data.py`: kiểm tra đầu ra của quy trình chuẩn bị dữ liệu.
