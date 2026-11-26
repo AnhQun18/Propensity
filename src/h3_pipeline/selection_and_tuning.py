@@ -393,18 +393,16 @@ def tune_150_models_on_val(
 
             d_core = xgb.QuantileDMatrix(X_tr[~es_m], label=y_tr[~es_m])
             d_es = xgb.QuantileDMatrix(X_tr[es_m], label=y_tr[es_m], ref=d_core)
-            d_full = xgb.QuantileDMatrix(X_tr, label=y_tr)
             d_ev = xgb.QuantileDMatrix(X_ev, ref=d_core)
 
             p_core = Pool(X_tr[~es_m], y_tr[~es_m])
             p_es = Pool(X_tr[es_m], y_tr[es_m])
-            p_full = Pool(X_tr, y_tr)
             p_ev = Pool(X_ev)
 
             cache.append({
                 "month": ev_m, "fold": k, "cid": ev_sl["client_id"].to_numpy(), "y_ev": y_ev,
-                "d_core": d_core, "d_es": d_es, "d_full": d_full, "d_ev": d_ev,
-                "p_core": p_core, "p_es": p_es, "p_full": p_full, "p_ev": p_ev,
+                "d_core": d_core, "d_es": d_es, "d_ev": d_ev,
+                "p_core": p_core, "p_es": p_es, "p_ev": p_ev,
             })
             del X_tr, X_ev
         del df_tr, df_ev
@@ -435,9 +433,7 @@ def tune_150_models_on_val(
         }
         for item in cache:
             bst_es = xgb.train(p_base, item["d_core"], num_boost_round=1200, evals=[(item["d_es"], "es")], early_stopping_rounds=80, verbose_eval=False)
-            best_r = max(50, int(bst_es.best_iteration) + 1)
-            bst = xgb.train(p_base, item["d_full"], num_boost_round=best_r, verbose_eval=False)
-            sc = bst.predict(item["d_ev"]).astype(np.float64)
+            sc = bst_es.predict(item["d_ev"], iteration_range=(0, int(bst_es.best_iteration) + 1)).astype(np.float64)
             recs.append(pd.DataFrame({"client_id": item["cid"], "month": item["month"], "y_true": item["y_ev"], "score": sc}))
         qm = quick_point_summary(pd.concat(recs, ignore_index=True), tie_seed=seed)
         tune_rows.append({"family": "xgb_gpu", "name": cfg["name"], "cfg": cfg, "sec": round(time.perf_counter() - t1, 1), **qm})
@@ -465,10 +461,7 @@ def tune_150_models_on_val(
         for item in cache:
             cm_es = CatBoostClassifier(**kw)
             cm_es.fit(item["p_core"], eval_set=item["p_es"], early_stopping_rounds=80, use_best_model=True)
-            best_r = max(50, int(cm_es.get_best_iteration()) + 1)
-            cm_f = CatBoostClassifier(**{**kw, "iterations": best_r})
-            cm_f.fit(item["p_full"])
-            sc = cm_f.predict_proba(item["p_ev"])[:, 1].astype(np.float64)
+            sc = cm_es.predict_proba(item["p_ev"])[:, 1].astype(np.float64)
             recs.append(pd.DataFrame({"client_id": item["cid"], "month": item["month"], "y_true": item["y_ev"], "score": sc}))
         qm = quick_point_summary(pd.concat(recs, ignore_index=True), tie_seed=seed)
         tune_rows.append({"family": "catboost_gpu", "name": cfg["name"], "cfg": cfg, "sec": round(time.perf_counter() - t1, 1), **qm})
@@ -510,9 +503,9 @@ def tune_150_models_on_val(
         "best_cb_name": best_cb_row["name"],
         "cb_params": cb_params,
         "lgbm_params": {
-            "n_estimators": 1000, "learning_rate": 0.03, "num_leaves": 28,
-            "min_child_samples": 110, "colsample_bytree": 0.65, "subsample": 0.8,
-            "subsample_freq": 1, "reg_lambda": 35.0, "reg_alpha": 8.0, "es_rounds": 80,
+            "n_estimators": 700, "learning_rate": 0.04, "num_leaves": 28,
+            "min_child_samples": 110, "colsample_bytree": 0.5, "subsample": 0.8,
+            "subsample_freq": 1, "reg_lambda": 35.0, "reg_alpha": 8.0, "es_rounds": 50,
         },
         "logreg_params": {"C": 0.5, "max_iter": 250},
         "tune_elapsed_sec": round(time.perf_counter() - t0, 1),

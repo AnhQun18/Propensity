@@ -212,7 +212,7 @@ def main() -> None:
     seeds = [int(s) for s in args.seeds]
     model_specs = [
         ("M1_logreg_150", "logreg", locked_hp["logreg_params"], [int(spec["canonical_seed"])]),
-        ("M2_lgbm_150_tuned", "lgbm", locked_hp["lgbm_params"], seeds),
+        ("M2_lgbm_150_tuned", "lgbm", locked_hp["lgbm_params"], [int(spec["canonical_seed"])]),
         ("M3_xgb_gpu_150_tuned", "xgb_gpu", locked_hp["xgb_params"], seeds),
         ("M4_catboost_gpu_150_tuned", "catboost_gpu", locked_hp["cb_params"], seeds),
     ]
@@ -263,11 +263,21 @@ def main() -> None:
     print(f"[Stage 2C] Val-Locked Blend: {best_blend}", flush=True)
 
     val_preds["M5_final_blend_150"] = [
-        blend_3_models(val_preds["M4_catboost_gpu_150_tuned"][i], val_preds["M3_xgb_gpu_150_tuned"][i], val_preds["M2_lgbm_150_tuned"][i], **best_blend)
+        blend_3_models(
+            val_preds["M4_catboost_gpu_150_tuned"][i],
+            val_preds["M3_xgb_gpu_150_tuned"][i],
+            val_preds["M2_lgbm_150_tuned"][min(i, len(val_preds["M2_lgbm_150_tuned"]) - 1)],
+            **best_blend,
+        )
         for i in range(len(seeds))
     ]
     oot_preds["M5_final_blend_150"] = [
-        blend_3_models(oot_preds["M4_catboost_gpu_150_tuned"][i], oot_preds["M3_xgb_gpu_150_tuned"][i], oot_preds["M2_lgbm_150_tuned"][i], **best_blend)
+        blend_3_models(
+            oot_preds["M4_catboost_gpu_150_tuned"][i],
+            oot_preds["M3_xgb_gpu_150_tuned"][i],
+            oot_preds["M2_lgbm_150_tuned"][min(i, len(oot_preds["M2_lgbm_150_tuned"]) - 1)],
+            **best_blend,
+        )
         for i in range(len(seeds))
     ]
 
