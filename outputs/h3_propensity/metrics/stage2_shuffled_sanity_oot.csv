@@ -1,0 +1,2 @@
+model,macro_pr_auc,macro_roc_auc,macro_lift_1pct,macro_lift_5pct,macro_log_loss
+M3_xgb_gpu_150_tuned_shuffled_oot,0.024377778376786584,0.5141268744301353,2.0693006117404806,1.4171690657562208,0.10696223486689838

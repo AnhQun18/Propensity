@@ -59,6 +59,14 @@ configs/*.local.json
 /outputs/verification_audit/*
 !/outputs/verification_audit/*.csv
 !/outputs/verification_audit/*.json
+!/outputs/h3_propensity/
+/outputs/h3_propensity/*
+!/outputs/h3_propensity/figures/
+!/outputs/h3_propensity/figures/*.png
+!/outputs/h3_propensity/metrics/
+/outputs/h3_propensity/metrics/*
+!/outputs/h3_propensity/metrics/*.csv
+!/outputs/h3_propensity/metrics/*.json
 *.zip
 /.tmp/
 /.mbd-pdf-*/

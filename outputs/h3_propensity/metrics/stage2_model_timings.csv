@@ -1,0 +1,9 @@
+stage,exp_id,family,seed,n_features,val_sec,oot_sec,total_sec,use_gpu
+stage2_150,M1_logreg_150,logreg,42,150,90.67,62.8,153.47,True
+stage2_150,M2_lgbm_150_tuned,lgbm,42,150,1010.43,797.74,1808.17,True
+stage2_150,M3_xgb_gpu_150_tuned,xgb_gpu,42,150,320.9,233.56,554.46,True
+stage2_150,M3_xgb_gpu_150_tuned,xgb_gpu,142,150,332.41,233.99,566.4,True
+stage2_150,M3_xgb_gpu_150_tuned,xgb_gpu,242,150,313.56,237.71,551.27,True
+stage2_150,M4_catboost_gpu_150_tuned,catboost_gpu,42,150,415.06,225.94,641.0,True
+stage2_150,M4_catboost_gpu_150_tuned,catboost_gpu,142,150,414.09,226.89,640.98,True
+stage2_150,M4_catboost_gpu_150_tuned,catboost_gpu,242,150,405.93,227.94,633.87,True

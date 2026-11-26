@@ -1,0 +1,41 @@
+{
+  "best_xgb_name": "xgb_d5_l25_lr03",
+  "xgb_params": {
+    "max_depth": 5,
+    "min_child_weight": 60,
+    "reg_lambda": 25.0,
+    "reg_alpha": 5.0,
+    "colsample_bytree": 0.7,
+    "subsample": 0.8,
+    "learning_rate": 0.03,
+    "scale_pos_weight": 1.0,
+    "n_estimators": 1200,
+    "es_rounds": 80
+  },
+  "best_cb_name": "cb_d6_spw3",
+  "cb_params": {
+    "depth": 6,
+    "l2_leaf_reg": 30.0,
+    "learning_rate": 0.03,
+    "scale_pos_weight": 3.0,
+    "iterations": 1200,
+    "es_rounds": 80
+  },
+  "lgbm_params": {
+    "n_estimators": 700,
+    "learning_rate": 0.04,
+    "num_leaves": 28,
+    "min_child_samples": 110,
+    "colsample_bytree": 0.5,
+    "subsample": 0.8,
+    "subsample_freq": 1,
+    "reg_lambda": 35.0,
+    "reg_alpha": 8.0,
+    "es_rounds": 50
+  },
+  "logreg_params": {
+    "C": 0.5,
+    "max_iter": 250
+  },
+  "tune_elapsed_sec": 826.5
+}

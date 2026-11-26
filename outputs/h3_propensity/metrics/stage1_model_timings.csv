@@ -1,0 +1,12 @@
+stage,exp_id,family,seed,n_features,val_sec,oot_sec,total_sec,use_gpu
+stage1_baseline,B1_rule_prior_rfm,rule_prior_rfm,42,50,0.0,0.0,0.0,True
+stage1_baseline,B2_logreg_top50,logreg,42,50,0.0,0.0,0.0,True
+stage1_baseline,B3_lgbm_top50,lgbm,42,50,0.0,0.0,0.0,True
+stage1_baseline,B3_lgbm_top50,lgbm,142,50,0.0,0.0,0.0,True
+stage1_baseline,B3_lgbm_top50,lgbm,242,50,0.0,0.0,0.0,True
+stage1_baseline,B4_xgb_gpu_top50,xgb_gpu,42,50,0.0,0.0,0.0,True
+stage1_baseline,B4_xgb_gpu_top50,xgb_gpu,142,50,0.0,0.0,0.0,True
+stage1_baseline,B4_xgb_gpu_top50,xgb_gpu,242,50,0.0,0.0,0.0,True
+stage1_baseline,B5_catboost_gpu_top50,catboost_gpu,42,50,0.0,0.0,0.0,True
+stage1_baseline,B5_catboost_gpu_top50,catboost_gpu,142,50,0.0,0.0,0.0,True
+stage1_baseline,B5_catboost_gpu_top50,catboost_gpu,242,50,0.0,0.0,0.0,True
