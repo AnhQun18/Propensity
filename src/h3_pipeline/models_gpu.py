@@ -86,15 +86,57 @@ def fit_predict_h3_model(
         return rule_prior_rfm_scores(X_ev, feature_names), None
 
     if family == "logreg":
+        import gc
+
         c_val = float(ov.get("C", 1.0))
-        max_iter = int(ov.get("max_iter", 250))
-        pipe = Pipeline([
-            ("imputer", SimpleImputer(strategy="median", add_indicator=True, keep_empty_features=True)),
-            ("scaler", StandardScaler()),
-            ("clf", LogisticRegression(C=c_val, solver="lbfgs", max_iter=max_iter, random_state=seed)),
-        ])
-        pipe.fit(X_tr, y_tr)
-        return pipe.predict_proba(X_ev)[:, 1].astype(np.float64), None
+        max_iter = int(ov.get("max_iter", 200))
+        n_tr, n_p = X_tr.shape
+        nan_mask_tr = ~np.isfinite(X_tr)
+        nan_cols = np.flatnonzero(nan_mask_tr.any(axis=0))
+        n_ind = len(nan_cols)
+
+        medians = np.nanmedian(X_tr, axis=0).astype(np.float32)
+        medians = np.where(np.isfinite(medians), medians, np.float32(0.0))
+
+        X_tr_f = np.empty((n_tr, n_p + n_ind), dtype=np.float32)
+        X_tr_f[:, :n_p] = X_tr
+        for j in range(n_p):
+            mj = nan_mask_tr[:, j]
+            if np.any(mj):
+                X_tr_f[mj, j] = medians[j]
+        for idx_i, j in enumerate(nan_cols):
+            X_tr_f[:, n_p + idx_i] = nan_mask_tr[:, j].astype(np.float32)
+        del nan_mask_tr
+
+        means = X_tr_f.mean(axis=0, dtype=np.float64).astype(np.float32)
+        stds = X_tr_f.std(axis=0, dtype=np.float64).astype(np.float32)
+        stds = np.where(stds > 1e-7, stds, np.float32(1.0))
+        X_tr_f -= means
+        X_tr_f /= stds
+
+        clf = LogisticRegression(C=c_val, solver="lbfgs", tol=1e-3, max_iter=max_iter, random_state=seed)
+        clf.fit(X_tr_f, y_tr)
+        del X_tr_f
+        gc.collect()
+
+        n_ev = X_ev.shape[0]
+        nan_mask_ev = ~np.isfinite(X_ev)
+        X_ev_f = np.empty((n_ev, n_p + n_ind), dtype=np.float32)
+        X_ev_f[:, :n_p] = X_ev
+        for j in range(n_p):
+            mj = nan_mask_ev[:, j]
+            if np.any(mj):
+                X_ev_f[mj, j] = medians[j]
+        for idx_i, j in enumerate(nan_cols):
+            X_ev_f[:, n_p + idx_i] = nan_mask_ev[:, j].astype(np.float32)
+        del nan_mask_ev
+        X_ev_f -= means
+        X_ev_f /= stds
+
+        probs = clf.predict_proba(X_ev_f)[:, 1].astype(np.float64)
+        del X_ev_f, clf
+        gc.collect()
+        return probs, None
 
     has_es = es_mask is not None and int(np.sum(es_mask)) >= 100 and int(np.sum(~es_mask)) >= 100
     if has_es:

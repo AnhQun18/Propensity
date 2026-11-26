@@ -131,8 +131,11 @@ def run_pca_model_schedule(
                 "y_true": y_ev,
                 "score": sc.astype(np.float64),
             }))
-            del X_tr, X_ev
+            del X_tr, X_ev, sl_tr, sl_ev
+            gc.collect()
             tracker.step_done(f"{ev_m} f{k}", extra=f"best_n={best_n}" if best_n is not None else "")
+        del df_tr, df_ev
+        gc.collect()
 
     total_sec = tracker.finish()
     pdf = pd.concat(step_dfs, ignore_index=True).sort_values(["month", "client_id"]).reset_index(drop=True)
@@ -206,6 +209,12 @@ def main() -> None:
     emb_idx = list(locked_feat["emb_indices"])
     _sync_to_drive(out_dir, args.drive_save_dir)
 
+    # Free ~40% of panel RAM immediately by dropping unselected candidate columns
+    keep_panel_cols = list(dict.fromkeys(["client_id", "fold", "month", "y_h3"] + tab_cols))
+    panel = panel[keep_panel_cols].copy()
+    gc.collect()
+    print(f"[Stage 2] Pruned panel to locked cols: shape={panel.shape}", flush=True)
+
     locked_hp = tune_150_models_on_val(spec, panel, tab_cols, emb_idx, pca_dir, out_dir)
     _sync_to_drive(out_dir, args.drive_save_dir)
 
@@ -242,6 +251,8 @@ def main() -> None:
             })
         val_preds[exp_id] = v_list
         oot_preds[exp_id] = o_list
+        pd.DataFrame(timing_rows).to_csv(out_dir / "stage2_model_timings.csv", index=False)
+        _sync_to_drive(out_dir, args.drive_save_dir)
 
     # Tune Final Blend weights strictly on Val (seed=42) BEFORE evaluating OOT Blend
     best_blend = None
