@@ -568,35 +568,26 @@ def score_df(pdf: pd.DataFrame) -> dict[str, Any]:
 
 
 def get_val_candidates() -> list[dict[str, Any]]:
-    """Full Validation candidate matrix (LogReg, LGBM, XGB, CatBoost + scale_pos_weight)."""
+    """Streamlined main candidates for FE-v2 Validation screening (LGBM, LGBM+spw5, XGB, CatBoostTuned)."""
     return [
-        {"name": "logreg_c05", "family": "logreg", "C": 0.5},
         {"name": "lgbm_reg", "family": "lgbm", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
                         colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0)},
         {"name": "lgbm_spw5", "family": "lgbm", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
                         colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=5.0)},
-        {"name": "lgbm_spw15", "family": "lgbm", "es_rounds": 100,
-         "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
-                        colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=15.0)},
         {"name": "xgb_reg", "family": "xgb", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, max_depth=5, min_child_weight=50,
                         colsample_bytree=0.7, subsample=0.8, reg_lambda=25.0, reg_alpha=5.0)},
-        {"name": "xgb_spw5", "family": "xgb", "es_rounds": 100,
-         "params": dict(n_estimators=1500, learning_rate=0.03, max_depth=5, min_child_weight=50,
-                        colsample_bytree=0.7, subsample=0.8, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=5.0)},
         {"name": "cb_tuned", "family": "catboost", "es_rounds": 100,
          "params": dict(iterations=1500, learning_rate=0.03, depth=6, l2_leaf_reg=25.0)},
-        {"name": "cb_tuned_spw5", "family": "catboost", "es_rounds": 100,
-         "params": dict(iterations=1500, learning_rate=0.03, depth=6, l2_leaf_reg=35.0, scale_pos_weight=5.0)},
     ]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage", default="all", choices=["all", "val_only", "test_confirm"])
-    parser.add_argument("--val-seeds", default="", help="Comma-separated Val seeds; default 42,142,242 on GPU else 42")
+    parser.add_argument("--val-seeds", default="42", help="Comma-separated Val seeds (default 42 per streamlined agreement)")
     args = parser.parse_args()
     print(f"[FE-v2] Runtime hardware: USE_GPU={USE_GPU}", flush=True)
 
@@ -615,10 +606,7 @@ def main() -> None:
         print("\n=== [Stage B] Validation Main Model Screening + scale_pos_weight Check (Protocol B) ===", flush=True)
         val_rows = []
         val_preds: dict[str, dict[int, pd.DataFrame]] = {c["name"]: {} for c in cands}
-        if args.val_seeds.strip():
-            val_seeds = tuple(int(x) for x in args.val_seeds.split(",") if x.strip())
-        else:
-            val_seeds = (42, 142, 242) if USE_GPU else (42,)
+        val_seeds = tuple(int(x) for x in args.val_seeds.split(",") if x.strip()) or (42,)
         for cfg in cands:
             for s in val_seeds:
                 t0 = time.perf_counter()
