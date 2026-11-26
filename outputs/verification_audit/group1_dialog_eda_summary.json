@@ -1,0 +1,219 @@
+{
+  "elapsed_sec": 42.67,
+  "timing_checks": {
+    "same_vs_next": [
+      {
+        "has_call_m": 0,
+        "n_obs": 1032714,
+        "total_calls": 0.0,
+        "pos_m": 7824.0,
+        "p_buy_m": 0.00757615370760927,
+        "pos_m1": 9173.0,
+        "p_buy_m1": 0.008882420495897218,
+        "p_buy_m1_given_ym0": 0.008404804418035107,
+        "p_buy_m1_given_ym1": 0.07144683026584867,
+        "p_t1_m": 0.002770370112151089,
+        "p_t1_m1": 0.003593444070672035,
+        "p_t2_m": 0.00038732892165691565,
+        "p_t2_m1": 0.00042122020230189576,
+        "p_t3_m": 0.002980496052149966,
+        "p_t3_m1": 0.0031828754137157044,
+        "p_t4_m": 0.0017691248496679622,
+        "p_t4_m1": 0.0021148159122467594
+      },
+      {
+        "has_call_m": 1,
+        "n_obs": 69750,
+        "total_calls": 113628.0,
+        "pos_m": 4355.0,
+        "p_buy_m": 0.06243727598566308,
+        "pos_m1": 2640.0,
+        "p_buy_m1": 0.0378494623655914,
+        "p_buy_m1_given_ym0": 0.03576726049392155,
+        "p_buy_m1_given_ym1": 0.06911595866819747,
+        "p_t1_m": 0.03357706093189964,
+        "p_t1_m1": 0.01568458781362007,
+        "p_t2_m": 0.00217921146953405,
+        "p_t2_m1": 0.0015627240143369176,
+        "p_t3_m": 0.017734767025089606,
+        "p_t3_m1": 0.013863799283154121,
+        "p_t4_m": 0.013476702508960573,
+        "p_t4_m1": 0.009146953405017921
+      }
+    ],
+    "recency_buckets": [
+      {
+        "recency_bucket": "0-3d",
+        "n_obs": 10256,
+        "positives": 635.0,
+        "buy_rate": 0.06191497659906396
+      },
+      {
+        "recency_bucket": "4-7d",
+        "n_obs": 11448,
+        "positives": 562.0,
+        "buy_rate": 0.04909154437456324
+      },
+      {
+        "recency_bucket": "8-14d",
+        "n_obs": 16140,
+        "positives": 610.0,
+        "buy_rate": 0.037794299876084264
+      },
+      {
+        "recency_bucket": "15-30d",
+        "n_obs": 28244,
+        "positives": 636.0,
+        "buy_rate": 0.02251805693244583
+      },
+      {
+        "recency_bucket": ">30d",
+        "n_obs": 326933,
+        "positives": 4111.0,
+        "buy_rate": 0.012574441858117718
+      },
+      {
+        "recency_bucket": "no_prior_call",
+        "n_obs": 609219,
+        "positives": 3692.0,
+        "buy_rate": 0.006060218082495785
+      }
+    ],
+    "call_count_buckets": [
+      {
+        "call_bucket_m": "0",
+        "n_obs": 1032714,
+        "total_calls_m": 0.0,
+        "pos_m": 7824.0,
+        "p_buy_m": 0.00757615370760927,
+        "pos_m1": 9173.0,
+        "p_buy_m1": 0.008882420495897218
+      },
+      {
+        "call_bucket_m": "1",
+        "n_obs": 47314,
+        "total_calls_m": 47314.0,
+        "pos_m": 2139.0,
+        "p_buy_m": 0.04520860633216384,
+        "pos_m1": 1596.0,
+        "p_buy_m1": 0.0337320877541531
+      },
+      {
+        "call_bucket_m": "2",
+        "n_obs": 12912,
+        "total_calls_m": 25824.0,
+        "pos_m": 1042.0,
+        "p_buy_m": 0.0807001239157373,
+        "pos_m1": 518.0,
+        "p_buy_m1": 0.04011771995043371
+      },
+      {
+        "call_bucket_m": "3-5",
+        "n_obs": 8033,
+        "total_calls_m": 28424.0,
+        "pos_m": 917.0,
+        "p_buy_m": 0.11415411427860077,
+        "pos_m1": 419.0,
+        "p_buy_m1": 0.05215984065728868
+      },
+      {
+        "call_bucket_m": "6+",
+        "n_obs": 1491,
+        "total_calls_m": 12066.0,
+        "pos_m": 257.0,
+        "p_buy_m": 0.17236753856472167,
+        "pos_m1": 107.0,
+        "p_buy_m1": 0.07176391683433937
+      }
+    ]
+  },
+  "cluster_checks": {
+    "cluster_same_vs_next": [
+      {
+        "cluster": 0,
+        "n_client_months": 54881,
+        "pos_m": 3637.0,
+        "p_buy_m": 0.06627065833348518,
+        "pos_m1": 2127.0,
+        "p_buy_m1": 0.038756582423789654,
+        "same_to_next_ratio": 1.7099200752233192,
+        "total_calls": 154347,
+        "unique_clients": 41819,
+        "mean_emb_l2": 13.258260726928711
+      },
+      {
+        "cluster": 1,
+        "n_client_months": 3116,
+        "pos_m": 265.0,
+        "p_buy_m": 0.08504492939666239,
+        "pos_m1": 139.0,
+        "p_buy_m1": 0.04460847240051348,
+        "same_to_next_ratio": 1.9064748201438848,
+        "total_calls": 6097,
+        "unique_clients": 5299,
+        "mean_emb_l2": 6.039497375488281
+      },
+      {
+        "cluster": 2,
+        "n_client_months": 8570,
+        "pos_m": 668.0,
+        "p_buy_m": 0.0779463243873979,
+        "pos_m1": 330.0,
+        "p_buy_m1": 0.038506417736289385,
+        "same_to_next_ratio": 2.024242424242424,
+        "total_calls": 17811,
+        "unique_clients": 12845,
+        "mean_emb_l2": 7.3319926261901855
+      },
+      {
+        "cluster": 3,
+        "n_client_months": 12231,
+        "pos_m": 965.0,
+        "p_buy_m": 0.07889788242989126,
+        "pos_m1": 530.0,
+        "p_buy_m1": 0.04333251573869675,
+        "same_to_next_ratio": 1.8207547169811322,
+        "total_calls": 25977,
+        "unique_clients": 16875,
+        "mean_emb_l2": 9.502927780151367
+      },
+      {
+        "cluster": 4,
+        "n_client_months": 2883,
+        "pos_m": 217.0,
+        "p_buy_m": 0.07526881720430108,
+        "pos_m1": 118.0,
+        "p_buy_m1": 0.04092958723551856,
+        "same_to_next_ratio": 1.8389830508474576,
+        "total_calls": 5617,
+        "unique_clients": 4925,
+        "mean_emb_l2": 6.994625568389893
+      },
+      {
+        "cluster": 5,
+        "n_client_months": 3684,
+        "pos_m": 321.0,
+        "p_buy_m": 0.08713355048859935,
+        "pos_m1": 181.0,
+        "p_buy_m1": 0.0491313789359392,
+        "same_to_next_ratio": 1.7734806629834252,
+        "total_calls": 7356,
+        "unique_clients": 6185,
+        "mean_emb_l2": 6.53346586227417
+      }
+    ]
+  },
+  "norm_cosine_checks": {
+    "n_all_emb_rows": 393021,
+    "n_90d_emb_rows": 138038,
+    "corr_norm_all_vs_log1p_count": -0.11761471350171614,
+    "corr_norm_all_vs_raw_count": -0.08146790952835772,
+    "corr_norm_90d_vs_log1p_count": -0.10492738400999509,
+    "corr_cosine_vs_log1p_count_all": -0.09496445674765576,
+    "frac_90d_count_eq_all_count": 0.3276778857995624,
+    "frac_cosine_gt_09999_when_counts_eq": 1.0,
+    "buy_rate_corr_norm_all": -0.003491567467684481,
+    "buy_rate_corr_norm_90d": -0.00415031499113423,
+    "buy_rate_corr_cosine": 0.013031567495810406
+  }
+}

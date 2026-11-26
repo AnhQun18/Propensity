@@ -1,0 +1,16 @@
+{
+  "border_count": 128,
+  "loss_function": "Logloss",
+  "eval_metric": "Logloss",
+  "allow_writing_files": false,
+  "verbose": false,
+  "learning_rate": 0.03,
+  "depth": 6,
+  "l2_leaf_reg": 25.0,
+  "max_iterations": 1500,
+  "early_stopping_rounds": 100,
+  "median_best_iter_val": 432,
+  "selected_on": "val_protocol_b_macro_lift_1pct_then_pr_auc",
+  "val_macro_lift_1pct": 8.936806849865876,
+  "val_macro_pr_auc": 0.03738458548875023
+}

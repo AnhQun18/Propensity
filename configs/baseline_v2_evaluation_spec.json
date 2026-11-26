@@ -1,0 +1,291 @@
+{
+  "spec_id": "baseline_v2_monthly_rolling_ooc_v1",
+  "spec_version": "2.0.0",
+  "frozen_before_execution": true,
+  "created_date_local": "2026-11-25",
+  "objective": "Khung đánh giá Baseline v2 tách giao thức khỏi mô hình. Giao thức chính là B (Out-of-Client 5-fold × Rolling mở rộng theo từng tháng) nhằm mô phỏng đúng vận hành chiến dịch thực tế: mỗi tháng huấn luyện lại, chấm điểm khách hàng mới ở tháng kế tiếp với ngân sách K tính theo tháng (~1.003 cuộc gọi). Giao thức A (Flat theo giai đoạn) được giữ làm đối chiếu trực tiếp với hệ baseline v1.",
+  "data_contract": {
+    "default_panel_parquet": "outputs/baseline_moscow_v1/panel_moscow.parquet",
+    "timezone": "Europe/Moscow (UTC+3)",
+    "cutoff_rule": "event_time_msk = event_time_utc + 3h < YYYY-MM-01 00:00:00 MSK (= prev_month_end 21:00:00 UTC)",
+    "cumulative_trx_start": "2021-01-01 00:00:02 MSK (giữ nguyên lịch sử TRX sớm từ 2021, không cắt bỏ giai đoạn chưa có nhãn)",
+    "burn_in_months": ["2022-02", "2022-03"],
+    "burn_in_rationale": "2 tháng tối thiểu để cửa sổ 90d của GEO (bắt đầu 11/12/2021) đạt đủ độ phủ 90 ngày từ 2022-04 trở đi.",
+    "modeling_months": [
+      "2022-04", "2022-05", "2022-06", "2022-07", "2022-08",
+      "2022-09", "2022-10", "2022-11", "2022-12", "2023-01"
+    ],
+    "val_months": ["2022-09", "2022-10"],
+    "test_months": ["2022-11", "2022-12", "2023-01"],
+    "target_col": "y_any",
+    "fold_col": "fold",
+    "n_folds": 5,
+    "client_split_rule": "Train strictly on fold != k, evaluate strictly on fold == k (0% client overlap across all 5 folds and all rolling months)",
+    "resample_labels": false,
+    "forbidden_cols": [
+      "client_id",
+      "fold",
+      "month",
+      "cutoff_msk",
+      "y_any",
+      "target_1",
+      "target_2",
+      "target_3",
+      "target_4",
+      "prior_months_observed"
+    ],
+    "target_lag_prefix": "prior_"
+  },
+  "protocols": {
+    "primary": "B_rolling_ooc",
+    "reference": "A_flat_ooc",
+    "B_rolling_ooc": {
+      "description": "Mỗi tháng đánh giá m, huấn luyện lại mô hình trên toàn bộ tháng modeling từ 2022-04 đến m-1 (fold != k) và dự báo cho tháng m (fold == k).",
+      "val_schedule": [
+        {"eval_month": "2022-09", "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08"]},
+        {"eval_month": "2022-10", "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09"]}
+      ],
+      "test_schedule": [
+        {"eval_month": "2022-11", "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10"]},
+        {"eval_month": "2022-12", "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11"]},
+        {"eval_month": "2023-01", "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12"]}
+      ]
+    },
+    "A_flat_ooc": {
+      "description": "Giao thức đối chiếu khớp baseline v1: fit 1 lần cho toàn bộ giai đoạn rồi chấm các tháng eval.",
+      "val_schedule": [
+        {"eval_months": ["2022-09", "2022-10"], "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08"]}
+      ],
+      "test_schedule": [
+        {"eval_months": ["2022-11", "2022-12", "2023-01"], "train_months": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10"]}
+      ]
+    }
+  },
+  "evaluation": {
+    "seeds": [42, 142, 242],
+    "canonical_seed": 42,
+    "tie_break_seed": 42,
+    "primary_metrics": ["lift_1pct", "average_precision"],
+    "secondary_metrics": ["roc_auc", "recall_1pct", "precision_1pct", "hits_1pct", "lift_0p5pct", "lift_5pct", "log_loss", "brier"],
+    "budget_fractions": [0.005, 0.01, 0.05],
+    "primary_budget_fraction": 0.01,
+    "budget_rule": "Ngân sách K = ceil(0.01 * N_month) tính theo từng tháng (~1.003 cuộc gọi trên N = 100.224). Báo cáo từng tháng trước (kèm 95% CI), sau đó mới gộp Macro-Monthly Average (kèm 95% CI) và Pooled OOF đối chiếu.",
+    "bootstrap_replicates": 1000,
+    "bootstrap_cluster_col": "client_id",
+    "bootstrap_seed": 42,
+    "val_only_rule": "Mọi bước chọn siêu tham số, early stopping, ablation (T+G/T+D, tenure, blend), permutation importance và slice analysis chỉ chạy trên Val (2022-09..2022-10). Test (2022-11..2023-01) chỉ mở một lần sau khi đóng băng cấu hình.",
+    "l1_label_delay_caveat": "L1_rule_target_lag sử dụng prior_1m/3m/6m (nhãn m-1). Do kiểm chứng snapshot chưa xác nhận được SLA công bố nhãn tháng m-1 có sẵn trước cutoff tháng m (label_delay = 0 chỉ là giả định offline), L1 chỉ là mốc tham chiếu 'dùng nhãn quá khứ' chứ chưa phải baseline mặc định triển khai được."
+  },
+  "feature_sets": {
+    "none": [],
+    "rule_target_lag_3": [
+      "prior_1m_bought_any",
+      "prior_3m_buy_months",
+      "prior_6m_buy_months"
+    ],
+    "rule_trx_rfm_6": [
+      "trx_30d_event_count",
+      "trx_90d_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event"
+    ],
+    "raw_T_8": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_days_since_first_event",
+      "trx_all_has_event"
+    ],
+    "raw_TG_11": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_days_since_first_event",
+      "trx_all_has_event",
+      "geo_90d_has_event",
+      "geo_90d_event_count",
+      "geo_90d_days_since_last_event"
+    ],
+    "raw_TD_11": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_days_since_first_event",
+      "trx_all_has_event",
+      "dialog_90d_has_event",
+      "dialog_90d_event_count",
+      "dialog_90d_days_since_last_event"
+    ],
+    "raw_TGD_14": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_days_since_first_event",
+      "trx_all_has_event",
+      "geo_90d_has_event",
+      "geo_90d_event_count",
+      "geo_90d_days_since_last_event",
+      "dialog_90d_has_event",
+      "dialog_90d_event_count",
+      "dialog_90d_days_since_last_event"
+    ],
+    "raw_TGD_13_no_tenure": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_has_event",
+      "geo_90d_has_event",
+      "geo_90d_event_count",
+      "geo_90d_days_since_last_event",
+      "dialog_90d_has_event",
+      "dialog_90d_event_count",
+      "dialog_90d_days_since_last_event"
+    ],
+    "raw_TGD_14_cap_tenure_365d": [
+      "trx_30d_days_since_last_event",
+      "trx_90d_days_since_last_event",
+      "trx_30d_log1p_event_count",
+      "trx_90d_log1p_event_count",
+      "trx_30d_log1p_main_amount_abs_sum",
+      "trx_90d_log1p_main_amount_abs_sum",
+      "trx_all_days_since_first_event__cap365",
+      "trx_all_has_event",
+      "geo_90d_has_event",
+      "geo_90d_event_count",
+      "geo_90d_days_since_last_event",
+      "dialog_90d_has_event",
+      "dialog_90d_event_count",
+      "dialog_90d_days_since_last_event"
+    ]
+  },
+  "models": [
+    {
+      "exp_id": "L0_base_rate",
+      "role": "Sàn ngẫu nhiên theo từng tháng",
+      "question": "Ngẫu nhiên chọn K=1% (~1.003 khách/tháng) đạt mức nào?",
+      "family": "prevalence",
+      "feature_set": "none",
+      "uses_target_lag": false,
+      "is_probabilistic": true,
+      "stochastic_across_seeds": false,
+      "is_reference_only": false
+    },
+    {
+      "exp_id": "L2_rule_trx_rfm",
+      "role": "Luật RFM thuần TRX (không nhãn)",
+      "question": "Luật đơn giản có đủ chưa, và snapshot có sạch không?",
+      "family": "rule_trx_rfm",
+      "feature_set": "rule_trx_rfm_6",
+      "uses_target_lag": false,
+      "is_probabilistic": false,
+      "stochastic_across_seeds": false,
+      "is_reference_only": false
+    },
+    {
+      "exp_id": "B_logreg_T",
+      "role": "LogReg trên TRX (8 biến)",
+      "question": "Mốc tuyến tính chỉ dùng dữ liệu giao dịch đạt tới đâu?",
+      "family": "logreg",
+      "feature_set": "raw_T_8",
+      "uses_target_lag": false,
+      "is_probabilistic": true,
+      "stochastic_across_seeds": true,
+      "is_reference_only": false
+    },
+    {
+      "exp_id": "B_logreg_TGD",
+      "role": "LogReg trên TRX+GEO+DIALOG thô (14 biến)",
+      "question": "Ngưỡng tuyến tính đa nguồn mạnh nhất cần vượt là bao nhiêu?",
+      "family": "logreg",
+      "feature_set": "raw_TGD_14",
+      "uses_target_lag": false,
+      "is_probabilistic": true,
+      "stochastic_across_seeds": true,
+      "is_reference_only": false
+    },
+    {
+      "exp_id": "B_catboost_TGD_tuned",
+      "role": "CatBoost trên 14 biến thô, có tune nhẹ",
+      "question": "Mốc họ cây công bằng (lr, depth, l2_leaf_reg, early stopping trên Val) đạt bao nhiêu?",
+      "family": "catboost_tuned",
+      "feature_set": "raw_TGD_14",
+      "uses_target_lag": false,
+      "is_probabilistic": true,
+      "stochastic_across_seeds": true,
+      "is_reference_only": false
+    },
+    {
+      "exp_id": "L1_rule_target_lag",
+      "role": "Tham chiếu — dùng nhãn quá khứ (1/3/6m)",
+      "question": "Lịch sử mua trước đó xếp hạng đỉnh hẹp ra sao (chỉ hợp lệ triển khai nếu nhãn m-1 kịp có trước cutoff m)?",
+      "family": "rule_target_lag",
+      "feature_set": "rule_target_lag_3",
+      "uses_target_lag": true,
+      "is_probabilistic": false,
+      "stochastic_across_seeds": false,
+      "is_reference_only": true
+    }
+  ],
+  "catboost_tuning": {
+    "selection_metric": "macro_val_lift_1pct_then_pr_auc",
+    "max_iterations": 1500,
+    "early_stopping_rounds": 100,
+    "es_strategy": "internal_last_train_month_m_minus_1_fold_ne_k_then_refit_full_train_with_best_iter",
+    "grid": [
+      {"learning_rate": 0.03, "depth": 4, "l2_leaf_reg": 3.0},
+      {"learning_rate": 0.03, "depth": 4, "l2_leaf_reg": 10.0},
+      {"learning_rate": 0.03, "depth": 6, "l2_leaf_reg": 10.0},
+      {"learning_rate": 0.03, "depth": 6, "l2_leaf_reg": 25.0},
+      {"learning_rate": 0.05, "depth": 4, "l2_leaf_reg": 10.0},
+      {"learning_rate": 0.05, "depth": 4, "l2_leaf_reg": 25.0},
+      {"learning_rate": 0.05, "depth": 6, "l2_leaf_reg": 10.0},
+      {"learning_rate": 0.05, "depth": 6, "l2_leaf_reg": 25.0},
+      {"learning_rate": 0.08, "depth": 4, "l2_leaf_reg": 15.0}
+    ],
+    "fixed_params": {
+      "border_count": 128,
+      "loss_function": "Logloss",
+      "eval_metric": "PRAUC",
+      "allow_writing_files": false,
+      "verbose": false
+    }
+  },
+  "val_only_ablations": {
+    "source_ablations": [
+      {"exp_id": "Abl_logreg_TG", "family": "logreg", "feature_set": "raw_TG_11"},
+      {"exp_id": "Abl_logreg_TD", "family": "logreg", "feature_set": "raw_TD_11"},
+      {"exp_id": "Abl_catboost_TG", "family": "catboost_tuned", "feature_set": "raw_TG_11"},
+      {"exp_id": "Abl_catboost_TD", "family": "catboost_tuned", "feature_set": "raw_TD_11"}
+    ],
+    "tenure_ablations": [
+      {"exp_id": "Abl_logreg_TGD_no_tenure", "family": "logreg", "feature_set": "raw_TGD_13_no_tenure"},
+      {"exp_id": "Abl_logreg_TGD_cap365", "family": "logreg", "feature_set": "raw_TGD_14_cap_tenure_365d"},
+      {"exp_id": "Abl_catboost_TGD_no_tenure", "family": "catboost_tuned", "feature_set": "raw_TGD_13_no_tenure"},
+      {"exp_id": "Abl_catboost_TGD_cap365", "family": "catboost_tuned", "feature_set": "raw_TGD_14_cap_tenure_365d"}
+    ],
+    "ensemble_ablations": [
+      {"exp_id": "Abl_blend_prob_50_50", "method": "prob_linear", "weight_logreg": 0.50},
+      {"exp_id": "Abl_blend_prob_70_30", "method": "prob_linear", "weight_logreg": 0.70},
+      {"exp_id": "Abl_blend_prob_30_70", "method": "prob_linear", "weight_logreg": 0.30},
+      {"exp_id": "Abl_blend_rank_50_50", "method": "rank_pct", "weight_logreg": 0.50},
+      {"exp_id": "Abl_blend_logit_50_50", "method": "logit_linear", "weight_logreg": 0.50}
+    ]
+  }
+}

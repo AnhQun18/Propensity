@@ -1,0 +1,388 @@
+{
+  "spec_id": "fe_v1_ablation_preregistration_v1",
+  "spec_version": "1.0.0",
+  "frozen_before_execution": true,
+  "created_date_local": "2026-11-25",
+  "objective": "Đo lường định lượng đóng góp riêng biệt của (1) họ mô hình (LogReg -> CatBoost), (2) bổ sung nguồn dữ liệu mới ở mức thô (GEO + DIALOG), và (3) Feature Engineering vòng 1 (biến phái sinh đa cửa sổ, geohash, DIALOG embedding 768d PCA/norms/cosine) bằng cách đổi L5d_cb_dialog_emb thành FE-v1 và dựng hai baseline thô B-raw-T, B-raw-TGD.",
+  "data_contract": {
+    "panel_parquet": "outputs/baseline_moscow_v1/panel_moscow.parquet",
+    "dialog_embedding_npz": "outputs/baseline_moscow_v1/dialog_emb_moscow.npz",
+    "legacy_predictions_dir": "outputs/baseline_moscow_v1/predictions",
+    "output_dir": "outputs/fe_v1_ablation",
+    "rebuild_features": false,
+    "timezone": "Europe/Moscow (UTC+3)",
+    "burn_in_months": ["2022-02", "2022-03"],
+    "train_months_val": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08"],
+    "val_months": ["2022-09", "2022-10"],
+    "train_months_test": ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10"],
+    "test_months": ["2022-11", "2022-12", "2023-01"],
+    "target_col": "y_any",
+    "fold_col": "fold",
+    "n_folds": 5,
+    "client_split_rule": "Train strictly on fold != k, evaluate strictly on fold == k (0% client overlap across all 5 folds)",
+    "forbidden_cols": [
+      "client_id",
+      "fold",
+      "month",
+      "cutoff_msk",
+      "y_any",
+      "target_1",
+      "target_2",
+      "target_3",
+      "target_4",
+      "prior_months_observed"
+    ],
+    "target_lag_prefix": "prior_"
+  },
+  "design_decisions_locked": {
+    "geo_dialog_raw_window": "90d",
+    "geo_dialog_raw_window_rationale": "Cửa sổ 90d có độ rộng cố định 90 ngày đồng nhất trên mọi tháng từ 2022-04 đến 2023-01 (nhờ burn-in 02-03/2022 sau mốc GEO bắt đầu 11/12/2021), tránh hiện tượng event_count tích lũy phình dần theo thời gian như cửa sổ all khi không được phép dùng biến tỷ lệ chuẩn hóa theo tenure.",
+    "include_cold_start_in_B_raw_TGD": false,
+    "cold_start_rationale": "Không đưa cold_start vào B-raw-TGD vì cold_start là biến cờ tổng hợp liên nguồn trên toàn lịch sử (trx_all=0 & geo_all=0 & dialog_all=0). Loại cold_start giữ cho B-raw-TGD thuần túy ghép cột thô độc lập của từng nguồn (8 + 3 + 3 = 14 biến), đẩy toàn bộ biến tổng hợp liên nguồn về nhánh FE.",
+    "run_logreg_for_B_raw_TGD": true,
+    "logreg_B_raw_TGD_rationale": "Chạy thêm B-raw-TGD_logreg (cùng pipeline SimpleImputer median + missing indicator + StandardScaler + L2 LogisticRegression C=1.0 như L3) với vai trò mô hình đối chứng phụ để hoàn thiện bảng 2x2 (Họ mô hình LogReg/CatBoost x Nguồn TRX/TRX+GEO+DIALOG thô), nhưng KHÔNG đưa vào họ kiểm định chính 7 cặp để không làm loãng hiệu chỉnh Holm-Bonferroni.",
+    "fe_v1_rename_rule": "L5d_cb_dialog_emb ở seed=42 của vòng trước được đổi tên thành FE-v1 (copy/alias trực tiếp dự báo và cập nhật manifest, không chạy lại seed=42). Hai seed bổ sung (142, 242) được chạy trên cùng ma trận đặc trưng đã đóng băng (PCA Stage 0 seed=42+k cố định) để đo đúng độ lệch chuẩn huấn luyện mô hình giữa 3 seed.",
+    "post_selection_disclosure": "FE-v1 (tức L5d_cb_dialog_emb) được chọn làm mốc chuẩn sau khi tập Locked Test (2022-11..2023-01) đã được xem ở vòng baseline_moscow_v1. Do đó mọi suy diễn trên Test đối với FE-v1 phải ghi nhận rủi ro post-selection optimism và đối chiếu song song với tập Validation (2022-09..2022-10)."
+  },
+  "protocol": {
+    "seeds": [42, 142, 242],
+    "canonical_seed": 42,
+    "tie_break_seed": 42,
+    "catboost_default_params": {
+      "iterations": 500,
+      "thread_count": 4,
+      "border_count": 128,
+      "used_ram_limit": "1.5gb",
+      "loss_function": "Logloss",
+      "verbose": false,
+      "allow_writing_files": false
+    },
+    "logreg_default_params": {
+      "imputer_strategy": "median",
+      "imputer_add_indicator": true,
+      "scaler": "StandardScaler",
+      "C": 1.0,
+      "solver": "lbfgs",
+      "max_iter": 300
+    },
+    "fold_aggregation_primary": "pooled_oof_5folds (gộp điểm dự báo out-of-fold của 5 mô hình fold tách rời để xếp hạng chung trên 100% khách hàng mỗi kỳ, khớp tuyệt đối với vòng trước)",
+    "fold_aggregation_secondary": "per_fold_mean_sd (tính metric riêng từng fold k=0..4 rồi lấy trung bình ± SD để kiểm tra độ lệch thang điểm giữa các fold)",
+    "primary_budget_k": 0.01,
+    "reported_budgets": [0.01, 0.05, 0.10],
+    "curve_budgets_pct": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    "primary_metric": "average_precision",
+    "operational_budget_metric": "lift_1pct",
+    "bootstrap_replicates": 1000,
+    "bootstrap_cluster_col": "client_id",
+    "bootstrap_seed": 42,
+    "multi_seed_paired_estimator": "Trong mỗi lượt bootstrap b (cùng vector trọng số cụm khách hàng w^(b)), tính trung bình chênh lệch metric qua S=3 seeds: Delta^(b) = mean_{s in seeds} [M(B_s, w^(b)) - M(A_s, w^(b))], bảo đảm ước lượng điểm khớp chính xác Mean(B) - Mean(A) mà không trộn xác suất dự báo thành ensemble.",
+    "multiple_testing_correction": "Holm-Bonferroni step-down (alpha = 0.05) trên toàn bộ M = 7 cặp kiểm định chính của Bước 3."
+  },
+  "practical_significance_thresholds": {
+    "primary_metric_name": "PR-AUC (Average Precision)",
+    "min_relative_delta_pr_auc": 0.05,
+    "min_absolute_delta_pr_auc": 0.001,
+    "operational_metric_name": "Lift@1% (tại ngân sách chiến dịch K = 1%)",
+    "min_absolute_delta_lift_1pct": 0.30,
+    "alpha_holm": 0.05
+  },
+  "models": [
+    {
+      "exp_id": "L0_base_rate",
+      "legacy_exp_id": "L0_base_rate",
+      "role": "Mốc sàn ngẫu nhiên (Prevalence floor)",
+      "in_main_table": true,
+      "family": "prevalence",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": false,
+      "n_features": 0,
+      "features": []
+    },
+    {
+      "exp_id": "L1_rule_target_lag",
+      "legacy_exp_id": "L1_rule_target_lag",
+      "role": "Luật nghiệp vụ Target-Lag (có dùng lịch sử nhãn mua 1/3/6m)",
+      "in_main_table": true,
+      "family": "rule_target_lag",
+      "is_probabilistic": false,
+      "uses_target_lag": true,
+      "uses_emb": false,
+      "stochastic_across_seeds": false,
+      "n_features": 3,
+      "features": [
+        "prior_1m_bought_any",
+        "prior_3m_buy_months",
+        "prior_6m_buy_months"
+      ]
+    },
+    {
+      "exp_id": "L2_rule_trx_rfm",
+      "legacy_exp_id": "L2_rule_trx_rfm",
+      "role": "Luật nghiệp vụ RFM thuần TRX (không dùng nhãn)",
+      "in_main_table": true,
+      "family": "rule_trx_rfm",
+      "is_probabilistic": false,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": false,
+      "n_features": 6,
+      "features": [
+        "trx_30d_event_count",
+        "trx_90d_event_count",
+        "trx_30d_log1p_main_amount_abs_sum",
+        "trx_90d_log1p_main_amount_abs_sum",
+        "trx_30d_days_since_last_event",
+        "trx_90d_days_since_last_event"
+      ]
+    },
+    {
+      "exp_id": "L3_logreg_rfm",
+      "legacy_exp_id": "L3_logreg_rfm",
+      "role": "Baseline tuyến tính LogReg L2 trên 8 biến TRX nhỏ",
+      "in_main_table": true,
+      "family": "logreg",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 8,
+      "features": [
+        "trx_30d_days_since_last_event",
+        "trx_90d_days_since_last_event",
+        "trx_30d_log1p_event_count",
+        "trx_90d_log1p_event_count",
+        "trx_30d_log1p_main_amount_abs_sum",
+        "trx_90d_log1p_main_amount_abs_sum",
+        "trx_all_days_since_first_event",
+        "trx_all_has_event"
+      ]
+    },
+    {
+      "exp_id": "B-raw-T",
+      "legacy_exp_id": null,
+      "role": "Baseline GBDT thô chỉ TRX (CatBoost mặc định trên đúng 8 biến của L3, giữ NaN)",
+      "in_main_table": true,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 8,
+      "features": [
+        "trx_30d_days_since_last_event",
+        "trx_90d_days_since_last_event",
+        "trx_30d_log1p_event_count",
+        "trx_90d_log1p_event_count",
+        "trx_30d_log1p_main_amount_abs_sum",
+        "trx_90d_log1p_main_amount_abs_sum",
+        "trx_all_days_since_first_event",
+        "trx_all_has_event"
+      ]
+    },
+    {
+      "exp_id": "B-raw-TGD",
+      "legacy_exp_id": null,
+      "role": "Baseline GBDT thô 3 nguồn TRX+GEO+DIALOG (CatBoost mặc định, 14 biến thô, không cold_start, giữ NaN)",
+      "in_main_table": true,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 14,
+      "features": [
+        "trx_30d_days_since_last_event",
+        "trx_90d_days_since_last_event",
+        "trx_30d_log1p_event_count",
+        "trx_90d_log1p_event_count",
+        "trx_30d_log1p_main_amount_abs_sum",
+        "trx_90d_log1p_main_amount_abs_sum",
+        "trx_all_days_since_first_event",
+        "trx_all_has_event",
+        "geo_90d_has_event",
+        "geo_90d_event_count",
+        "geo_90d_days_since_last_event",
+        "dialog_90d_has_event",
+        "dialog_90d_event_count",
+        "dialog_90d_days_since_last_event"
+      ]
+    },
+    {
+      "exp_id": "B-raw-TGD_logreg",
+      "legacy_exp_id": null,
+      "role": "Mô hình đối chứng phụ: LogReg L2 trên đúng 14 biến thô của B-raw-TGD (hoàn thiện bảng 2x2)",
+      "in_main_table": false,
+      "family": "logreg",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 14,
+      "features": [
+        "trx_30d_days_since_last_event",
+        "trx_90d_days_since_last_event",
+        "trx_30d_log1p_event_count",
+        "trx_90d_log1p_event_count",
+        "trx_30d_log1p_main_amount_abs_sum",
+        "trx_90d_log1p_main_amount_abs_sum",
+        "trx_all_days_since_first_event",
+        "trx_all_has_event",
+        "geo_90d_has_event",
+        "geo_90d_event_count",
+        "geo_90d_days_since_last_event",
+        "dialog_90d_has_event",
+        "dialog_90d_event_count",
+        "dialog_90d_days_since_last_event"
+      ]
+    },
+    {
+      "exp_id": "L4_cb",
+      "legacy_exp_id": "L4_cb_trx",
+      "role": "Bậc trung gian: CatBoost mặc định trên toàn bộ 63 biến TRX đã qua Feature Engineering",
+      "in_main_table": true,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 63,
+      "feature_selector": "all_trx_63"
+    },
+    {
+      "exp_id": "M_deriv_cb",
+      "legacy_exp_id": null,
+      "role": "Bậc trung gian phân rã thứ cấp: CatBoost trên 100 biến phái sinh bảng 3 nguồn (TRX 63 + GEO meta 18 + DIALOG meta 18 + cold_start 1, chưa có geohash và embedding)",
+      "in_main_table": false,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 100,
+      "feature_selector": "trx_63_plus_geo_meta_18_plus_dialog_meta_18_plus_cold_start_1"
+    },
+    {
+      "exp_id": "L5c_cb",
+      "legacy_exp_id": "L5c_cb_dialog_meta",
+      "role": "Bậc trung gian giữ lại từ vòng trước: CatBoost trên 112 biến (M_deriv_cb + 12 biến geohash, chưa có embedding)",
+      "in_main_table": true,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": false,
+      "stochastic_across_seeds": true,
+      "n_features": 112,
+      "feature_selector": "trx_63_plus_geo_meta_18_plus_geo_geohash_12_plus_dialog_meta_18_plus_cold_start_1"
+    },
+    {
+      "exp_id": "FE-v1",
+      "legacy_exp_id": "L5d_cb_dialog_emb",
+      "role": "Mốc chuẩn Feature Engineering vòng 1 (đổi tên từ L5d_cb_dialog_emb, 139 biến = 112 biến bảng/geohash + 27 biến DIALOG embedding PCA/norms/cosine)",
+      "in_main_table": true,
+      "family": "catboost",
+      "is_probabilistic": true,
+      "uses_target_lag": false,
+      "uses_emb": true,
+      "stochastic_across_seeds": true,
+      "n_features": 139,
+      "feature_selector": "L5c_cb_112_plus_dialog_emb_pca_27"
+    }
+  ],
+  "primary_holm_comparisons": [
+    {
+      "pair_id": "C1",
+      "model_b": "B-raw-T",
+      "model_a": "L3_logreg_rfm",
+      "question": "Chỉ đổi họ mô hình (LogReg sang CatBoost mặc định), giữ nguyên 8 biến TRX"
+    },
+    {
+      "pair_id": "C2",
+      "model_b": "L4_cb",
+      "model_a": "B-raw-T",
+      "question": "Feature engineering trên riêng TRX (từ 8 biến lên 63 biến, cùng CatBoost)"
+    },
+    {
+      "pair_id": "C3",
+      "model_b": "B-raw-TGD",
+      "model_a": "B-raw-T",
+      "question": "Thêm hai nguồn mới GEO và DIALOG ở mức thô (từ 8 biến lên 14 biến, cùng CatBoost)"
+    },
+    {
+      "pair_id": "C4",
+      "model_b": "FE-v1",
+      "model_a": "B-raw-TGD",
+      "question": "Đóng góp tổng của Feature Engineering đa nguồn (biến phái sinh đa cửa sổ, geohash và DIALOG embedding: 14 lên 139 biến)"
+    },
+    {
+      "pair_id": "C5",
+      "model_b": "FE-v1",
+      "model_a": "L4_cb",
+      "question": "Đóng góp tổng của hai nguồn GEO và DIALOG (gồm cả dữ liệu nguồn + FE đa nguồn: 63 lên 139 biến)"
+    },
+    {
+      "pair_id": "C6a",
+      "model_b": "FE-v1",
+      "model_a": "L1_rule_target_lag",
+      "question": "FE-v1 (thuần hành vi, không dùng nhãn) có vượt luật Target-Lag (L1, có dùng nhãn quá khứ) tại ngân sách K không?"
+    },
+    {
+      "pair_id": "C6b",
+      "model_b": "FE-v1",
+      "model_a": "L2_rule_trx_rfm",
+      "question": "FE-v1 có vượt luật RFM thuần giao dịch (L2, không dùng nhãn) tại ngân sách K không?"
+    }
+  ],
+  "future_reserved_comparisons": [
+    {
+      "pair_id": "C7_future",
+      "model_b": "FE-v2",
+      "model_a": "FE-v1",
+      "question": "Cải tiến Feature Engineering vòng 2 (về sau) có vượt đáng kể FE-v1 không?"
+    }
+  ],
+  "secondary_conditional_decomposition": {
+    "trigger_condition": "Chỉ diễn giải chính thức khi C4 (FE-v1 vs B-raw-TGD) vượt ngưỡng ý nghĩa thực tế (Delta PR-AUC_rel >= +5% và >= +0.0010) VÀ có p_Holm < 0.05 ở họ kiểm định chính.",
+    "correction": "Holm-Bonferroni bậc 2 trên 3 thành phần cộng tính khép kín",
+    "pairs": [
+      {
+        "pair_id": "D1",
+        "model_b": "M_deriv_cb",
+        "model_a": "B-raw-TGD",
+        "question": "Thành phần 1: Biến phái sinh bảng đa cửa sổ (30d/90d/all, tỷ lệ, liên cửa sổ, cold_start: 14 -> 100 biến)"
+      },
+      {
+        "pair_id": "D2",
+        "model_b": "L5c_cb",
+        "model_a": "M_deriv_cb",
+        "question": "Thành phần 2: Nội dung không gian geohash_4/5/6 và độ tập trung (100 -> 112 biến)"
+      },
+      {
+        "pair_id": "D3",
+        "model_b": "FE-v1",
+        "model_a": "L5c_cb",
+        "question": "Thành phần 3: Nội dung ngữ nghĩa DIALOG embedding 768d (PCA 16+8, L2 norms, cosine topic-shift: 112 -> 139 biến)"
+      }
+    ]
+  },
+  "auxiliary_2x2_comparisons": [
+    {
+      "pair_id": "A1",
+      "model_b": "B-raw-TGD_logreg",
+      "model_a": "L3_logreg_rfm",
+      "question": "Thêm GEO và DIALOG thô trên họ mô hình tuyến tính LogReg (8 -> 14 biến)"
+    },
+    {
+      "pair_id": "A2",
+      "model_b": "B-raw-TGD",
+      "model_a": "B-raw-TGD_logreg",
+      "question": "Đổi họ mô hình từ LogReg sang CatBoost trên cùng 14 biến thô 3 nguồn"
+    }
+  ],
+  "decision_rules_step7": {
+    "R1_fe_v1_value_high": "Nếu C4 (FE-v1 vs B-raw-TGD) đạt Delta PR-AUC_rel >= +5% (và Delta PR-AUC >= +0.0010) VÀ p_Holm < 0.05: kết luận Feature Engineering vòng 1 tạo giá trị thực chất vượt lên trên việc chỉ ghép nguồn thô; tiến hành đọc bảng phân rã D1/D2/D3 (biến phái sinh, geohash, embedding) để xác định thành phần gánh hiệu quả chính.",
+    "R2_fe_v1_value_low": "Nếu C4 có chênh lệch dưới ngưỡng thực tế HOẶC p_Holm >= 0.05: kết luận phần lớn lợi ích đến từ bản thân việc mở rộng nguồn dữ liệu (GEO + DIALOG), còn độ phức tạp 125 biến FE chưa xứng đáng; cần lược giản mạnh tập biến trước khi phát triển tiếp.",
+    "R3_rule_sanity_at_budget_k": "Nếu B-raw-TGD hoặc L4_cb thấp hơn L2_rule_trx_rfm (luật thuần hành vi) tại ngân sách chính K = 1% (Lift@1%), dừng ngay việc tinh chỉnh mô hình và kiểm toán lại snapshot/cửa sổ feature. Nếu vượt L2 nhưng thấp hơn L1_rule_target_lag tại K = 1%, kiểm tra chéo theo từng tháng và tách bạch rõ phần thiếu hụt do không dùng lịch sử nhãn mua (Target-Lag) so với hành vi cửa sổ."
+  }
+}

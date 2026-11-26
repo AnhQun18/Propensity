@@ -69,5 +69,19 @@
       "val_obs_rate": 0.00938397988505747,
       "val_raw_pred_mean": 0.012265105777694983
     }
+  },
+  "tier_renaming_v2": {
+    "updated_at_utc": "2026-11-25T03:03:14.494034+00:00",
+    "FE-v1": {
+      "renamed_from": "L5d_cb_dialog_emb",
+      "calibrated_renamed_from": "L5d_cb_dialog_emb_cal",
+      "rerun_performed": false,
+      "post_selection_disclosure": "FE-v1 (tức L5d_cb_dialog_emb) được chọn làm mốc chuẩn sau khi tập Locked Test (2022-11..2023-01) đã được xem ở vòng baseline_moscow_v1. Do đó mọi suy diễn trên Test đối với FE-v1 phải ghi nhận rủi ro post-selection optimism và đối chiếu song song với tập Validation (2022-09..2022-10)."
+    },
+    "intermediate_tiers_retained": [
+      "L4_cb_trx",
+      "L5c_cb_dialog_meta"
+    ],
+    "next_milestone_id": "FE-v2"
   }
 }
