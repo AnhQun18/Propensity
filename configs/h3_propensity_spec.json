@@ -1,0 +1,123 @@
+{
+  "spec_id": "h3_propensity_rolling_ooc_v1",
+  "spec_version": "1.0.0",
+  "horizon": 3,
+  "snapshot_step": 1,
+  "timezone": "Europe/Moscow (UTC+3)",
+  "cutoff_rule": "event_time_msk = event_time_utc + 3h < YYYY-MM-01 00:00:00 MSK",
+  "active_h3_months": [
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-11"
+  ],
+  "oot_period_months": [
+    "2022-11",
+    "2022-12",
+    "2023-01"
+  ],
+  "quarantined_months": [
+    "2022-09",
+    "2022-10",
+    "2022-11",
+    "2022-12",
+    "2023-01"
+  ],
+  "val_schedule": [
+    {
+      "eval_month": "2022-05",
+      "train_months": ["2022-02"]
+    },
+    {
+      "eval_month": "2022-06",
+      "train_months": ["2022-02", "2022-03"]
+    },
+    {
+      "eval_month": "2022-07",
+      "train_months": ["2022-02", "2022-03", "2022-04"]
+    },
+    {
+      "eval_month": "2022-08",
+      "train_months": ["2022-02", "2022-03", "2022-04", "2022-05"]
+    }
+  ],
+  "oot_test_schedule": [
+    {
+      "eval_month": "2022-11",
+      "train_months": ["2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08"]
+    }
+  ],
+  "non_overlapping_step3_oot_schedule": [
+    {
+      "eval_month": "2022-11",
+      "train_months": ["2022-02", "2022-05", "2022-08"]
+    }
+  ],
+  "target_col": "y_h3",
+  "fold_col": "fold",
+  "n_folds": 5,
+  "seeds": [42, 142, 242],
+  "canonical_seed": 42,
+  "tie_break_seed": 42,
+  "bootstrap_seed": 42,
+  "bootstrap_replicates": 1000,
+  "budget_fractions": [0.005, 0.01, 0.05],
+  "primary_budget_fraction": 0.01,
+  "max_seconds_per_model": 1800,
+  "top50_features": [
+    "prior_1m_bought_any",
+    "prior_3m_buy_months",
+    "prior_3m_total_products",
+    "prior_6m_buy_months",
+    "prior_all_bought_any",
+    "prior_all_buy_months",
+    "prior_months_since_last_buy",
+    "prior_all_bought_p1",
+    "prior_all_bought_p2",
+    "prior_all_bought_p3",
+    "prior_all_bought_p4",
+    "prior_all_distinct_products",
+    "prior_months_observed",
+    "dialog_30d_has_event",
+    "dialog_30d_event_count",
+    "dialog_30d_days_since_last_event",
+    "dialog_90d_has_event",
+    "dialog_90d_event_count",
+    "dialog_90d_days_since_last_event",
+    "dialog_all_event_count",
+    "dialog_all_days_since_last_event",
+    "dialog_all_days_since_first_event",
+    "trx_30d_has_event",
+    "trx_30d_event_count",
+    "trx_30d_log1p_event_count",
+    "trx_30d_active_days",
+    "trx_30d_days_since_last_event",
+    "trx_30d_log1p_main_amount_abs_sum",
+    "trx_30d_main_amount_signed_log_mean",
+    "trx_30d_main_amount_max",
+    "trx_30d_event_type_nunique",
+    "trx_30d_event_subtype_nunique",
+    "trx_30d_event_type_top_share",
+    "trx_90d_log1p_event_count",
+    "trx_90d_days_since_last_event",
+    "trx_90d_log1p_main_amount_abs_sum",
+    "trx_all_event_count",
+    "trx_all_days_since_last_event",
+    "trx_all_days_since_first_event",
+    "trx_all_log1p_main_amount_abs_sum",
+    "trx_all_main_amount_median",
+    "trx_all_foreign_fraction",
+    "geo_30d_event_count",
+    "geo_30d_days_since_last_event",
+    "geo_30d_geohash_4_nunique",
+    "geo_90d_has_event",
+    "geo_90d_days_since_last_event",
+    "geo_all_geohash_4_nunique",
+    "geo_30d_top_geohash_6_share",
+    "cold_start"
+  ]
+}
