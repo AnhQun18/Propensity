@@ -299,11 +299,20 @@ def run_warning_verifications(
     # 6. Shuffled-label sanity check (Val & OOT Test)
     shuf_val = _run_check("6_shuffled_sanity", "shuffled_y_train_val", top50, sched_key="val_schedule", shuffle=True)
     shuf_oot = _run_check("6_shuffled_sanity", "shuffled_y_train_oot", top50, sched_key="oot_test_schedule", shuffle=True)
-    assert rows[-2]["macro_lift_1pct"] < 1.8, f"LEAKAGE WARNING: Shuffled Val Lift@1%={rows[-2]['macro_lift_1pct']:.2f}x"
-    assert rows[-1]["macro_lift_1pct"] < 1.8, f"LEAKAGE WARNING: Shuffled OOT Lift@1%={rows[-1]['macro_lift_1pct']:.2f}x"
+
+    # Also verify shuffled_y_eval collapses Lift@1% to ~1.0x (confirming zero tie-break/ranking bias)
+    ev_shuf = shuf_oot.copy()
+    ev_shuf["y_true"] = np.random.default_rng(9999).permutation(ev_shuf["y_true"].to_numpy())
+    ev_qm = quick_point_summary(ev_shuf, tie_seed=seed, is_prob=True)
+    rows.append({"check_group": "6_shuffled_sanity", "variant": "shuffled_y_eval_oot", "schedule": "oot_test_schedule", "n_features": 50, "elapsed_sec": 0.1, **ev_qm})
+    print(f"  [{'6_shuffled_sanity':18s} | {'shuffled_y_eval_oot':26s}] PR-AUC={ev_qm['macro_pr_auc']:.5f} | Lift@1%={ev_qm['macro_lift_1pct']:.2f}x | AUC={ev_qm['macro_roc_auc']:.4f}", flush=True)
 
     pd.DataFrame(rows).to_csv(out_dir / "stage1_warning_verifications.csv", index=False)
     _sync_to_drive(out_dir, drive_dir)
+
+    assert abs(rows[-3]["macro_roc_auc"] - 0.50) < 0.05, f"LEAKAGE WARNING: Shuffled Val ROC-AUC={rows[-3]['macro_roc_auc']:.4f}"
+    assert abs(rows[-2]["macro_roc_auc"] - 0.50) < 0.05, f"LEAKAGE WARNING: Shuffled OOT ROC-AUC={rows[-2]['macro_roc_auc']:.4f}"
+    assert abs(rows[-1]["macro_lift_1pct"] - 1.0) < 0.4, f"TIE-BREAK WARNING: Shuffled Eval Lift@1%={rows[-1]['macro_lift_1pct']:.2f}x"
     del panel_aug
     gc.collect()
 

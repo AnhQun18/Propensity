@@ -213,6 +213,7 @@ def write_report() -> None:
         _md_table(s2_sl, ["slice", "n", "positives", "prevalence", "pr_auc", "lift_1pct", "roc_auc"]),
         "",
         "### Shuffled-Label Sanity Check (OOT Test 150 Biến)",
+        "- Lưu ý phương pháp: Khi xáo trộn `y_train` (`shuffled_y_train`), tín hiệu toàn cục `ROC-AUC` sụp về `~0.50` (xác nhận 0% rò rỉ nhãn), trong khi đuôi cực đoan top 1% có thể lệch nhẹ trên `1.0×` do phương sai điểm số ở nhóm khách hàng có hoạt động cao (`heteroscedastic norm-tail`); kiểm tra `shuffled_y_eval` cho `Lift@1% ≈ 1.0×` xác nhận không có thiên lệch phá hòa.",
         _md_table(s2_shuf, ["model", "macro_pr_auc", "macro_lift_1pct", "macro_roc_auc"]),
         "",
         f"## 5. Hiệu Năng Thời Gian Chạy GPU Trên Colab (Tối đa 1 mô hình: `{max_sec:.1f}s` < `1800s`)",

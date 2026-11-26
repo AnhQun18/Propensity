@@ -130,7 +130,7 @@ def fit_predict_h3_model(
                 eval_set=[(X_es, y_es)],
                 callbacks=[lgb.early_stopping(es_rounds, verbose=False)],
             )
-            best_n = max(50, int(es_clf.best_iteration_ or max_trees))
+            best_n = max(1, int(es_clf.best_iteration_ or max_trees))
             refit_params = {**lgb_params, "n_estimators": best_n}
             clf = lgb.LGBMClassifier(**refit_params)
             clf.fit(X_tr, y_tr)
@@ -162,7 +162,7 @@ def fit_predict_h3_model(
             es_clf = xgb.XGBClassifier(**xgb_params, early_stopping_rounds=es_rounds)
             es_clf.fit(X_core, y_core, eval_set=[(X_es, y_es)], verbose=False)
             raw_best = getattr(es_clf, "best_iteration", None)
-            best_n = max(50, int(raw_best) + 1) if (raw_best is not None and raw_best >= 0) else max_trees
+            best_n = max(1, int(raw_best) + 1) if (raw_best is not None and raw_best >= 0) else max_trees
             refit_params = {**xgb_params, "n_estimators": best_n}
             clf = xgb.XGBClassifier(**refit_params)
             clf.fit(X_tr, y_tr, verbose=False)
@@ -197,7 +197,7 @@ def fit_predict_h3_model(
                 use_best_model=True,
             )
             raw_best = es_clf.get_best_iteration()
-            best_n = max(50, int(raw_best) + 1) if (raw_best is not None and raw_best >= 0) else max_trees
+            best_n = max(1, int(raw_best) + 1) if (raw_best is not None and raw_best >= 0) else max_trees
             refit_params = {**cb_params, "iterations": best_n}
             clf = CatBoostClassifier(**refit_params)
             clf.fit(Pool(X_tr, y_tr))
