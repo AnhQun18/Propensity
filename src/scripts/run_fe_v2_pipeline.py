@@ -38,7 +38,7 @@ from sklearn.preprocessing import StandardScaler
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from baseline_v2.metrics import bootstrap_paired_delta, holm_bonferroni
+from baseline_v2.metrics import holm_bonferroni, paired_bootstrap_macro_monthly
 from baseline_v2.spec import load_spec
 from propensity_model.metrics import compute_metrics, deterministic_tie_hash
 
@@ -748,11 +748,11 @@ def run_posthoc_fe_v2_checks(
 
     # 2) Cold-start & Silent-TRX 90d slices on Locked Test
     test_meta = panel[panel["month"].isin(["2022-11", "2022-12", "2023-01"])][
-        ["client_id", "month", "cold_start", "trx_count_90d", "dialog_count_30d"]
+        ["client_id", "month", "cold_start", "trx_90d_event_count", "dialog_30d_event_count"]
     ]
     mrg = pdf.merge(test_meta, on=["client_id", "month"], how="left")
-    mrg["trx_90d_active"] = (mrg["trx_count_90d"].fillna(0) > 0).astype(int)
-    mrg["dlg_30d_active"] = (mrg["dialog_count_30d"].fillna(0) > 0).astype(int)
+    mrg["trx_90d_active"] = (mrg["trx_90d_event_count"].fillna(0) > 0).astype(int)
+    mrg["dlg_30d_active"] = (mrg["dialog_30d_event_count"].fillna(0) > 0).astype(int)
     slice_defs = [
         ("all_test", np.ones(len(mrg), dtype=bool)),
         ("cold_start_eq1", mrg["cold_start"].to_numpy() == 1),
@@ -894,20 +894,24 @@ def main() -> None:
             ("A_FEv2_best_vs_LogReg_TGD", p_fe2_a_s, p_tgd_lr_a, "Protocol A: FE-v2 best single - B-raw-TGD_logreg"),
         ]
         boot_rows = []
+        test_months = ("2022-11", "2022-12", "2023-01")
         for pid, df_b, df_a, desc in pairs:
-            mrg = df_a[["client_id", "month", "y_true", "score"]].merge(
-                df_b[["client_id", "month", "score"]], on=["client_id", "month"], suffixes=("_a", "_b")
-            )
-            res = bootstrap_paired_delta(
-                mrg["y_true"].to_numpy(), mrg["score_a"].to_numpy(), mrg["score_b"].to_numpy(),
-                mrg["client_id"].to_numpy(), mrg["month"].to_numpy(), n_rep=1000, seed=seed,
+            res = paired_bootstrap_macro_monthly(
+                [df_a[["client_id", "month", "y_true", "score"]]],
+                [df_b[["client_id", "month", "y_true", "score"]]],
+                months=test_months,
+                prob_a=True,
+                prob_b=True,
+                n_replicates=1000,
+                boot_seed=seed,
+                tie_seed=seed,
             )
             boot_rows.append({"pair_id": pid, "desc": desc, **res})
         pair_df = pd.DataFrame(boot_rows)
-        pair_df["delta_pr_p_holm"] = holm_bonferroni(pair_df["delta_pr_auc_p_raw"].tolist())
-        pair_df["delta_pr_p_bh"] = benjamini_hochberg(pair_df["delta_pr_auc_p_raw"].tolist())
-        pair_df["delta_l1_p_holm"] = holm_bonferroni(pair_df["delta_lift_1pct_p_raw"].tolist())
-        pair_df["delta_l1_p_bh"] = benjamini_hochberg(pair_df["delta_lift_1pct_p_raw"].tolist())
+        pair_df["delta_pr_p_holm"] = holm_bonferroni(pair_df["delta_average_precision_p_value"].tolist())
+        pair_df["delta_pr_p_bh"] = benjamini_hochberg(pair_df["delta_average_precision_p_value"].tolist())
+        pair_df["delta_l1_p_holm"] = holm_bonferroni(pair_df["delta_lift_1pct_p_value"].tolist())
+        pair_df["delta_l1_p_bh"] = benjamini_hochberg(pair_df["delta_lift_1pct_p_value"].tolist())
         pair_df.to_csv(OUT_DIR / "test_paired_bootstrap_holm_bh.csv", index=False)
         print("[Stage C] Paired bootstrap done -> test_paired_bootstrap_holm_bh.csv", flush=True)
 
