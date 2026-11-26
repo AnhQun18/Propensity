@@ -56,7 +56,8 @@ PRED_DIR.mkdir(parents=True, exist_ok=True)
 PCA_ALL_DIM = 16
 PCA_90D_DIM = 8
 MAX_FEATURES = 120
-SEEDS_5 = [42, 142, 242, 342, 442]
+PRIMARY_SEED = 42
+EVAL_SEEDS = [42]
 
 EMB_COL_NAMES = (
     [f"dlg_pca_all_{i}" for i in range(PCA_ALL_DIM)]
@@ -567,29 +568,226 @@ def score_df(pdf: pd.DataFrame) -> dict[str, Any]:
     }
 
 
-def get_val_candidates() -> list[dict[str, Any]]:
-    """Streamlined main candidates for FE-v2 Validation screening (LGBM, LGBM+spw5, XGB, CatBoostTuned)."""
+def get_sh_candidates() -> list[dict[str, Any]]:
+    """12-config initial pool for Stage B Successive Halving on one representative Val month (2022-10)."""
     return [
-        {"name": "lgbm_reg", "family": "lgbm", "es_rounds": 100,
+        {"name": "lgbm_d31_l25_lr03", "family": "lgbm", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
                         colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0)},
+        {"name": "lgbm_d20_l50_lr03", "family": "lgbm", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=20, min_child_samples=120,
+                        colsample_bytree=0.6, subsample=0.8, subsample_freq=1, reg_lambda=50.0, reg_alpha=10.0)},
+        {"name": "lgbm_d45_l15_lr03", "family": "lgbm", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=45, min_child_samples=80,
+                        colsample_bytree=0.8, subsample=0.85, subsample_freq=1, reg_lambda=15.0, reg_alpha=2.0)},
+        {"name": "lgbm_d31_l25_lr05", "family": "lgbm", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.05, num_leaves=31, min_child_samples=100,
+                        colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0)},
+        {"name": "lgbm_spw3", "family": "lgbm", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
+                        colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=3.0)},
         {"name": "lgbm_spw5", "family": "lgbm", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, num_leaves=31, min_child_samples=100,
                         colsample_bytree=0.7, subsample=0.8, subsample_freq=1, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=5.0)},
-        {"name": "xgb_reg", "family": "xgb", "es_rounds": 100,
+        {"name": "xgb_d5_l25_lr03", "family": "xgb", "es_rounds": 100,
          "params": dict(n_estimators=1500, learning_rate=0.03, max_depth=5, min_child_weight=50,
                         colsample_bytree=0.7, subsample=0.8, reg_lambda=25.0, reg_alpha=5.0)},
-        {"name": "cb_tuned", "family": "catboost", "es_rounds": 100,
+        {"name": "xgb_d4_l50_lr04", "family": "xgb", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.04, max_depth=4, min_child_weight=80,
+                        colsample_bytree=0.6, subsample=0.8, reg_lambda=50.0, reg_alpha=8.0)},
+        {"name": "xgb_spw5", "family": "xgb", "es_rounds": 100,
+         "params": dict(n_estimators=1500, learning_rate=0.03, max_depth=5, min_child_weight=50,
+                        colsample_bytree=0.7, subsample=0.8, reg_lambda=25.0, reg_alpha=5.0, scale_pos_weight=5.0)},
+        {"name": "cb_d6_l25_lr03", "family": "catboost", "es_rounds": 100,
          "params": dict(iterations=1500, learning_rate=0.03, depth=6, l2_leaf_reg=25.0)},
+        {"name": "cb_d5_l40_lr04", "family": "catboost", "es_rounds": 100,
+         "params": dict(iterations=1500, learning_rate=0.04, depth=5, l2_leaf_reg=40.0)},
+        {"name": "cb_d6_spw3", "family": "catboost", "es_rounds": 100,
+         "params": dict(iterations=1500, learning_rate=0.03, depth=6, l2_leaf_reg=25.0, scale_pos_weight=3.0)},
     ]
+
+
+def _make_rung_cfg(cfg: dict[str, Any], max_trees: int, es_rounds: int) -> dict[str, Any]:
+    out = {"name": cfg["name"], "family": cfg["family"], "es_rounds": es_rounds, "params": dict(cfg["params"])}
+    if out["family"] == "catboost":
+        out["params"]["iterations"] = max_trees
+    else:
+        out["params"]["n_estimators"] = max_trees
+    return out
+
+
+def run_successive_halving_on_rep_val(
+    spec: dict[str, Any],
+    panel: pd.DataFrame,
+    tab_cols: list[str],
+    emb_idx: list[int],
+    seed: int = 42,
+    rep_month: str = "2022-10",
+) -> dict[str, Any]:
+    """Tune once on one representative Val month (2022-10) using Successive Halving; lock winners for all months & folds."""
+    lock_hp_path = OUT_DIR / "locked_best_hyperparams.json"
+    if lock_hp_path.exists():
+        return json.loads(lock_hp_path.read_text(encoding="utf-8"))
+
+    step = next(s for s in spec["protocols"]["B_rolling_ooc"]["val_schedule"] if s["eval_month"] == rep_month)
+    tr_ms, es_m, ev_m = step["train_months"], step["train_months"][-1], step["eval_month"]
+    df_tr_all = panel[panel["month"].isin(tr_ms)].reset_index(drop=True)
+    df_ev = panel[panel["month"] == ev_m].reset_index(drop=True)
+
+    print(f"[SH Tuning] Assembling 5-fold cache for representative Val month={rep_month} (seed={seed}) ...", flush=True)
+    fold_cache: dict[int, tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]] = {}
+    for k in range(5):
+        tr_all_k = df_tr_all[df_tr_all["fold"] != k].reset_index(drop=True)
+        ev_k_mask = df_ev["fold"].to_numpy() == k
+        X_tr_all = assemble_matrix(tr_all_k, tab_cols, emb_idx, PCA_B_DIR / ev_m / f"f{k}_tr.npy" if emb_idx else None)
+        X_ev = assemble_matrix(df_ev.loc[ev_k_mask], tab_cols, emb_idx, PCA_B_DIR / ev_m / f"f{k}_ev.npy" if emb_idx else None)
+        is_es = tr_all_k["month"].to_numpy() == es_m
+        fold_cache[k] = (
+            X_tr_all[~is_es], tr_all_k.loc[~is_es, "y_any"].to_numpy(dtype=np.int8),
+            X_tr_all[is_es], tr_all_k.loc[is_es, "y_any"].to_numpy(dtype=np.int8),
+            X_ev, df_ev.loc[ev_k_mask, "y_any"].to_numpy(dtype=np.int8),
+            df_ev.loc[ev_k_mask, "client_id"].to_numpy(),
+        )
+        del X_tr_all
+    del df_tr_all, df_ev
+    gc.collect()
+
+    rungs = [
+        {"rung": 1, "folds": (0, 1), "max_trees": 250, "es_rounds": 40, "keep": 6},
+        {"rung": 2, "folds": (0, 1, 2, 3, 4), "max_trees": 600, "es_rounds": 60, "keep": 3},
+        {"rung": 3, "folds": (0, 1, 2, 3, 4), "max_trees": 1500, "es_rounds": 100, "keep": 3},
+    ]
+    pool = get_sh_candidates()
+    sh_rows: list[dict[str, Any]] = []
+    rung2_board: list[dict[str, Any]] = []
+    rung3_board: list[dict[str, Any]] = []
+
+    for rc in rungs:
+        rung_rows = []
+        for cfg in pool:
+            rcfg = _make_rung_cfg(cfg, rc["max_trees"], rc["es_rounds"])
+            t0 = time.perf_counter()
+            ys, scs, cids = [], [], []
+            for k in rc["folds"]:
+                X_c, y_c, X_es, y_es, X_ev, y_ev, cid_ev = fold_cache[k]
+                sc = fit_predict_model(rcfg, X_c, y_c, X_es, y_es, X_ev, seed=seed)
+                ys.append(y_ev); scs.append(sc); cids.append(cid_ev)
+            y_cat, sc_cat, cid_cat = np.concatenate(ys), np.concatenate(scs), np.concatenate(cids)
+            th = deterministic_tie_hash(cid_cat, seed=seed)
+            m, _ = compute_metrics(y_cat, sc_cat, cid_cat, budget_fractions=(0.01,), primary_budget=0.01, seed=seed, is_probabilistic=True, tie_hashes=th)
+            rec = {
+                "rung": rc["rung"], "n_folds": len(rc["folds"]), "max_trees": rc["max_trees"],
+                "name": cfg["name"], "family": cfg["family"],
+                "spw": float(cfg["params"].get("scale_pos_weight", 1.0)),
+                "pr_auc": float(m["average_precision"]), "roc_auc": float(m["roc_auc"]),
+                "lift_1pct": float(m["lift_1pct"]), "log_loss": float(m["log_loss"]),
+                "sec": round(time.perf_counter() - t0, 1),
+            }
+            sh_rows.append(rec)
+            rung_rows.append((rec, cfg))
+            print(f"  [SH R{rc['rung']} k={len(rc['folds'])} T={rc['max_trees']}] {cfg['name']:20s} PR={rec['pr_auc']:.5f} | L1={rec['lift_1pct']:.2f}x | LL={rec['log_loss']:.5f} ({rec['sec']}s)", flush=True)
+
+        rung_rows.sort(key=lambda x: x[0]["pr_auc"], reverse=True)
+        if rc["rung"] == 2:
+            rung2_board = [x[1] for x in rung_rows]
+        if rc["rung"] == 3:
+            rung3_board = [x[1] for x in rung_rows]
+        pool = [x[1] for x in rung_rows[: rc["keep"]]]
+
+    pd.DataFrame(sh_rows).to_csv(OUT_DIR / "val_tuning_successive_halving.csv", index=False)
+
+    # Lock top winner + top diverse runner-up + LogReg linear anchor (+ top spw>1 check if distinct)
+    best_cfg = rung3_board[0]
+    runner_up = next((c for c in rung3_board[1:] + rung2_board if c["family"] != best_cfg["family"]), rung3_board[1])
+    best_lgbm = next((c for c in rung3_board + rung2_board if c["family"] == "lgbm"), get_sh_candidates()[0])
+    best_spw = next((c for c in rung3_board + rung2_board if float(c["params"].get("scale_pos_weight", 1.0)) > 1.0), get_sh_candidates()[5])
+
+    eval_cfgs: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for c in [best_cfg, runner_up, best_lgbm, best_spw]:
+        if c["name"] not in seen:
+            seen.add(c["name"])
+            eval_cfgs.append(c)
+    eval_cfgs.append({"name": "logreg_l2", "family": "logreg", "C": 0.5, "use_temporal_es": False, "params": {"C": 0.5}})
+
+    locked_hp = {
+        "rep_val_month": rep_month,
+        "seed": seed,
+        "best_single": best_cfg["name"],
+        "runner_up": runner_up["name"],
+        "best_lgbm": best_lgbm["name"],
+        "best_spw": best_spw["name"],
+        "eval_configs": eval_cfgs,
+    }
+    lock_hp_path.write_text(json.dumps(locked_hp, indent=2, ensure_ascii=False), encoding="utf-8")
+    del fold_cache
+    gc.collect()
+    print(f"[SH Tuning] Locked best={best_cfg['name']}, runner_up={runner_up['name']}, best_lgbm={best_lgbm['name']} -> {lock_hp_path}", flush=True)
+    return locked_hp
+
+
+def run_posthoc_fe_v2_checks(
+    best_cfg: dict[str, Any],
+    spec: dict[str, Any],
+    panel: pd.DataFrame,
+    tab_cols: list[str],
+    emb_idx: list[int],
+    seed: int = 42,
+) -> None:
+    """Post-hoc Test checks for best FE-v2 model: monthly breakdown, cold/silent-TRX slices, and Dialog no-dialog / lag-0 ref."""
+    pdf = pd.read_parquet(PRED_DIR / f"protB_test_{best_cfg['name']}_seed{seed}.parquet")
+    # 1) Monthly breakdown on Test (check 2022-11, 2022-12, 2023-01 stability)
+    mo_rows = []
+    for mo, g in pdf.groupby("month"):
+        th = deterministic_tie_hash(g["client_id"].to_numpy(), seed=seed)
+        m, _ = compute_metrics(g["y_true"].to_numpy(), g["score"].to_numpy(), g["client_id"].to_numpy(),
+                               budget_fractions=(0.01, 0.05), primary_budget=0.01, seed=seed, is_probabilistic=True, tie_hashes=th)
+        mo_rows.append({"month": mo, "n_rows": len(g), "n_pos": int(g["y_true"].sum()), "base_rate": float(g["y_true"].mean()),
+                        "pr_auc": m["average_precision"], "roc_auc": m["roc_auc"], "lift_1pct": m["lift_1pct"], "lift_5pct": m["lift_5pct"]})
+    pd.DataFrame(mo_rows).to_csv(OUT_DIR / "test_fe_v2_monthly_breakdown.csv", index=False)
+
+    # 2) Cold-start & Silent-TRX 90d slices on Locked Test
+    test_meta = panel[panel["month"].isin(["2022-11", "2022-12", "2023-01"])][
+        ["client_id", "month", "cold_start", "trx_count_90d", "dialog_count_30d"]
+    ]
+    mrg = pdf.merge(test_meta, on=["client_id", "month"], how="left")
+    mrg["trx_90d_active"] = (mrg["trx_count_90d"].fillna(0) > 0).astype(int)
+    mrg["dlg_30d_active"] = (mrg["dialog_count_30d"].fillna(0) > 0).astype(int)
+    slice_defs = [
+        ("all_test", np.ones(len(mrg), dtype=bool)),
+        ("cold_start_eq1", mrg["cold_start"].to_numpy() == 1),
+        ("cold_start_eq0", mrg["cold_start"].to_numpy() == 0),
+        ("trx_90d_silent", mrg["trx_90d_active"].to_numpy() == 0),
+        ("trx_90d_active", mrg["trx_90d_active"].to_numpy() == 1),
+        ("silent_trx90d_active_dlg30d", (mrg["trx_90d_active"].to_numpy() == 0) & (mrg["dlg_30d_active"].to_numpy() == 1)),
+    ]
+    srows = []
+    for sname, mask in slice_defs:
+        sub = mrg.loc[mask]
+        if len(sub) < 10 or sub["y_true"].sum() == 0:
+            continue
+        sm, _ = compute_metrics(sub["y_true"].to_numpy(), sub["score"].to_numpy(), sub["client_id"].to_numpy(),
+                                budget_fractions=(0.01, 0.05), primary_budget=0.01, seed=seed, is_probabilistic=True)
+        srows.append({"slice": sname, "n_rows": len(sub), "n_pos": int(sub["y_true"].sum()), "base_rate": float(sub["y_true"].mean()),
+                      "pr_auc": sm["average_precision"], "roc_auc": sm["roc_auc"], "lift_1pct": sm["lift_1pct"]})
+    pd.DataFrame(srows).to_csv(OUT_DIR / "test_fe_v2_slices.csv", index=False)
+
+    # 3) Dialog ablation check on winning FE-v2 config: full FE-v2 vs no-dialog (pure TRX+Geo tabular FE-v2)
+    tab_no_dlg = [c for c in tab_cols if not c.startswith(("dialog_", "is_silent_trx_90d_active_dlg"))]
+    nodlg_cfg = dict(best_cfg, name=f"{best_cfg['name']}_no_dialog")
+    pdf_nd = eval_protocol_b(nodlg_cfg, spec, panel, tab_no_dlg, [], "test", seed)
+    sc_full = score_df(pdf); sc_full["variant"] = f"{best_cfg['name']}_full"
+    sc_nd = score_df(pdf_nd); sc_nd["variant"] = f"{best_cfg['name']}_no_dialog_tabular_only"
+    pd.DataFrame([sc_full, sc_nd]).to_csv(OUT_DIR / "test_fe_v2_dialog_ablation.csv", index=False)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage", default="all", choices=["all", "val_only", "test_confirm"])
-    parser.add_argument("--val-seeds", default="42", help="Comma-separated Val seeds (default 42 per streamlined agreement)")
+    parser.add_argument("--seed", type=int, default=PRIMARY_SEED, help="Single deterministic seed (default 42)")
     args = parser.parse_args()
-    print(f"[FE-v2] Runtime hardware: USE_GPU={USE_GPU}", flush=True)
+    seed = int(args.seed)
+    print(f"[FE-v2] Runtime hardware: USE_GPU={USE_GPU} | Single Seed={seed}", flush=True)
 
     spec = load_spec(REPO_ROOT / "configs" / "baseline_v2_evaluation_spec.json")
     panel = pd.read_parquet(CANDIDATES_PATH)
@@ -599,114 +797,76 @@ def main() -> None:
     tab_cols = list(locked["tab_cols"])
     emb_idx = list(locked["emb_indices"])
 
-    cands = get_val_candidates()
-    cand_map = {c["name"]: c for c in cands}
+    locked_hp = run_successive_halving_on_rep_val(spec, panel, tab_cols, emb_idx, seed=seed, rep_month="2022-10")
+    eval_cfgs = locked_hp["eval_configs"]
+    cfg_map = {c["name"]: c for c in eval_cfgs}
+    best_single = locked_hp["best_single"]
+    runner_up = locked_hp["runner_up"]
+    best_lgbm = locked_hp["best_lgbm"]
 
     if args.stage in ("all", "val_only"):
-        print("\n=== [Stage B] Validation Main Model Screening + scale_pos_weight Check (Protocol B) ===", flush=True)
+        print("\n=== [Stage B] Evaluating Locked Hyperparams Across All Val Months (2022-09..10, seed=42) ===", flush=True)
         val_rows = []
-        val_preds: dict[str, dict[int, pd.DataFrame]] = {c["name"]: {} for c in cands}
-        val_seeds = tuple(int(x) for x in args.val_seeds.split(",") if x.strip()) or (42,)
-        for cfg in cands:
-            for s in val_seeds:
-                t0 = time.perf_counter()
-                pdf = eval_protocol_b(cfg, spec, panel, tab_cols, emb_idx, "val", s)
-                val_preds[cfg["name"]][s] = pdf
-                sc = score_df(pdf)
-                sc["model"] = cfg["name"]
-                sc["seed"] = s
-                sc["sec"] = round(time.perf_counter() - t0, 1)
-                val_rows.append(sc)
-                print(f"  [VAL {cfg['name']:18s} s={s}] MacroPR={sc['macro_pr_auc']:.5f} | MacroL1={sc['macro_lift_1pct']:.2f}x | AUC={sc['macro_roc_auc']:.4f} | Slope={sc['cal_slope']:.3f} ({sc['sec']}s)", flush=True)
+        val_preds: dict[str, pd.DataFrame] = {}
+        for cfg in eval_cfgs:
+            t0 = time.perf_counter()
+            pdf = eval_protocol_b(cfg, spec, panel, tab_cols, emb_idx, "val", seed)
+            val_preds[cfg["name"]] = pdf
+            sc = score_df(pdf)
+            sc["model"], sc["seed"], sc["sec"] = cfg["name"], seed, round(time.perf_counter() - t0, 1)
+            val_rows.append(sc)
+            print(f"  [VAL {cfg['name']:20s}] MacroPR={sc['macro_pr_auc']:.5f} | MacroL1={sc['macro_lift_1pct']:.2f}x | AUC={sc['macro_roc_auc']:.4f} | Slope={sc['cal_slope']:.3f} ({sc['sec']}s)", flush=True)
 
-        # Evaluate blends on Val
-        for s in val_seeds:
-            p_lgb = val_preds["lgbm_reg"][s]
-            p_xgb = val_preds["xgb_reg"][s]
-            p_cb = val_preds["cb_tuned"][s]
-            for bname, weights in (("blend_lgb_cb", (0.5, 0.0, 0.5)), ("blend_lgb_xgb_cb", (0.4, 0.3, 0.3))):
-                bdf = p_lgb[["client_id", "fold", "month", "y_true"]].copy()
-                bdf["score"] = (
-                    weights[0] * p_lgb["score"].to_numpy()
-                    + weights[1] * p_xgb["score"].to_numpy()
-                    + weights[2] * p_cb["score"].to_numpy()
-                )
-                bdf.to_parquet(PRED_DIR / f"protB_val_{bname}_seed{s}.parquet", index=False, compression="zstd")
-                sc = score_df(bdf)
-                sc["model"], sc["seed"], sc["sec"] = bname, s, 0.0
-                val_rows.append(sc)
+        # Blend top-2 diverse locked winners on Val
+        p1, p2 = val_preds[best_single], val_preds[runner_up]
+        bdf = p1[["client_id", "fold", "month", "y_true"]].copy()
+        bdf["score"] = 0.5 * p1["score"].to_numpy() + 0.5 * p2["score"].to_numpy()
+        bdf.to_parquet(PRED_DIR / f"protB_val_blend_top2_seed{seed}.parquet", index=False, compression="zstd")
+        sc = score_df(bdf)
+        sc["model"], sc["seed"], sc["sec"] = "blend_top2", seed, 0.0
+        val_rows.append(sc)
 
         val_df = pd.DataFrame(val_rows)
         val_df.to_csv(OUT_DIR / "val_model_comparison_detailed.csv", index=False)
-        val_agg = val_df.groupby("model", as_index=False).agg(
-            macro_pr_mean=("macro_pr_auc", "mean"),
-            macro_pr_sd=("macro_pr_auc", "std"),
-            macro_l1_mean=("macro_lift_1pct", "mean"),
-            macro_l1_sd=("macro_lift_1pct", "std"),
-            macro_auc_mean=("macro_roc_auc", "mean"),
-            macro_ll_mean=("macro_log_loss", "mean"),
-            pooled_pr_mean=("pooled_pr_auc", "mean"),
-            cal_slope_mean=("cal_slope", "mean"),
-            cal_intercept_mean=("cal_intercept", "mean"),
-        ).sort_values("macro_pr_mean", ascending=False)
+        val_agg = val_df.sort_values("macro_pr_auc", ascending=False).reset_index(drop=True)
         val_agg.to_csv(OUT_DIR / "val_model_comparison_summary.csv", index=False)
-        print("\n[VAL SUMMARY]\n" + val_agg.to_string(index=False), flush=True)
+        print("\n[VAL SUMMARY - FIXED PARAMS SINGLE SEED]\n" + val_agg.to_string(index=False), flush=True)
 
     if args.stage in ("all", "test_confirm"):
-        print("\n=== [Stage C] Locked Test Confirmation (5 seeds ProtB, 3 seeds ProtA + Stats) ===", flush=True)
-        val_agg = pd.read_csv(OUT_DIR / "val_model_comparison_summary.csv")
-        singles = [m for m in val_agg["model"] if not m.startswith("blend_")]
-        best_single = singles[0]
-        confirm_singles = list(dict.fromkeys([best_single, "cb_tuned", "lgbm_reg"]))
-        print(f"[Stage C] Confirming main Val-selected models: {confirm_singles} + blend_lgb_cb across 5 seeds ...", flush=True)
-
+        print("\n=== [Stage C] Locked Test Confirmation (Single Seed=42, Fixed Hyperparams, ProtB + ProtA) ===", flush=True)
+        confirm_singles = list(dict.fromkeys([best_single, runner_up, best_lgbm, "logreg_l2"]))
         test_rows = []
-        test_preds: dict[str, dict[int, pd.DataFrame]] = {m: {} for m in confirm_singles}
+        test_preds: dict[str, pd.DataFrame] = {}
         for mname in confirm_singles:
-            cfg = cand_map[mname]
-            for s in SEEDS_5:
-                pdf_b = eval_protocol_b(cfg, spec, panel, tab_cols, emb_idx, "test", s)
-                test_preds[mname][s] = pdf_b
-                sc = score_df(pdf_b)
-                sc["protocol"], sc["model"], sc["seed"] = "B_rolling_ooc", mname, s
-                test_rows.append(sc)
-                # Run Protocol A (3 seeds 42/142/242 for v1 apples-to-apples comparison)
-                if s in (42, 142, 242):
-                    pdf_a = eval_protocol_a(cfg, panel, tab_cols, emb_idx, "test", s)
-                    sca = score_df(pdf_a)
-                    sca["protocol"], sca["model"], sca["seed"] = "A_flat_ooc", mname, s
-                    test_rows.append(sca)
-
-        # Protocol B Blend (5 seeds: 0.5 lgbm_reg + 0.5 cb_tuned)
-        for s in SEEDS_5:
-            p_lgb, p_cb = test_preds["lgbm_reg"][s], test_preds["cb_tuned"][s]
-            bdf = p_lgb[["client_id", "fold", "month", "y_true"]].copy()
-            bdf["score"] = 0.5 * p_lgb["score"].to_numpy() + 0.5 * p_cb["score"].to_numpy()
-            bdf.to_parquet(PRED_DIR / f"protB_test_blend_lgb_cb_seed{s}.parquet", index=False, compression="zstd")
-            sc = score_df(bdf)
-            sc["protocol"], sc["model"], sc["seed"] = "B_rolling_ooc", "blend_lgb_cb", s
+            cfg = cfg_map[mname]
+            t0 = time.perf_counter()
+            pdf_b = eval_protocol_b(cfg, spec, panel, tab_cols, emb_idx, "test", seed)
+            test_preds[mname] = pdf_b
+            sc = score_df(pdf_b)
+            sc["protocol"], sc["model"], sc["seed"], sc["sec"] = "B_rolling_ooc", mname, seed, round(time.perf_counter() - t0, 1)
             test_rows.append(sc)
+            if mname in (best_single, best_lgbm):
+                pdf_a = eval_protocol_a(cfg, panel, tab_cols, emb_idx, "test", seed)
+                sca = score_df(pdf_a)
+                sca["protocol"], sca["model"], sca["seed"], sca["sec"] = "A_flat_ooc", mname, seed, 0.0
+                test_rows.append(sca)
 
-        test_df = pd.DataFrame(test_rows)
+        # Blend top-2 locked singles on Test
+        p1, p2 = test_preds[best_single], test_preds[runner_up]
+        bdf = p1[["client_id", "fold", "month", "y_true"]].copy()
+        bdf["score"] = 0.5 * p1["score"].to_numpy() + 0.5 * p2["score"].to_numpy()
+        bdf.to_parquet(PRED_DIR / f"protB_test_blend_top2_seed{seed}.parquet", index=False, compression="zstd")
+        sc = score_df(bdf)
+        sc["protocol"], sc["model"], sc["seed"], sc["sec"] = "B_rolling_ooc", "blend_top2", seed, 0.0
+        test_rows.append(sc)
+
+        test_df = pd.DataFrame(test_rows).sort_values(["protocol", "macro_pr_auc"], ascending=[True, False]).reset_index(drop=True)
         test_df.to_csv(OUT_DIR / "test_confirmation_detailed.csv", index=False)
-        test_agg = test_df.groupby(["protocol", "model"], as_index=False).agg(
-            n_seeds=("seed", "nunique"),
-            macro_pr_mean=("macro_pr_auc", "mean"),
-            macro_pr_sd=("macro_pr_auc", "std"),
-            macro_l1_mean=("macro_lift_1pct", "mean"),
-            macro_l1_sd=("macro_lift_1pct", "std"),
-            macro_auc_mean=("macro_roc_auc", "mean"),
-            macro_ll_mean=("macro_log_loss", "mean"),
-            pooled_pr_mean=("pooled_pr_auc", "mean"),
-            pooled_l1_mean=("pooled_lift_1pct", "mean"),
-            cal_slope_mean=("cal_slope", "mean"),
-            cal_intercept_mean=("cal_intercept", "mean"),
-        ).sort_values(["protocol", "macro_pr_mean"], ascending=[True, False])
-        test_agg.to_csv(OUT_DIR / "test_confirmation_summary.csv", index=False)
-        print("\n[LOCKED TEST SUMMARY]\n" + test_agg.to_string(index=False), flush=True)
+        test_df.to_csv(OUT_DIR / "test_confirmation_summary.csv", index=False)
+        print("\n[LOCKED TEST SUMMARY - SINGLE SEED]\n" + test_df.to_string(index=False), flush=True)
 
         # Shuffled-label sanity check on winning single (Protocol B Test seed=42)
-        shuf_pdf = eval_protocol_b(cand_map[best_single], spec, panel, tab_cols, emb_idx, "test", 42, shuffle_labels=True)
+        shuf_pdf = eval_protocol_b(cfg_map[best_single], spec, panel, tab_cols, emb_idx, "test", seed, shuffle_labels=True)
         shuf_sc = score_df(shuf_pdf)
         shuf_sc["model"] = f"{best_single}_shuffled_label"
         shuf_sc["base_rate"] = float(shuf_pdf["y_true"].mean())
@@ -716,19 +876,19 @@ def main() -> None:
         # Paired Bootstrap (1000 client-cluster reps, Holm + BH) on seed=42 Test:
         p_tgd_b = pd.read_parquet(V2_PRED_DIR / "B_rolling_ooc" / "test" / "B_catboost_TGD_tuned_seed42.parquet")
         p_lr_b = pd.read_parquet(V2_PRED_DIR / "B_rolling_ooc" / "test" / "B_logreg_TGD_seed42.parquet")
-        p_fe2_b_s = test_preds[best_single][42]
-        p_fe2_b_bl = pd.read_parquet(PRED_DIR / "protB_test_blend_lgb_cb_seed42.parquet")
+        p_fe2_b_s = test_preds[best_single]
+        p_fe2_b_bl = bdf
 
         p_fe1_a = pd.read_parquet(FE1_PRED_DIR / "test" / "FE-v1_seed42.parquet")
         p_l5c_lgb_a = pd.read_parquet(REPO_ROOT / "outputs" / "baseline_moscow_v1" / "predictions" / "test" / "L5c_lgbm_dialog_meta.parquet")
         p_tgd_lr_a = pd.read_parquet(FE1_PRED_DIR / "test" / "B-raw-TGD_logreg_seed42.parquet")
-        p_fe2_a_s = eval_protocol_a(cand_map[best_single], panel, tab_cols, emb_idx, "test", 42)
-        p_fe2_a_lgb = eval_protocol_a(cand_map["lgbm_reg"], panel, tab_cols, emb_idx, "test", 42)
+        p_fe2_a_s = eval_protocol_a(cfg_map[best_single], panel, tab_cols, emb_idx, "test", seed)
+        p_fe2_a_lgb = eval_protocol_a(cfg_map[best_lgbm], panel, tab_cols, emb_idx, "test", seed)
 
         pairs = [
             ("B_FEv2_best_vs_TGD_tuned", p_fe2_b_s, p_tgd_b, "Protocol B: FE-v2 best single - B_catboost_TGD_tuned"),
-            ("B_FEv2_blend_vs_TGD_tuned", p_fe2_b_bl, p_tgd_b, "Protocol B: FE-v2 blend (LGB+CB) - B_catboost_TGD_tuned"),
-            ("B_FEv2_blend_vs_LogReg_TGD", p_fe2_b_bl, p_lr_b, "Protocol B: FE-v2 blend (LGB+CB) - B_logreg_TGD"),
+            ("B_FEv2_blend_vs_TGD_tuned", p_fe2_b_bl, p_tgd_b, "Protocol B: FE-v2 blend (top2) - B_catboost_TGD_tuned"),
+            ("B_FEv2_blend_vs_LogReg_TGD", p_fe2_b_bl, p_lr_b, "Protocol B: FE-v2 blend (top2) - B_logreg_TGD"),
             ("A_FEv2_best_vs_FEv1", p_fe2_a_s, p_fe1_a, "Protocol A: FE-v2 best single - FE-v1 (139)"),
             ("A_FEv2_lgbm_vs_L5cLGBM", p_fe2_a_lgb, p_l5c_lgb_a, "Protocol A: FE-v2 LGBM - L5c_lgbm (112)"),
             ("A_FEv2_best_vs_LogReg_TGD", p_fe2_a_s, p_tgd_lr_a, "Protocol A: FE-v2 best single - B-raw-TGD_logreg"),
@@ -740,16 +900,19 @@ def main() -> None:
             )
             res = bootstrap_paired_delta(
                 mrg["y_true"].to_numpy(), mrg["score_a"].to_numpy(), mrg["score_b"].to_numpy(),
-                mrg["client_id"].to_numpy(), mrg["month"].to_numpy(), n_rep=1000, seed=42,
+                mrg["client_id"].to_numpy(), mrg["month"].to_numpy(), n_rep=1000, seed=seed,
             )
             boot_rows.append({"pair_id": pid, "desc": desc, **res})
-        bdf = pd.DataFrame(boot_rows)
-        bdf["delta_pr_p_holm"] = holm_bonferroni(bdf["delta_pr_auc_p_raw"].tolist())
-        bdf["delta_pr_p_bh"] = benjamini_hochberg(bdf["delta_pr_auc_p_raw"].tolist())
-        bdf["delta_l1_p_holm"] = holm_bonferroni(bdf["delta_lift_1pct_p_raw"].tolist())
-        bdf["delta_l1_p_bh"] = benjamini_hochberg(bdf["delta_lift_1pct_p_raw"].tolist())
-        bdf.to_csv(OUT_DIR / "test_paired_bootstrap_holm_bh.csv", index=False)
+        pair_df = pd.DataFrame(boot_rows)
+        pair_df["delta_pr_p_holm"] = holm_bonferroni(pair_df["delta_pr_auc_p_raw"].tolist())
+        pair_df["delta_pr_p_bh"] = benjamini_hochberg(pair_df["delta_pr_auc_p_raw"].tolist())
+        pair_df["delta_l1_p_holm"] = holm_bonferroni(pair_df["delta_lift_1pct_p_raw"].tolist())
+        pair_df["delta_l1_p_bh"] = benjamini_hochberg(pair_df["delta_lift_1pct_p_raw"].tolist())
+        pair_df.to_csv(OUT_DIR / "test_paired_bootstrap_holm_bh.csv", index=False)
         print("[Stage C] Paired bootstrap done -> test_paired_bootstrap_holm_bh.csv", flush=True)
+
+        run_posthoc_fe_v2_checks(cfg_map[best_single], spec, panel, tab_cols, emb_idx, seed=seed)
+        print("[Stage C] Post-hoc monthly/slice/no-dialog diagnostics done.", flush=True)
 
 
 if __name__ == "__main__":

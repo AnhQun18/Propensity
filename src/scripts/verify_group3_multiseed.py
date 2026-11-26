@@ -45,11 +45,12 @@ MS_PRED_DIR = OUT_DIR / "multiseed_preds"
 MS_PRED_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def run_missing_protocol_a_seeds() -> None:
-    print("[MultiSeed 1/2] Checking Protocol A seeds for L5c_cb (42,142,242) & L5c_lgbm (5 seeds) ...", flush=True)
+def run_missing_protocol_a_seeds(seeds: tuple[int, ...] = (42,)) -> None:
+    print(f"[MultiSeed 1/2] Checking Protocol A seeds={seeds} for L5c_cb & L5c_lgbm_dialog_meta ...", flush=True)
     panel = pd.read_parquet(PANEL_PATH)
     pcols = list(panel.columns)
     cols_112 = [c for c in pcols if c.startswith(("trx_", "geo_", "dialog_"))] + ["cold_start"]
+    base_pred_dir = REPO_ROOT / "outputs" / "baseline_moscow_v1" / "predictions"
 
     for stage, tr_m, ev_m in (
         ("val", ["2022-04", "2022-05", "2022-06", "2022-07", "2022-08"], ["2022-09", "2022-10"]),
@@ -58,8 +59,8 @@ def run_missing_protocol_a_seeds() -> None:
         df_tr = panel[panel["month"].isin(tr_m)].reset_index(drop=True)
         df_ev = panel[panel["month"].isin(ev_m)].reset_index(drop=True)
 
-        # L5c_cb seeds 142, 242 (seed 42 already in FE1_PRED_DIR)
-        for seed in (142, 242):
+        # L5c_cb (seed 42 already in FE1_PRED_DIR; only run extra seeds if requested)
+        for seed in [s for s in seeds if s != 42]:
             out_p = MS_PRED_DIR / f"{stage}_L5c_cb_seed{seed}.parquet"
             fe_p = FE1_PRED_DIR / stage / f"L5c_cb_seed{seed}.parquet"
             if out_p.exists() or fe_p.exists():
@@ -88,10 +89,11 @@ def run_missing_protocol_a_seeds() -> None:
             pdf.to_parquet(out_p, index=False, compression="zstd")
             print(f"  [{stage}] L5c_cb seed={seed} done ({time.perf_counter()-t0:.1f}s)", flush=True)
 
-        # L5c_lgbm_dialog_meta 5 seeds (42, 142, 242, 342, 442)
-        for seed in (42, 142, 242, 342, 442):
+        # L5c_lgbm_dialog_meta (seed 42 already in baseline_moscow_v1/predictions; run only missing requested seeds)
+        for seed in seeds:
             out_p = MS_PRED_DIR / f"{stage}_L5c_lgbm_seed{seed}.parquet"
-            if out_p.exists():
+            base_p = base_pred_dir / stage / "L5c_lgbm_dialog_meta.parquet" if seed == 42 else None
+            if out_p.exists() or (base_p is not None and base_p.exists()):
                 continue
             t0 = time.perf_counter()
             fdfs = []
@@ -116,14 +118,18 @@ def run_missing_protocol_a_seeds() -> None:
     gc.collect()
 
 
-def run_extra_protocol_b_seeds() -> None:
-    print("[MultiSeed 2/2] Running Protocol B B_catboost_TGD_tuned extra seeds (342, 442 -> 5 seeds total) ...", flush=True)
+def run_extra_protocol_b_seeds(seeds: tuple[int, ...] = (42,)) -> None:
+    extra = [s for s in seeds if s in (342, 442)]
+    if not extra:
+        print("[MultiSeed 2/2] Single-seed mode: skipping extra Protocol B seeds (using existing seed=42/142/242 predictions).", flush=True)
+        return
+    print(f"[MultiSeed 2/2] Running Protocol B B_catboost_TGD_tuned extra seeds={extra} ...", flush=True)
     spec = load_spec(REPO_ROOT / "configs" / "baseline_v2_evaluation_spec.json")
     tuned = json.loads((REPO_ROOT / "outputs" / "baseline_v2" / "tuned_catboost_config.json").read_text(encoding="utf-8"))
     fcols = list(spec["feature_sets"]["raw_TGD_14"])
     panel = pd.read_parquet(PANEL_PATH, columns=["client_id", "fold", "month", "y_any"] + fcols)
 
-    for seed in (342, 442):
+    for seed in extra:
         for st, sched in (("val", spec["protocols"]["B_rolling_ooc"]["val_schedule"]), ("test", spec["protocols"]["B_rolling_ooc"]["test_schedule"])):
             out_p = MS_PRED_DIR / f"protB_{st}_B_catboost_TGD_tuned_seed{seed}.parquet"
             if out_p.exists():
@@ -168,14 +174,22 @@ def summarize_all_multiseed() -> None:
     prot_a_rows = []
     for st in ("val", "test"):
         models_paths: dict[str, list[tuple[int, Path]]] = {}
-        for eid in ("B-raw-T", "B-raw-TGD", "L4_cb", "FE-v1", "L3_logreg_rfm", "B-raw-TGD_logreg"):
+        for eid in ("B-raw-T", "B-raw-TGD", "L4_cb", "FE-v1"):
             models_paths[eid] = [(s, FE1_PRED_DIR / st / f"{eid}_seed{s}.parquet") for s in (42, 142, 242) if (FE1_PRED_DIR / st / f"{eid}_seed{s}.parquet").exists()]
+        # Deterministic LogReg (lbfgs): always report single seed 42 only
+        for eid in ("L3_logreg_rfm", "B-raw-TGD_logreg"):
+            p42 = FE1_PRED_DIR / st / f"{eid}_seed42.parquet"
+            if p42.exists():
+                models_paths[eid] = [(42, p42)]
         models_paths["L5c_cb"] = [
             (42, FE1_PRED_DIR / st / "L5c_cb_seed42.parquet"),
             (142, MS_PRED_DIR / f"{st}_L5c_cb_seed142.parquet"),
             (242, MS_PRED_DIR / f"{st}_L5c_cb_seed242.parquet"),
         ]
-        models_paths["L5c_lgbm_dialog_meta"] = [(s, MS_PRED_DIR / f"{st}_L5c_lgbm_seed{s}.parquet") for s in (42, 142, 242, 342, 442)]
+        models_paths["L5c_lgbm_dialog_meta"] = [
+            (42, REPO_ROOT / "outputs" / "baseline_moscow_v1" / "predictions" / st / "L5c_lgbm_dialog_meta.parquet"),
+            *[(s, MS_PRED_DIR / f"{st}_L5c_lgbm_seed{s}.parquet") for s in (42, 142, 242, 342, 442)],
+        ]
 
         for eid, s_list in models_paths.items():
             for s, p in s_list:
@@ -242,8 +256,14 @@ def summarize_all_multiseed() -> None:
 
 
 def main() -> None:
-    run_missing_protocol_a_seeds()
-    run_extra_protocol_b_seeds()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seeds", default="42", help="Comma-separated seeds (default 42 single-seed policy)")
+    args = parser.parse_args()
+    seeds = tuple(int(x) for x in args.seeds.split(",") if x.strip()) or (42,)
+    run_missing_protocol_a_seeds(seeds)
+    run_extra_protocol_b_seeds(seeds)
     summarize_all_multiseed()
 
 
