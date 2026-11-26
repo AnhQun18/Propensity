@@ -503,9 +503,9 @@ def tune_150_models_on_val(
         "best_cb_name": best_cb_row["name"],
         "cb_params": cb_params,
         "lgbm_params": {
-            "n_estimators": 700, "learning_rate": 0.04, "num_leaves": 28,
-            "min_child_samples": 110, "colsample_bytree": 0.5, "subsample": 0.8,
-            "subsample_freq": 1, "reg_lambda": 35.0, "reg_alpha": 8.0, "es_rounds": 50,
+            "n_estimators": 350, "learning_rate": 0.05, "num_leaves": 24,
+            "min_child_samples": 150, "colsample_bytree": 0.4, "subsample": 0.8,
+            "subsample_freq": 1, "reg_lambda": 35.0, "reg_alpha": 8.0, "max_bin": 127, "es_rounds": 40,
         },
         "logreg_params": {"C": 0.5, "max_iter": 250},
         "tune_elapsed_sec": round(time.perf_counter() - t0, 1),

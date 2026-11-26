@@ -216,12 +216,18 @@ def main() -> None:
     print(f"[Stage 2] Pruned panel to locked cols: shape={panel.shape}", flush=True)
 
     locked_hp = tune_150_models_on_val(spec, panel, tab_cols, emb_idx, pca_dir, out_dir)
+    # Ensure fast CPU-safe LightGBM settings (<6m on 2 vCPU Colab) even if locked_final_model_spec.json was cached
+    fast_lgbm_params = {
+        "n_estimators": 350, "learning_rate": 0.05, "num_leaves": 24,
+        "min_child_samples": 150, "colsample_bytree": 0.4, "subsample": 0.8,
+        "subsample_freq": 1, "reg_lambda": 35.0, "reg_alpha": 8.0, "max_bin": 127, "es_rounds": 40,
+    }
     _sync_to_drive(out_dir, args.drive_save_dir)
 
     seeds = [int(s) for s in args.seeds]
     model_specs = [
         ("M1_logreg_150", "logreg", locked_hp["logreg_params"], [int(spec["canonical_seed"])]),
-        ("M2_lgbm_150_tuned", "lgbm", locked_hp["lgbm_params"], [int(spec["canonical_seed"])]),
+        ("M2_lgbm_150_tuned", "lgbm", fast_lgbm_params, [int(spec["canonical_seed"])]),
         ("M3_xgb_gpu_150_tuned", "xgb_gpu", locked_hp["xgb_params"], seeds),
         ("M4_catboost_gpu_150_tuned", "catboost_gpu", locked_hp["cb_params"], seeds),
     ]
@@ -234,6 +240,11 @@ def main() -> None:
 
     val_preds: dict[str, list[pd.DataFrame]] = {}
     oot_preds: dict[str, list[pd.DataFrame]] = {}
+    prev_timings_path = out_dir / "stage2_model_timings.csv"
+    prev_timings: dict[tuple[str, int], dict[str, Any]] = {}
+    if prev_timings_path.exists():
+        for r in pd.read_csv(prev_timings_path).to_dict("records"):
+            prev_timings[(str(r["exp_id"]), int(r["seed"]))] = r
     timing_rows: list[dict[str, Any]] = []
 
     for exp_id, fam, p_ov, exp_seeds in model_specs:
@@ -243,10 +254,13 @@ def main() -> None:
             o_df, o_info = run_pca_model_schedule(spec, panel, "oot_test_schedule", exp_id, fam, tab_cols, emb_idx, pca_dir, s, p_ov, pred_dir)
             v_list.append(v_df)
             o_list.append(o_df)
+            prev_r = prev_timings.get((exp_id, int(s)))
+            v_sec = float(prev_r["val_sec"]) if (v_info["cached"] and prev_r and float(prev_r["val_sec"]) > 0) else float(v_info["elapsed_sec"])
+            o_sec = float(prev_r["oot_sec"]) if (o_info["cached"] and prev_r and float(prev_r["oot_sec"]) > 0) else float(o_info["elapsed_sec"])
             timing_rows.append({
                 "stage": "stage2_150", "exp_id": exp_id, "family": fam, "seed": s,
-                "n_features": locked_feat["n_total"], "val_sec": v_info["elapsed_sec"],
-                "oot_sec": o_info["elapsed_sec"], "total_sec": round(v_info["elapsed_sec"] + o_info["elapsed_sec"], 2),
+                "n_features": locked_feat["n_total"], "val_sec": v_sec,
+                "oot_sec": o_sec, "total_sec": round(v_sec + o_sec, 2),
                 "use_gpu": USE_GPU,
             })
         val_preds[exp_id] = v_list
