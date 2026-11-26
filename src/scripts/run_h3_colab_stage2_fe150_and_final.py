@@ -209,8 +209,9 @@ def main() -> None:
     emb_idx = list(locked_feat["emb_indices"])
     _sync_to_drive(out_dir, args.drive_save_dir)
 
-    # Free ~40% of panel RAM immediately by dropping unselected candidate columns
-    keep_panel_cols = list(dict.fromkeys(["client_id", "fold", "month", "y_h3"] + tab_cols))
+    # Free ~40% of panel RAM immediately by dropping unselected candidate columns (keep slice meta cols)
+    slice_meta_cols = [c for c in ("cold_start", "trx_90d_has_event", "trx_all_has_event", "dialog_30d_has_event", "prior_all_bought_any") if c in panel.columns]
+    keep_panel_cols = list(dict.fromkeys(["client_id", "fold", "month", "y_h3"] + slice_meta_cols + tab_cols))
     panel = panel[keep_panel_cols].copy()
     gc.collect()
     print(f"[Stage 2] Pruned panel to locked cols: shape={panel.shape}", flush=True)
