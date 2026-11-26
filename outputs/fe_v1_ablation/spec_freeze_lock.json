@@ -1,0 +1,7 @@
+{
+  "locked_at_utc": "2026-11-25T03:03:13.105760+00:00",
+  "spec_json_path": "configs/fe_v1_evaluation_spec.json",
+  "spec_json_sha256": "c4b04c7154554b5648d96f9c3dcc263b8aa8eca29dea8f9b00ca8a0e12d2b62d",
+  "spec_md_path": "docs/FE_V1_FROZEN_SPEC.md",
+  "spec_md_sha256": "226d194af39df555219a05177a127c0e55f72d15e413f58bd0a29655378ea347"
+}

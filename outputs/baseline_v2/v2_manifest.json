@@ -1,0 +1,25 @@
+{
+  "status": "ready",
+  "phase_last_run": "all",
+  "completed_at_utc": "2026-11-25T14:46:13.695062+00:00",
+  "elapsed_seconds": 21884.16,
+  "spec_id": "baseline_v2_monthly_rolling_ooc_v1",
+  "spec_freeze_lock": {
+    "spec_id": "baseline_v2_monthly_rolling_ooc_v1",
+    "spec_version": "2.0.0",
+    "spec_json_sha256": "5ab70bd89a07ca6e9bdd6bd078fa633e007cf7e0d6a686b3a0343b54ea73e8d4",
+    "spec_md_sha256": "01c68948ff35af8894cc4912819ef8267d4dacbeb763bac99a0f8cc7aec9248d"
+  },
+  "seeds": [
+    42,
+    142,
+    242
+  ],
+  "bootstrap_replicates": 1000,
+  "include_protocol_a": true,
+  "figures": [
+    "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\baseline_v2\\figures\\01_protocol_b_monthly_trends.png",
+    "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\baseline_v2\\figures\\02_test_protocol_b_vs_a_lift.png"
+  ],
+  "report_path": "C:\\Users\\admin\\Documents\\Thực tập VSF\\new propensity\\outputs\\baseline_v2\\BASELINE_V2_REPORT.md"
+}
