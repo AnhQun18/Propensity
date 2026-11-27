@@ -119,14 +119,57 @@ def _render_no_m5_charts() -> tuple[Path, Path]:
     p2 = FIG_DIR / "pres_02_oot_single_ci.png"
     fig.savefig(p2, dpi=180, bbox_inches="tight")
     plt.close(fig)
-    return p1, p2
+
+    # 3) Clean Directional SHAP Bar Chart from stage2_m4_oot_shap_top20.csv (excluding constant month offset)
+    shap_df = pd.read_csv(METRICS_DIR / "stage2_m4_oot_shap_top20.csv")
+    shap_df = shap_df[~shap_df["feature"].str.startswith("obs_age_")].head(10).copy()
+    nice = {
+        "trx_all_event_subtype_nunique": "Đa dạng loại GD phụ (all)",
+        "trx_all_days_since_first_event": "Tuổi lịch sử GD (raw)",
+        "trx_all_days_since_last_event": "Số ngày từ GD gần nhất",
+        "trx_90d_dst_type11_nunique": "Đa dạng đích GD 90d (dst11)",
+        "trx_dormant_days_gap": "Khoảng thời gian gắn bó GD",
+        "trx_all_days_since_first_event_cap365": "Tuổi lịch sử GD (cap 365d)",
+        "trx_30d_new_event_subtype_count": "Số loại GD phụ mới 30d",
+        "trx_90d_log1p_event_count": "Tần suất GD 90d (log1p)",
+        "trx_all_dst_type12_nunique": "Đa dạng đích GD (dst12, all)",
+        "trx_all_event_type_top_share": "Độ tập trung loại GD chính",
+        "geo_90d_gh4_entropy": "Entropy không gian GEO 90d",
+    }
+    shap_df["nice"] = shap_df["feature"].map(lambda c: nice.get(c, c))
+    fig, ax = plt.subplots(figsize=(7.6, 4.6))
+    y_s = np.arange(len(shap_df))
+    cols_s = ["#0D9488" if r >= 0 else "#EA580C" for r in shap_df["spearman_val_vs_shap"]]
+    ax.barh(y_s, shap_df["mean_abs_shap"], color=cols_s, height=0.66)
+    ax.set_yticks(y_s)
+    ax.set_yticklabels(shap_df["nice"], fontsize=9.8, color="#0F172A")
+    ax.invert_yaxis()
+    ax.set_xlabel("Mean |SHAP| trên OOT 2022-11 (tác động lên log-odds mua)", fontsize=9.2, color="#334155")
+    ax.set_xlim(0, shap_df["mean_abs_shap"].max() * 1.28)
+    for i, r in enumerate(shap_df.itertuples()):
+        sgn = "+" if r.spearman_val_vs_shap >= 0 else "−"
+        ct = "#0D9488" if r.spearman_val_vs_shap >= 0 else "#EA580C"
+        ax.text(r.mean_abs_shap + 0.002, i, f"{r.mean_abs_shap:.3f} ({sgn})", va="center", fontsize=8.8, fontweight="bold", color=ct)
+    from matplotlib.patches import Patch
+    ax.legend(
+        handles=[
+            Patch(facecolor="#0D9488", label="(+) Giá trị cao → Tăng khả năng mua"),
+            Patch(facecolor="#EA580C", label="(−) Giá trị cao → Giảm khả năng mua"),
+        ],
+        loc="lower right", frameon=True, facecolor="#F8FAFC", edgecolor="#E2E8F0", fontsize=8.5,
+    )
+    fig.tight_layout(pad=1.0)
+    p3 = FIG_DIR / "pres_03_m4_shap_oot.png"
+    fig.savefig(p3, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return p1, p2, p3
 
 
 def _b64_path(p: Path) -> str:
     return f"data:image/png;base64,{base64.b64encode(p.read_bytes()).decode('ascii')}"
 
 
-def build_html(fig1_uri: str, fig2_uri: str) -> str:
+def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
     html = """<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -456,114 +499,11 @@ def build_html(fig1_uri: str, fig2_uri: str) -> str:
 <section class="slide slide-dark">
   <div class="kicker k-orange">BÁO CÁO THỰC NGHIỆM DỮ LIỆU &bull; PROPENSITY H=3</div>
   <div class="cover-title">Mô Hình Dự Đoán Xu Hướng Mua Hàng<br/>Horizon = 3 Tháng &bull; Rolling Snapshot = 1</div>
-  <div class="cover-sub">Từ EDA chuyên sâu 105,28M sự kiện, kiến trúc chống rò rỉ Embargo 2 tháng, 5 Baselines, kiểm chứng từng cảnh báo đến tối ưu 150 đặc trưng &amp; chốt Final Model trên GPU T4</div>
+  <div class="cover-sub">Từ kiến trúc chống rò rỉ Embargo 2 tháng, 5 Baselines, kiểm chứng từng cảnh báo, tối ưu 150 đặc trưng, hiệu chuẩn xác suất đến giải thích SHAP trên GPU T4</div>
   <div class="bar-teal"></div>
 </section>
 
-<!-- ==================== SLIDE 2: OVERVIEW KPIS ==================== -->
-<section class="slide">
-  <div class="title">Bức tranh Dữ liệu &amp; Kết quả Final Model Trên OOT (2022-11)</div>
-  <div class="subtitle">100.224 khách hàng &times; 12 tháng nhãn (02/2022–01/2023) &nbsp;|&nbsp; Mục tiêu mua trong 3 tháng tới (H=3) &nbsp;|&nbsp; Final Model: CatBoost GPU 150 biến</div>
-  <div class="content">
-    <div class="grid-3">
-      <div class="card-white">
-        <div class="hero-num c-teal">105,28M</div>
-        <div class="hero-lbl">Sự kiện gốc toàn lịch sử</div>
-        <div class="hero-sub">38,76M TRX &bull; 66,30M GEO &bull; 217K DIALOG</div>
-      </div>
-      <div class="card-white">
-        <div class="hero-num c-dark">8,05&times; / 9,62&times;</div>
-        <div class="hero-lbl">Lift@1% / Lift@0,5% OOT</div>
-        <div class="hero-sub">M4 CatBoost GPU 150 biến &bull; PR-AUC = 0,0862</div>
-      </div>
-      <div class="card-white">
-        <div class="hero-num c-orange">25,1%</div>
-        <div class="hero-lbl">Recall@5% (Lift 5,02&times;)</div>
-        <div class="hero-sub">ROC-AUC = 0,7744 (p &lt; 0,001 vs Top-50)</div>
-      </div>
-    </div>
-    <div class="banner-note">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" fill="#0D9488"/><path d="M10 14.2l-2.2-2.2-1.4 1.4L10 17l7.6-7.6-1.4-1.4L10 14.2z" fill="#FFFFFF"/></svg>
-      <div><strong>Kỷ luật chống rò rỉ tuyệt đối:</strong> 4/4 Unit Test PASS, cách ly cứng 2 tháng Embargo (2022-09 &amp; 2022-10), Shuffled Eval Lift = <strong>0,97&times;</strong> (0% leak).</div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 3: MUC 1 - EDA CHARTS ==================== -->
-<section class="slide">
-  <div class="kicker k-teal">MỤC 1 &bull; NHẬN ĐỊNH TỪ EDA (CÓ ĐÓNG GÓP FEATURE)</div>
-  <div class="title">DIALOG Gần Cutoff &amp; Đường Cong Chữ U TRX Dẫn Dắt Thiết Kế Biến</div>
-  <div class="subtitle">Đối soát 15/15 kiểm tra dữ liệu gốc (0 orphan, 0 null khóa/thời gian) &rarr; chuyển hóa trực tiếp thành 5 nhóm đặc trưng</div>
-  <div class="content">
-    <div class="grid-2">
-      <div class="card">
-        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Tỷ lệ mua H=1 theo Tín hiệu DIALOG &amp; Tương tác 0-TRX</div>
-        <svg viewBox="0 0 500 235" width="100%" height="225">
-          <text x="0" y="26" font-size="13" font-weight="700" fill="#EA580C">0-TRX &times; DIALOG gần</text>
-          <rect x="175" y="10" width="260" height="24" rx="6" fill="#EA580C"/>
-          <text x="444" y="27" font-size="14" font-weight="800" fill="#EA580C">9,41%</text>
-
-          <text x="0" y="72" font-size="13" font-weight="700" fill="#0D9488">Có DIALOG tháng trước</text>
-          <rect x="175" y="56" width="117" height="24" rx="6" fill="#0D9488"/>
-          <text x="301" y="73" font-size="14" font-weight="800" fill="#0D9488">4,22% (3,71&times;)</text>
-
-          <text x="0" y="118" font-size="13" font-weight="600" fill="#0F172A">Chưa từng mua + DIALOG</text>
-          <rect x="175" y="102" width="107" height="24" rx="6" fill="#14B8A6"/>
-          <text x="291" y="119" font-size="14" font-weight="700" fill="#0F172A">3,87%</text>
-
-          <text x="0" y="164" font-size="13" font-weight="600" fill="#334155">Đủ cả 3 nguồn T+G+D</text>
-          <rect x="175" y="148" width="55" height="24" rx="6" fill="#334155"/>
-          <text x="239" y="165" font-size="14" font-weight="700" fill="#334155">1,98%</text>
-
-          <text x="0" y="210" font-size="13" font-weight="600" fill="#64748B">Nền chung (10 cutoff)</text>
-          <rect x="175" y="194" width="32" height="24" rx="6" fill="#94A3B8"/>
-          <text x="216" y="211" font-size="14" font-weight="700" fill="#64748B">1,14%</text>
-        </svg>
-      </div>
-
-      <div class="card">
-        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Quan hệ Phi đơn điệu (Chữ U) theo Số Giao dịch TRX</div>
-        <svg viewBox="0 0 500 235" width="100%" height="225">
-          <line x1="30" y1="95" x2="470" y2="95" stroke="#94A3B8" stroke-dasharray="5,5" stroke-width="1.5"/>
-          <text x="385" y="88" font-size="11.5" fill="#64748B">Nền 1,14%</text>
-
-          <rect x="55" y="55" width="76" height="140" rx="8" fill="#EA580C"/>
-          <text x="93" y="45" text-anchor="middle" font-size="15" font-weight="800" fill="#EA580C">1,41%</text>
-          <text x="93" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">0 TRX</text>
-
-          <rect x="165" y="120" width="76" height="75" rx="8" fill="#94A3B8"/>
-          <text x="203" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#475569">0,76%</text>
-          <text x="203" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">1–9 TRX</text>
-
-          <rect x="275" y="137" width="76" height="58" rx="8" fill="#CBD5E1"/>
-          <text x="313" y="127" text-anchor="middle" font-size="15" font-weight="700" fill="#475569">0,59%</text>
-          <text x="313" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">10–99 TRX</text>
-
-          <rect x="385" y="48" width="76" height="147" rx="8" fill="#0D9488"/>
-          <text x="423" y="38" text-anchor="middle" font-size="15" font-weight="800" fill="#0D9488">1,48%</text>
-          <text x="423" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">&ge;100 TRX</text>
-        </svg>
-      </div>
-    </div>
-
-    <div class="grid-3">
-      <div class="card-mint" style="padding:16px 20px;">
-        <div class="hero-lbl c-teal">Đóng góp DIALOG</div>
-        <div class="hero-sub" style="color:#1E293B;">Chỉ 5,75% mẫu nhưng chứa <strong>21,33%</strong> người mua &rarr; tạo recency mũ, burst &amp; PCA.</div>
-      </div>
-      <div class="card-peach" style="padding:16px 20px;">
-        <div class="hero-lbl c-orange">Đuôi currency=11 (1,37e12)</div>
-        <div class="hero-sub" style="color:#1E293B;">Median 18K vs Max 1,37 nghìn tỷ &rarr; dùng median, signed-log &amp; độ lệch đuôi.</div>
-      </div>
-      <div class="card" style="padding:16px 20px;">
-        <div class="hero-lbl">Lệch tuổi nguồn &amp; Đa cộng tuyến</div>
-        <div class="hero-sub" style="color:#1E293B;">GEO bắt đầu muộn 12/2021 &rarr; thêm <strong>obs_age</strong>, Entropy &amp; khử cặp r = 0,998.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 4: H=3 ZERO-LEAK DESIGN ==================== -->
+<!-- ==================== SLIDE 2: H=3 ZERO-LEAK DESIGN ==================== -->
 <section class="slide">
   <div class="kicker k-teal">THIẾT KẾ BÀI TOÁN &bull; CHỐNG RÒ RỈ THỜI GIAN</div>
   <div class="title">Cửa Sổ Trượt H=3 (Snapshot = 1) &amp; Embargo 2 Tháng Khóa OOT</div>
@@ -811,53 +751,40 @@ def build_html(fig1_uri: str, fig2_uri: str) -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 8: WARNINGS 2 & 3 (PRIOR DELAY + LABEL OVERLAP) ==================== -->
+<!-- ==================== SLIDE 6: WARNING 2 - LABEL OVERLAP H=3 ==================== -->
 <section class="slide">
-  <div class="kicker k-orange">KIỂM CHỨNG 2 &amp; 3 / 6 &bull; ĐỘ TRỄ NHÃN PRIOR &amp; LABEL OVERLAP H=3</div>
-  <div class="title">Độ Nhạy Trễ Nhãn <code>prior_*</code> &amp; Kiểm Định Trùng Nhãn Cửa Sổ Trượt</div>
-  <div class="subtitle">Tách riêng 2 biểu đồ đối chứng độc lập trên tập Validation</div>
+  <div class="kicker k-orange">KIỂM CHỨNG 2 / 5 &bull; TRÙNG NHÃN CỬA SỔ TRƯỢT (LABEL OVERLAP H=3)</div>
+  <div class="title">Cửa Sổ Trượt Step=1 Có Làm Thổi Phồng Điểm Không?</div>
+  <div class="subtitle">Đối chứng trực tiếp trên cùng tháng đánh giá <code>2022-08</code> giữa huấn luyện trượt chồng nhãn <code>[02..05]</code> vs không chồng nhãn <code>[02, 05]</code></div>
   <div class="content">
-    <div class="grid-2">
-      <!-- Chart 2: Prior Delay -->
-      <div class="card" style="padding:24px 26px;">
-        <div class="pill-warn">CẢNH BÁO 2 &bull; LƯU Ý SLA NHÃN</div>
-        <div style="font-size:16px; font-weight:700; color:#0F172A; margin-bottom:14px;">Tác động khi nhãn <code>prior_*</code> cập nhật trễ 1 tháng</div>
-        <svg viewBox="0 0 460 205" width="100%" height="195">
-          <rect x="45" y="25" width="90" height="145" rx="8" fill="#0E192D"/>
-          <text x="90" y="17" text-anchor="middle" font-size="14" font-weight="800" fill="#0E192D">0,0785</text>
-          <text x="90" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,99&times;</text>
-          <text x="90" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Đủ nhãn (0m)</text>
+    <div class="grid-2-bal">
+      <div class="card" style="padding:26px 30px;">
+        <div style="font-size:15.5px; font-weight:700; color:#0F172A; margin-bottom:14px;">So sánh PR-AUC &amp; Lift@1% trên 2022-08</div>
+        <svg viewBox="0 0 460 215" width="100%" height="205">
+          <rect x="75" y="34" width="115" height="142" rx="8" fill="#0D9488"/>
+          <text x="132" y="24" text-anchor="middle" font-size="15" font-weight="800" fill="#0D9488">0,0843 PR</text>
+          <text x="132" y="110" text-anchor="middle" font-size="16" font-weight="800" fill="#FFFFFF">5,75&times;</text>
+          <text x="132" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Rolling (02..05)</text>
 
-          <rect x="185" y="47" width="90" height="123" rx="8" fill="#EA580C"/>
-          <text x="230" y="39" text-anchor="middle" font-size="14" font-weight="800" fill="#EA580C">0,0755 (-3,9%)</text>
-          <text x="230" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,38&times;</text>
-          <text x="230" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Trễ 1 tháng</text>
-
-          <rect x="325" y="75" width="90" height="95" rx="8" fill="#94A3B8"/>
-          <text x="370" y="67" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">0,0712 (-9,3%)</text>
-          <text x="370" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,10&times;</text>
-          <text x="370" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Bỏ hẳn Prior</text>
+          <rect x="265" y="24" width="115" height="152" rx="8" fill="#0E192D"/>
+          <text x="322" y="15" text-anchor="middle" font-size="15" font-weight="800" fill="#0E192D">0,0867 PR</text>
+          <text x="322" y="106" text-anchor="middle" font-size="16" font-weight="800" fill="#FFFFFF">5,89&times;</text>
+          <text x="322" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Non-Overlap (02, 05)</text>
         </svg>
-        <div class="hero-sub" style="color:#334155; margin-top:8px;">Cần xác minh SLA chốt nhãn <code>s-1</code> trước ngày 01; nếu trễ dùng bản <code>delay_1m</code>.</div>
       </div>
 
-      <!-- Chart 3: Label Overlap H=3 -->
-      <div class="card" style="padding:24px 26px;">
-        <div class="pill-ok">CẢNH BÁO 3 &bull; PASS (0% THỔI PHỒNG)</div>
-        <div style="font-size:16px; font-weight:700; color:#0F172A; margin-bottom:14px;">Rolling Step=1 (02..05) vs Non-Overlap (02, 05) trên 2022-08</div>
-        <svg viewBox="0 0 460 205" width="100%" height="195">
-          <!-- PR-AUC pair -->
-          <rect x="75" y="34" width="115" height="136" rx="8" fill="#0D9488"/>
-          <text x="132" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0D9488">0,0843 PR</text>
-          <text x="132" y="106" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF">5,75&times;</text>
-          <text x="132" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Rolling (02..05)</text>
-
-          <rect x="265" y="24" width="115" height="146" rx="8" fill="#0E192D"/>
-          <text x="322" y="15" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0E192D">0,0867 PR</text>
-          <text x="322" y="102" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF">5,89&times;</text>
-          <text x="322" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Non-Overlap (02, 05)</text>
-        </svg>
-        <div class="hero-sub" style="color:#334155; margin-top:8px;">Rolling step=1 <strong>không hề thổi phồng điểm</strong> so với không chồng nhãn (thậm chí thấp hơn nhẹ).</div>
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <div class="card-mint">
+          <div class="kicker k-teal" style="margin-bottom:6px;">KẾT LUẬN: PASS (0% THỔI PHỒNG)</div>
+          <div class="hero-num c-teal">0,0843 &le; 0,0867</div>
+          <div class="hero-lbl">Rolling Step=1 không hề tạo lift ảo</div>
+          <div class="hero-sub" style="color:#1E293B;">Thậm chí không chồng nhãn (<code>02, 05</code>) còn nhỉnh hơn nhẹ trên <code>2022-08</code> (ROC 0,756 vs 0,755).</div>
+        </div>
+        <div class="card-white">
+          <div class="kicker k-orange" style="margin-bottom:6px;">Ý NGHĨA THIẾT KẾ</div>
+          <div class="hero-lbl">An toàn dùng cửa sổ trượt snapshot = 1</div>
+          <div class="hero-sub" style="color:#334155;">Tăng gấp đôi số mẫu huấn luyện mà không vi phạm tính độc lập của kỳ đánh giá.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1295,7 +1222,41 @@ def build_html(fig1_uri: str, fig2_uri: str) -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 17: IMPACT & DEPLOYMENT ==================== -->
+<!-- ==================== SLIDE 15: SHAP EXPLAINABILITY ==================== -->
+<section class="slide">
+  <div class="kicker k-teal">GIẢI THÍCH MÔ HÌNH &bull; TREESHAP TRÊN LOCKED OOT (2022-11)</div>
+  <div class="title">SHAP: Yếu Tố Nào Liên Quan Mạnh Nhất Tới Khả Năng Mua?</div>
+  <div class="subtitle">Giá trị TreeSHAP thật của <code>M4_catboost_gpu_150_tuned</code> trên 20.328 khách hàng OOT (fold 0) &nbsp;|&nbsp; Phân rõ chiều tác động tăng / giảm</div>
+  <div class="content">
+    <div style="display:grid; grid-template-columns:1.35fr 0.65fr; gap:24px; align-items:center;">
+      <div class="img-clean" style="height:4.55in;">
+        <img src="__FIG3__" alt="M4 CatBoost TreeSHAP OOT" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="card-mint" style="padding:20px 22px;">
+          <div class="kicker k-teal" style="margin-bottom:6px;">(+) TĂNG MẠNH KHẢ NĂNG MUA</div>
+          <div class="hero-lbl" style="margin-bottom:6px;">Mở rộng &amp; Đa dạng hóa hành vi</div>
+          <div class="hero-sub" style="color:#1E293B;">
+            &bull; Dùng nhiều loại GD phụ &amp; phát sinh loại GD mới 30d.<br/>
+            &bull; Mở rộng đích GD 90d (<code>dst11/12</code>) &amp; tần suất GD 90d.<br/>
+            &bull; Di chuyển rộng (<code>GEO entropy</code>) &amp; có nhiều tháng DIALOG.
+          </div>
+        </div>
+        <div class="card-peach" style="padding:20px 22px;">
+          <div class="kicker k-orange" style="margin-bottom:6px;">(&minus;) GIẢM KHẢ NĂNG MUA</div>
+          <div class="hero-lbl" style="margin-bottom:6px;">Ngủ đông &amp; Hành vi đơn điệu</div>
+          <div class="hero-sub" style="color:#1E293B;">
+            &bull; Lâu không giao dịch (<code>days_since_last</code>, r = &minus;0,98).<br/>
+            &bull; Chỉ lặp đi lặp lại 1 loại GD chính (<code>top_share</code> cao).<br/>
+            &bull; Khách cũ lâu năm ít mở mới hơn nhóm mới kích hoạt.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 16: IMPACT & DEPLOYMENT ==================== -->
 <section class="slide">
   <div class="kicker k-teal">TÁC ĐỘNG KINH DOANH &amp; KHUYẾN NGHỊ TRIỂN KHAI</div>
   <div class="title">Hiệu Quả Theo Ngân Sách Tiếp Cận: <code>M4_catboost_gpu_150_tuned</code></div>
@@ -1344,15 +1305,15 @@ def build_html(fig1_uri: str, fig2_uri: str) -> str:
 </body>
 </html>
 """
-    return html.replace("__FIG1__", fig1_uri).replace("__FIG2__", fig2_uri)
+    return html.replace("__FIG1__", fig1_uri).replace("__FIG2__", fig2_uri).replace("__FIG3__", fig3_uri)
 
 
 def main() -> None:
-    p1, p2 = _render_no_m5_charts()
-    print(f"[Charts] Generated {p1.name} & {p2.name}")
+    p1, p2, p3 = _render_no_m5_charts()
+    print(f"[Charts] Generated {p1.name}, {p2.name} & {p3.name}")
 
     OUT_HTML.parent.mkdir(parents=True, exist_ok=True)
-    OUT_HTML.write_text(build_html(_b64_path(p1), _b64_path(p2)), encoding="utf-8")
+    OUT_HTML.write_text(build_html(_b64_path(p1), _b64_path(p2), _b64_path(p3)), encoding="utf-8")
     print(f"[HTML] Wrote {OUT_HTML} ({OUT_HTML.stat().st_size / 1024:.1f} KB)")
 
     edge = next((p for p in EDGE_CANDIDATES if p.exists()), None)

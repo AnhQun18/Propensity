@@ -1,0 +1,21 @@
+feature,label,mean_abs_shap,spearman_val_vs_shap,direction
+trx_all_event_subtype_nunique,Đa dạng loại GD phụ (all),0.10170667508811797,0.8536112991867143,Tăng mua khi cao
+trx_all_days_since_first_event,Tuổi lịch sử GD (raw),0.08870987004251843,-0.46619182264049097,Giảm mua khi cao
+obs_age_days_geo,obs_age_days_geo,0.08578495914340255,0.0,Tăng mua khi cao
+trx_all_days_since_last_event,Số ngày từ GD gần nhất,0.07322298960919746,-0.9757198643415402,Giảm mua khi cao
+trx_90d_dst_type11_nunique,trx_90d_dst_type11_nunique,0.0726490829329597,0.9335349412067467,Tăng mua khi cao
+trx_dormant_days_gap,Khoảng thời gian gắn bó GD,0.06738752074379788,-0.3844925019164629,Giảm mua khi cao
+trx_all_days_since_first_event_cap365,Tuổi lịch sử GD (cap 365d),0.04911481396005859,-0.4343084117276671,Giảm mua khi cao
+trx_30d_new_event_subtype_count,Số loại GD phụ mới 30d,0.04537867144531581,0.5162107469410817,Tăng mua khi cao
+trx_90d_log1p_event_count,trx_90d_log1p_event_count,0.03879761441158591,0.8698536512539647,Tăng mua khi cao
+trx_all_dst_type12_nunique,trx_all_dst_type12_nunique,0.0380505486887207,0.8217790319252006,Tăng mua khi cao
+trx_all_event_type_top_share,Độ tập trung loại GD chính,0.03675787934116101,-0.8350229956240992,Giảm mua khi cao
+geo_90d_gh4_entropy,geo_90d_gh4_entropy,0.034187972345555005,0.7882314991427647,Tăng mua khi cao
+trx_30d_new_dst12_count,Số đích GD mới 30d (dst12),0.03337511250133235,0.48132956159500473,Tăng mua khi cao
+trx_all_main_amount_signed_log_mean,trx_all_main_amount_signed_log_mean,0.030091366668517878,-0.7703024122447397,Giảm mua khi cao
+trx_30d_event_type_nunique,trx_30d_event_type_nunique,0.029605156754867693,0.6414290872955898,Tăng mua khi cao
+trx_30d_event_count,trx_30d_event_count,0.027936322656503455,0.7380337991020848,Tăng mua khi cao
+trx_all_src_type12_top_share,Độ tập trung nguồn GD (src12),0.026098444965743744,-0.40717313296054175,Giảm mua khi cao
+trx_tenure_frac_of_obs,Tỷ lệ tenure / tuổi quan sát,0.026091814662600143,-0.4169371433003326,Giảm mua khi cao
+dialog_active_months_all,dialog_active_months_all,0.02527129656729004,0.8275358535901679,Tăng mua khi cao
+trx_tx_per_active_day_all,Số GD / ngày hoạt động (all),0.02361674482336552,0.888304690769285,Tăng mua khi cao
