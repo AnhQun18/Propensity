@@ -2,7 +2,7 @@
 
 **Ngày hoàn thành:** 27/11/2026  
 **Phạm vi dữ liệu:** 100.224 khách hàng duy nhất (`client_id`) × 12 tháng nhãn (`2022-02` → `2023-01`) = 1.202.688 khách–tháng; quét toàn bộ lịch sử 38.764.930 TRX (`01/2021+`), 66.295.724 GEO (`12/2021+`) và 217.205 DIALOG (`02/2021+`).  
-**Môi trường thực thi:** Feature Engineering local (DuckDB + Polars/Pandas, `< 12 phút`) + Huấn luyện & Kiểm định trên Google Colab GPU Tesla T4 (toàn bộ từng model chạy `< 30 phút`, trung bình 2.5–10.7 phút/seed trên GPU).
+**Môi trường thực thi:** Feature Engineering local (DuckDB + Polars/Pandas) + Huấn luyện & Kiểm định trên Google Colab GPU Tesla T4.
 
 ---
 
@@ -67,7 +67,7 @@ Tất cả 6 cảnh báo kỹ thuật đã được kiểm định định lư�
 
 ## 4. Feature Engineering Từ Phát Hiện EDA (Bước 4)
 
-Từ sổ phát hiện EDA ([docs/eda_insights_checklist_20261119.md](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/docs/eda_insights_checklist_20261119.md)), script [src/scripts/build_h3_stage2_eda_fe.py](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/src/scripts/build_h3_stage2_eda_fe.py) chạy local trong `703.2s` đã xây dựng **123 biến mới/mở rộng** cho toàn bộ 8 tháng active (`801.792` dòng), nâng tổng kho ứng viên lên **272 biến** (bao gồm `239` biến bảng + `33` biến embedding PCA/norm/drift khớp chặt trên tập train từng fold):
+Từ sổ phát hiện EDA ([docs/eda_insights_checklist_20261119.md](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/docs/eda_insights_checklist_20261119.md)), script [src/scripts/build_h3_stage2_eda_fe.py](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/src/scripts/build_h3_stage2_eda_fe.py) đã xây dựng **123 biến mới/mở rộng** cho toàn bộ 8 tháng active (`801.792` dòng), nâng tổng kho ứng viên lên **272 biến** (bao gồm `239` biến bảng + `33` biến embedding PCA/norm/drift khớp chặt trên tập train từng fold):
 
 1. **Nhóm DIALOG chuyên sâu (từ insight Lift `3.71×` tháng trước & đóng góp `21.33%` người mua):**
    - Cửa sổ ngắn & lịch: `dialog_7d_event_count`, `dialog_14d_event_count`, `dialog_prev_cal_month_has_event`, `dialog_prev_cal_month_log1p_count`, `dialog_active_months_all`.
@@ -92,10 +92,10 @@ Từ sổ phát hiện EDA ([docs/eda_insights_checklist_20261119.md](file:///c:
 ## 5. Chọn Lọc Đặc Trưng (Val-Only → 150 Biến) & Tối Ưu Mô Hình (Bước 5)
 
 ### 5.1. Quy trình chọn lọc 150 biến (Tuyệt đối không chạm OOT)
-Toàn bộ quá trình chọn lọc chạy thuần trên **Validation `2022-05..08`** (`559.0s` trên GPU T4):
-1. **Bước lọc sơ bộ:** Loại hằng số / >99.95% thiếu / toàn bộ biến `prior_delay1m_*`.
-2. **Chấm điểm đa tiêu chí (Consensus Rank):** Kết hợp trung bình thứ hạng từ 3 nguồn trên Val: (i) `XGBoost GPU Gain`, (ii) `CatBoost GPU Feature Importance`, (iii) `Val Permutation Drop` trên `PR-AUC` và `Lift@1%`.
-3. **Khử đa cộng tuyến (`|r| > 0.96`):** Với mỗi cặp biến tương quan Spearman > 0.96 trên Val, chỉ giữ lại biến có thứ hạng đồng thuận cao hơn.
+Toàn bộ quá trình chọn lọc chạy thuần trên **Validation `2022-05..08`**:
+1. **Bước lọc sơ bộ:** Loại hằng số (`std <= 1e-7`) / toàn bộ biến `prior_delay1m_*` / 3 biến tổng tiền thô chưa lấy log.
+2. **Chấm điểm đa tiêu chí (Consensus Rank):** Kết hợp thứ hạng từ 4 tín hiệu trên Val (`0.45 × Perm ΔPR-AUC + 0.25 × XGB Gain + 0.25 × CatBoost Importance + 0.05 × Perm ΔLift@1%`).
+3. **Khử đa cộng tuyến (`|r| > 0.988`):** Với mỗi cặp biến bảng tương quan Pearson > 0.988 trên Val, chỉ giữ lại biến có thứ hạng đồng thuận cao hơn.
 4. **Bảo toàn 18 biến neo EDA/Prior cốt lõi + lấy top đến đúng `150` biến** ([fe_h3_150_locked.json](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/outputs/h3_propensity/metrics/fe_h3_150_locked.json)): gồm **`129` biến bảng** (`TRX`, `DIALOG`, `GEO`, `prior_*`, `obs_age`, `interactions`) + **`21` biến embedding DIALOG** (`19` thành phần PCA + `dlg_norm_ratio_90d_all` + `dlg_l2_drift_90d_all`).
 
 ![Top 20 đặc trưng có điểm đồng thuận cao nhất trên Validation](outputs/h3_propensity/figures/04_top_eda_features_importance.png)
@@ -103,10 +103,10 @@ Toàn bộ quá trình chọn lọc chạy thuần trên **Validation `2022-05..
 **Top 10 biến dẫn đầu bảng xếp hạng đồng thuận Val ([val_candidate_feature_ranking.csv](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/outputs/h3_propensity/metrics/val_candidate_feature_ranking.csv)):**  
 `trx_share_90d_of_all` (0.943), `trx_all_days_since_last_event` (0.938), `trx_30d_dst_type11_nunique` (0.932), `trx_all_event_subtype_nunique` (0.922), `trx_all_days_since_first_event` (0.920), `trx_all_days_since_first_event_cap365` (0.911), `trx_30d_new_dst12_count` (0.908), `trx_tenure_frac_of_obs` (0.885), `trx_all_event_type_entropy` (0.876), `dialog_recency_exp_14d` (0.868), kế tiếp ngay sau là `prior_buy_rate_per_obs_mo` (0.867) và `dlg_pca_90d_7` (0.866).
 
-### 5.2. Tối ưu siêu tham số trên Validation (`val_150_tuning_grid.csv`, `826.5s`)
+### 5.2. Tối ưu siêu tham số trên Validation (`val_150_tuning_grid.csv`)
 Khảo sát 12 cấu hình (6 CatBoost GPU + 6 XGBoost GPU) trên Val `2022-07..08`:
-- **Best CatBoost GPU (`cb_d6_spw3`):** `depth=6, l2_leaf_reg=30, lr=0.03, scale_pos_weight=3.0, iterations=1200, es=80` → Val `PR-AUC = 0.08523`, `Lift@1% = 5.77x`, `ROC-AUC = 0.7491` (`75.0s`).
-- **Best XGBoost GPU (`xgb_d5_l25_lr03`):** `max_depth=5, min_child_weight=60, reg_lambda=25, reg_alpha=5, colsample=0.7, subsample=0.8, lr=0.03, spw=1.0` → Val `PR-AUC = 0.08274`, `Lift@1% = 5.30x`, `ROC-AUC = 0.7467` (`18.6s`).
+- **Best CatBoost GPU (`cb_d6_spw3`):** `depth=6, l2_leaf_reg=30, lr=0.03, scale_pos_weight=3.0, iterations=1200, es=80` → Val `PR-AUC = 0.08523`, `Lift@1% = 5.77x`, `ROC-AUC = 0.7491`.
+- **Best XGBoost GPU (`xgb_d5_l25_lr03`):** `max_depth=5, min_child_weight=60, reg_lambda=25, reg_alpha=5, colsample=0.7, subsample=0.8, lr=0.03, spw=1.0` → Val `PR-AUC = 0.08274`, `Lift@1% = 5.30x`, `ROC-AUC = 0.7467`.
 - **Val-Locked Ensemble (`M5_final_blend_150`):** Tối ưu lưới 48 tổ hợp trọng số trên Val (seed 42) chọn phương thức **`prob`** với trọng số **`0.50 × CatBoost_150 + 0.30 × LightGBM_150 + 0.20 × XGBoost_150`** ([locked_ensemble_weights.json](file:///c:/Users/admin/Documents/Th%E1%BB%B1c%20t%E1%BA%ADp%20VSF/new%20propensity/outputs/h3_propensity/metrics/locked_ensemble_weights.json)).
 
 ---
@@ -156,24 +156,7 @@ Mọi fold đều giữ `ROC-AUC` rất ổn định (`0.771–0.785`) và `Lift
 
 ---
 
-## 7. Thời Gian Chạy & Tối Ưu Hóa Tài Nguyên (Bước 6–7)
-
-Toàn bộ mô hình đều đạt mục tiêu **`< 30 phút / model`** trên Colab T4 GPU và hiển thị tiến trình thời gian thực:
-
-| Giai đoạn / Model | Môi trường | Thời gian / 1 seed (Val + OOT) | Ghi chú tối ưu |
-| :--- | :--- | :---: | :--- |
-| Build Stage-1 Delta (`02, 03` + `y_h3` + `prior_*`) | Local (DuckDB) | `201.4s` (~3.4 phút) | Chạy local song song |
-| Build Stage-2 EDA FE (`123` biến GEO/DIALOG/TRX) | Local (DuckDB) | `703.2s` (~11.7 phút) | Chạy local trong lúc chờ Colab Stage 1 |
-| Stage 2A Feature Selection (`272 → 150` biến) | Colab T4 GPU | `559.0s` (~9.3 phút) | Cache JSON trên Drive |
-| Stage 2B Hyperparameter Grid (12 cấu hình) | Colab T4 GPU | `826.5s` (~13.8 phút) | 6 CB GPU + 6 XGB GPU |
-| `M1_logreg_150` (150 biến) | Colab CPU (`float32`) | `153.5s` (~2.6 phút) | In-place `float32` tránh OOM |
-| `M2_lgbm_150_tuned` (150 biến) | Colab 2 vCPU | `1,808.2s` (~30.1 phút) | `max_bin=127, colsample=0.4` |
-| `M3_xgb_gpu_150_tuned` (150 biến, 3 seeds) | Colab T4 GPU | **`551–566s` (~9.3 phút/seed)** | Nhanh gấp 3.2× CPU |
-| `M4_catboost_gpu_150_tuned` (150 biến, 3 seeds) | Colab T4 GPU | **`634–641s` (~10.6 phút/seed)** | Ổn định & mượt nhất trên GPU |
-
----
-
-## 8. Chốt Final Model & Khuyến Nghị Triển Khai
+## 7. Chốt Final Model & Khuyến Nghị Triển Khai
 
 1. **Final Model chính (Chiến dịch diện rộng Top-5% / Scoring toàn hệ thống):** **`M5_final_blend_150`** (`0.50 × CatBoost_150 + 0.30 × LightGBM_150 + 0.20 × XGBoost_150`, 150 biến EDA+Prior+PCA) — dẫn đầu tuyệt đối trên Validation (`PR-AUC = 0.08175`, `ROC-AUC = 0.7370`) và đạt **`ROC-AUC = 0.7756` (cao nhất, `p < 0.001` vs Top-50)**, **`Lift@0.5% = 9.62x`**, **`Lift@5% = 5.01x` (`Recall@5% = 25.1%`)** trên Locked OOT Test `2022-11`. Khi đưa lên production cần bật hiệu chuẩn Isotonic/Platt (hoặc đổi `scale_pos_weight=1.0`) để tối ưu `LogLoss`.
 2. **Challenger gọn nhẹ (Chiến dịch telesales siêu hẹp Top-1% cần độ trễ thấp & xác suất chuẩn ngay):** **`B5_catboost_gpu_top50`** (50 biến tinh gọn, `spw=1.0`) — đạt `Lift@1% = 8.31x`, `PR-AUC = 0.08844`, `LogLoss = 0.09410` trên OOT `2022-11` với chi phí vận hành bằng 1/3.
