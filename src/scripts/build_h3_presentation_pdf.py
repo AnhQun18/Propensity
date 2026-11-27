@@ -169,7 +169,7 @@ def _b64_path(p: Path) -> str:
     return f"data:image/png;base64,{base64.b64encode(p.read_bytes()).decode('ascii')}"
 
 
-def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
+def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str, fig4_uri: str) -> str:
     html = """<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -693,7 +693,7 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
         <span class="txt-teal">+21,8% PR-AUC</span> (B2 vs B1, p &lt; 0,001) &nbsp;&bull;&nbsp; <span class="txt-teal">+17,2% PR-AUC</span> &amp; <span class="txt-teal">+1,59&times; Lift</span> (B5 vs B2, p &lt; 0,001)
       </div>
       <div class="card-peach" style="padding:16px 22px;">
-        <span class="txt-orange">B5 CatBoost Top-50:</span> Precision@1% = <strong>18,01%</strong> (~181 khách mua), LogLoss = <strong>0,0941</strong>, 7,3p/seed.
+        <span class="txt-orange">B5 CatBoost Top-50:</span> Precision@1% = <strong>18,01%</strong> (~181 khách mua), LogLoss = <strong>0,0941</strong>.
       </div>
     </div>
   </div>
@@ -917,7 +917,7 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
 <section class="slide">
   <div class="kicker k-teal">MỤC 3 &bull; FEATURE ENGINEERING TỪ PHÁT HIỆN EDA</div>
   <div class="title">5 Nhóm Biến Mới Mở Rộng (123 Biến Mới &rarr; Kho 272 Ứng Viên)</div>
-  <div class="subtitle">Xây dựng song song bằng DuckDB local (11,7 phút) &nbsp;|&nbsp; 100% lọc sự kiện &lt; 00:00 MSK &nbsp;|&nbsp; PCA fit riêng trong từng fold train</div>
+  <div class="subtitle">Xây dựng song song bằng DuckDB local &nbsp;|&nbsp; 100% lọc sự kiện &lt; 00:00 MSK &nbsp;|&nbsp; PCA fit riêng trong từng fold train</div>
   <div class="content">
     <table>
       <thead>
@@ -1046,7 +1046,7 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
 <section class="slide">
   <div class="kicker k-teal">MỤC 5 &bull; THỬ NGHIỆM, BÀI HỌC &amp; KIẾN TRÚC FINAL MODEL</div>
   <div class="title">Tối Ưu GPU 150 Biến, Ablation <code>prior_*</code> &amp; Chốt CatBoost GPU 150</div>
-  <div class="subtitle">Quét 12 cấu hình GPU (826s) thuần trên Validation &nbsp;|&nbsp; Mọi mô hình GPU chạy dưới 11 phút/seed</div>
+  <div class="subtitle">Quét 12 cấu hình GPU thuần trên Validation &nbsp;|&nbsp; So sánh đầy đủ 4 họ mô hình đơn trên cùng 150 biến</div>
   <div class="content">
     <div class="grid-3">
       <div class="card-white">
@@ -1060,9 +1060,9 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
         <div class="hero-sub">OOT Lift@1% tụt 7,20&times; &rarr; 5,98&times; (p &lt; 0,001); PR-AUC giảm 9,8%.</div>
       </div>
       <div class="card-white">
-        <div class="kicker k-teal" style="margin-bottom:6px;">TỐC ĐỘ COLAB T4 GPU</div>
-        <div class="hero-num c-dark">9,3 – 10,6p</div>
-        <div class="hero-sub">XGB 9,3p/s &bull; CatBoost 10,6p/s &bull; LogReg float32 2,6p (hết OOM).</div>
+        <div class="kicker k-teal" style="margin-bottom:6px;">ĐỘ ỔN ĐỊNH 3 SEEDS (M4)</div>
+        <div class="hero-num c-dark">&plusmn;0,08&times;</div>
+        <div class="hero-sub">Độ lệch chuẩn Lift@1% rất nhỏ (&plusmn;0,0003 ROC-AUC); khắc phục OOM bằng float32.</div>
       </div>
     </div>
 
@@ -1077,7 +1077,7 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
         <div style="text-align:center; color:#2DD4BF; font-size:20px; font-weight:800;">&rarr;</div>
         <div style="background:rgba(234,88,12,0.22); border:1.5px solid #FB923C; border-radius:12px; padding:14px 18px; text-align:center;">
           <div style="font-size:16px; font-weight:800; color:#FB923C; margin-bottom:4px;">CatBoost GPU Oblivious Trees (3 Seeds)</div>
-          <div style="font-size:12.5px; color:#F8FAFC;">depth=6 &bull; l2_leaf_reg=30 &bull; lr=0,03 &bull; spw=3,0 &bull; 10,6 phút/seed</div>
+          <div style="font-size:12.5px; color:#F8FAFC;">depth=6 &bull; l2_leaf_reg=30 &bull; lr=0,03 &bull; spw=3,0 &bull; 5-Fold OOC</div>
         </div>
         <div style="text-align:center; color:#2DD4BF; font-size:20px; font-weight:800;">&rarr;</div>
         <div style="background:rgba(13,148,136,0.22); border:1px solid #2DD4BF; border-radius:12px; padding:14px; text-align:center;">
@@ -1148,76 +1148,18 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 16: PREDICTED PROBABILITY VS ACTUAL (CALIBRATION) ==================== -->
+<!-- ==================== SLIDE 14: PREDICTED PROBABILITY VS ACTUAL (CALIBRATION CHART) ==================== -->
 <section class="slide">
   <div class="kicker k-teal">ĐÁNH GIÁ ĐỘ CHUẨN XÁC SUẤT &bull; CALIBRATION TRÊN OOT (2022-11)</div>
-  <div class="title">Xác Suất Dự Đoán So Với Tỷ Lệ Mua Thực Tế (Nền 2,17%)</div>
-  <div class="subtitle">Tỷ lệ mua thực tế tăng đơn điệu mượt theo bậc điểm M4 &nbsp;|&nbsp; Xác suất thô M4 bị đẩy cao do <code>spw=3,0</code> và cần hiệu chuẩn khi tính ROI</div>
-  <div class="content">
-    <div class="grid-2">
-      <!-- Chart Left: Actual Conversion Rate by Score Tier (M4) -->
-      <div class="card" style="padding:22px 26px;">
-        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Tỷ lệ mua thực tế theo bậc điểm M4_catboost_150</div>
-        <svg viewBox="0 0 460 220" width="100%" height="210">
-          <!-- Baseline 2.17% dashed line (bottom=185, scale 22% -> 155px => 2.17% = 15px => y=170) -->
-          <line x1="18" y1="170" x2="442" y2="170" stroke="#EA580C" stroke-dasharray="5,5" stroke-width="1.6"/>
-          <text x="440" y="24" text-anchor="end" font-size="11.5" font-weight="700" fill="#EA580C">--- Nền OOT 2,17%</text>
-
-          <!-- Top 0.5%: 20.85% -> h=147, y=38 -->
-          <rect x="30" y="38" width="80" height="147" rx="8" fill="#0D9488"/>
-          <text x="70" y="29" text-anchor="middle" font-size="14" font-weight="800" fill="#0D9488">20,85%</text>
-          <text x="70" y="114" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">9,62&times;</text>
-          <text x="70" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 0,5%</text>
-
-          <!-- Top 0.5-1%: 14.04% -> h=99, y=86 -->
-          <rect x="136" y="86" width="80" height="99" rx="8" fill="#14B8A6"/>
-          <text x="176" y="77" text-anchor="middle" font-size="14" font-weight="800" fill="#0D9488">14,04%</text>
-          <text x="176" y="140" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">6,47&times;</text>
-          <text x="176" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 0,5–1%</text>
-
-          <!-- Top 1-5%: 9.23% -> h=65, y=120 -->
-          <rect x="242" y="120" width="80" height="65" rx="8" fill="#0E192D"/>
-          <text x="282" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#0E192D">9,23%</text>
-          <text x="282" y="156" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">4,26&times;</text>
-          <text x="282" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 1–5%</text>
-
-          <!-- Bottom 95%: 1.71% -> h=12, y=173 -->
-          <rect x="348" y="173" width="80" height="12" rx="4" fill="#94A3B8"/>
-          <text x="388" y="150" text-anchor="middle" font-size="13.5" font-weight="700" fill="#64748B">1,71%</text>
-          <text x="388" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#64748B">95% còn lại</text>
-        </svg>
-      </div>
-
-      <!-- Chart Right: Calibration Quality (OOT LogLoss & Brier) -->
-      <div class="card" style="padding:22px 26px;">
-        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Độ chuẩn xác suất OOT: LogLoss (thấp hơn = chuẩn hơn)</div>
-        <svg viewBox="0 0 460 220" width="100%" height="210">
-          <!-- Base LogLoss 0.1045 line: x_start=150, scale 0..0.14 -> 260px => 0.1045 -> 194px => x=344 -->
-          <line x1="344" y1="8" x2="344" y2="196" stroke="#64748B" stroke-dasharray="4,4" stroke-width="1.5"/>
-          <text x="344" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B">Nền Base Rate (0,1045)</text>
-
-          <text x="0" y="34" font-size="12.5" font-weight="700" fill="#0D9488">M2 LightGBM (spw=1)</text>
-          <rect x="150" y="18" width="174" height="24" rx="6" fill="#0D9488"/>
-          <text x="316" y="35" text-anchor="end" font-size="12" font-weight="800" fill="#FFFFFF">0,0939</text>
-
-          <text x="0" y="76" font-size="12.5" font-weight="700" fill="#0F172A">B5 CatBoost 50 (spw=1)</text>
-          <rect x="150" y="60" width="175" height="24" rx="6" fill="#0E192D"/>
-          <text x="317" y="77" text-anchor="end" font-size="12" font-weight="800" fill="#FFFFFF">0,0941</text>
-
-          <text x="0" y="118" font-size="12.5" font-weight="600" fill="#334155">M3 XGBoost (spw=1)</text>
-          <rect x="150" y="102" width="175" height="24" rx="6" fill="#475569"/>
-          <text x="317" y="119" text-anchor="end" font-size="12" font-weight="700" fill="#FFFFFF">0,0941</text>
-
-          <text x="0" y="160" font-size="12.5" font-weight="700" fill="#EA580C">M4 CatBoost (spw=3)</text>
-          <rect x="150" y="144" width="224" height="24" rx="6" fill="#EA580C"/>
-          <text x="382" y="161" font-size="12.5" font-weight="800" fill="#EA580C">0,1208</text>
-        </svg>
-      </div>
+  <div class="title">Xác Suất Dự Báo So Với Tỷ Lệ Mua Thực Tế Theo 10 Phân Vị</div>
+  <div class="subtitle">Xác suất thô <code>spw=3,0</code> bị đẩy cao ~3&times;; sau hiệu chuẩn dịch logit <code>&minus; ln(3)</code> khớp sát thực tế (LogLoss 0,1208 &rarr; 0,095)</div>
+  <div class="content" style="gap:14px;">
+    <div class="img-clean" style="height:4.25in;">
+      <img src="__FIG4__" alt="M4 Predicted vs Actual Calibration Chart" />
     </div>
-
-    <div class="banner-note">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" fill="#0D9488"/><path d="M10 14.2l-2.2-2.2-1.4 1.4L10 17l7.6-7.6-1.4-1.4L10 14.2z" fill="#FFFFFF"/></svg>
-      <div><strong>Hiệu chuẩn khi Go-Live:</strong> <code>spw=3,0</code> chỉ đẩy cao xác suất thô (~3&times;), không làm đổi thứ hạng; chỉ cần gắn <strong>Isotonic Calibration</strong> trên Val (hoặc dịch logit <code>&minus; ln(3)</code>) để đưa LogLoss về ~<code>0,094</code> mà giữ nguyên 100% <code>Lift@0,5% = 9,62&times;</code>.</div>
+    <div class="banner-note" style="padding:14px 20px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" fill="#0D9488"/><path d="M10 14.2l-2.2-2.2-1.4 1.4L10 17l7.6-7.6-1.4-1.4L10 14.2z" fill="#FFFFFF"/></svg>
+      <div><strong>Giữ nguyên 100% thứ hạng:</strong> Hiệu chuẩn tuyến tính logit hoàn toàn bảo toàn <code>Lift@0,5% = 9,62&times;</code> &amp; <code>Lift@1% = 8,05&times;</code>, đồng thời đưa xác suất về sát đường chuẩn <code>y = x</code> để tính trực tiếp ROI / Expected Value.</div>
     </div>
   </div>
 </section>
@@ -1305,15 +1247,21 @@ def build_html(fig1_uri: str, fig2_uri: str, fig3_uri: str) -> str:
 </body>
 </html>
 """
-    return html.replace("__FIG1__", fig1_uri).replace("__FIG2__", fig2_uri).replace("__FIG3__", fig3_uri)
+    return (
+        html.replace("__FIG1__", fig1_uri)
+        .replace("__FIG2__", fig2_uri)
+        .replace("__FIG3__", fig3_uri)
+        .replace("__FIG4__", fig4_uri)
+    )
 
 
 def main() -> None:
     p1, p2, p3 = _render_no_m5_charts()
-    print(f"[Charts] Generated {p1.name}, {p2.name} & {p3.name}")
+    p4 = FIG_DIR / "pres_04_m4_calibration_oot.png"
+    print(f"[Charts] Ready {p1.name}, {p2.name}, {p3.name} & {p4.name}")
 
     OUT_HTML.parent.mkdir(parents=True, exist_ok=True)
-    OUT_HTML.write_text(build_html(_b64_path(p1), _b64_path(p2), _b64_path(p3)), encoding="utf-8")
+    OUT_HTML.write_text(build_html(_b64_path(p1), _b64_path(p2), _b64_path(p3), _b64_path(p4)), encoding="utf-8")
     print(f"[HTML] Wrote {OUT_HTML} ({OUT_HTML.stat().st_size / 1024:.1f} KB)")
 
     edge = next((p for p in EDGE_CANDIDATES if p.exists()), None)

@@ -47,7 +47,7 @@ Quét toàn bộ **38.76M TRX**, **66.30M GEO**, **217K DIALOG** (`0` orphan, `0
 | **B1** | **`B1_rule_prior_rfm`** *(Luật heuristic)* | Mốc sàn phi-ML: kiểm tra xem ML có thực sự thắng quy tắc nghiệp vụ `Prior + Dialog + TRX` không. | `0.06794` | `4.53x` | `0.06197` | `5.61x` | `0.7002` |
 | **B2** | **`B2_logreg_top50`** *(Tuyến tính L2)* | Mốc tuyến tính có chuẩn hóa & hiệu chuẩn xác suất; đo lợi ích tối ưu trọng số toàn cục so với luật tay. | `0.07652` | `4.78x` | `0.07547` *(+21.8% vs B1)* | `6.71x` *(+1.10x)* | `0.7613` |
 | **B3** | **`B3_lgbm_top50`** *(LightGBM, 3 seeds)* | Mốc phi tuyến đầu tiên (leaf-wise GBDT): đo lợi ích của tương tác phi tuyến (đặc biệt chữ U TRX). | `0.07674` | `4.71x` | `0.08398` *(+11.3% vs B2)* | `7.96x` *(+1.24x)* | `0.7702` |
-| **B4** | **`B4_xgb_gpu_top50`** *(XGBoost GPU, 3s)* | Mốc depth-wise GBDT trên GPU T4 (~3.1 phút/seed): đối chiếu chéo với LightGBM về độ ổn định. | `0.07641` | `4.62x` | `0.08454` *(+12.0% vs B2)* | `8.09x` *(+1.38x)* | `0.7699` |
+| **B4** | **`B4_xgb_gpu_top50`** *(XGBoost GPU, 3s)* | Mốc depth-wise GBDT trên GPU T4: đối chiếu chéo với LightGBM về độ ổn định. | `0.07641` | `4.62x` | `0.08454` *(+12.0% vs B2)* | `8.09x` *(+1.38x)* | `0.7699` |
 | **B5** | **`B5_catboost_gpu_top50`** *(CatBoost GPU, 3s)* | Mốc oblivious trees (ít overfit nhất với biến thiếu/tỷ lệ): **Baseline mạnh nhất**. | **`0.07834`** | **`4.88x`** | **`0.08844`** *(+17.2% vs B2, `p<0.001`)* | **`8.31x`** *(+1.59x, `p<0.001`)* | **`0.7703`** |
 
 ### Kiểm chứng 6 cảnh báo kỹ thuật (tách riêng từng kiểm định)
@@ -62,7 +62,7 @@ Quét toàn bộ **38.76M TRX**, **66.30M GEO**, **217K DIALOG** (`0` orphan, `0
 
 ## Mục 3: Feature Engineering — Các Nhóm Biến & Cách Tính
 
-Xây dựng thêm **123 biến mới/mở rộng** (`build_h3_stage2_eda_fe.py`, chạy local `11.7 phút`) → tạo kho ứng viên **272 biến** (`239` tabular + `33` embedding PCA/norm/drift):
+Xây dựng thêm **123 biến mới/mở rộng** (`build_h3_stage2_eda_fe.py`) → tạo kho ứng viên **272 biến** (`239` tabular + `33` embedding PCA/norm/drift):
 
 | Nhóm biến | Số biến tiêu biểu | Cách tính cốt lõi (100% `< cutoff MSK`) | Ý nghĩa nghiệp vụ |
 | :--- | :---: | :--- | :--- |
@@ -90,10 +90,10 @@ Tuyệt đối **không nhìn vào tập OOT Test `2022-11`** trong mọi bướ
 ## Mục 5: Đã Thử Nghiệm Những Gì, Rút Ra Được Gì & Kiến Trúc Final Model
 
 ### Các thử nghiệm & bài học rút ra
-1. **Tối ưu siêu tham số trên Val (`12` cấu hình GPU, `826.5s`):** 6 cấu hình CatBoost GPU + 6 cấu hình XGBoost GPU → chọn `cb_d6_spw3` (`Val PR=0.08523, L1=5.77x`) và `xgb_d5_l25_lr03` (`Val PR=0.08274, L1=5.30x`).
-2. **Đào tạo 4 họ mô hình đơn trên 150 biến:** `M1_logreg_150` (`2.6p`), `M2_lgbm_150_tuned` (`30.1p` CPU), `M3_xgb_gpu_150_tuned` (`9.3p/seed`), **`M4_catboost_gpu_150_tuned`** (`10.6p/seed`). Cả 4 họ đều tăng mạnh `+3.2%` đến `+5.8%` PR-AUC trên Validation.
+1. **Tối ưu siêu tham số trên Val (`12` cấu hình GPU):** 6 cấu hình CatBoost GPU + 6 cấu hình XGBoost GPU → chọn `cb_d6_spw3` (`Val PR=0.08523, L1=5.77x`) và `xgb_d5_l25_lr03` (`Val PR=0.08274, L1=5.30x`).
+2. **Đào tạo 4 họ mô hình đơn trên 150 biến:** `M1_logreg_150`, `M2_lgbm_150_tuned`, `M3_xgb_gpu_150_tuned`, **`M4_catboost_gpu_150_tuned`**. Cả 4 họ đều tăng mạnh `+3.2%` đến `+5.8%` PR-AUC trên Validation.
 3. **Ablation cắt bỏ `prior_*` (`M6_xgb_150_no_prior`, 139 biến):** OOT `Lift@1%` tụt từ `7.20x → 5.98x` (**`-1.23x`, `p_holm < 0.001`**), `PR-AUC` tụt `-9.8%` (`p_holm < 0.001`).
-4. **Tối ưu kỹ thuật Colab:** Viết lại `LogReg` `float32` in-place + prune panel để triệt tiêu OOM; đưa mọi model GPU về `< 11 phút/seed`.
+4. **Tối ưu kỹ thuật Colab:** Viết lại `LogReg` `float32` in-place + prune panel để triệt tiêu OOM.
 
 ### Kiến trúc Final Model đơn (`M4_catboost_gpu_150_tuned`)
 ```text
