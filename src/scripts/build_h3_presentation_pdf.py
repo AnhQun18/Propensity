@@ -529,11 +529,83 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 5: MUC 2 - 5 BASELINES ==================== -->
+<!-- ==================== SLIDE 5: MUC 2A - TOP 50 FEATURES ==================== -->
 <section class="slide">
-  <div class="kicker k-teal">MỤC 2 &bull; HỆ THỐNG 5 BASELINES (TẬP 50 BIẾN CÓ PRIOR)</div>
+  <div class="kicker k-teal">MỤC 2 &bull; TẬP 50 BIẾN BASELINE (TOP50_FEATURES)</div>
+  <div class="title">50 Biến Ban Đầu Xoay Quanh Gì &amp; Cách Tính Chống Rò Rỉ</div>
+  <div class="subtitle">Toàn bộ 50 biến tổng hợp trên toàn lịch sử &lt; 00:00 Moscow (UTC+3) &nbsp;|&nbsp; Đưa sẵn <code>prior_*</code> đã đóng vào để so sánh công bằng</div>
+  <div class="content" style="gap:18px;">
+    <!-- Distribution Stacked/Horizontal Bar -->
+    <div class="card" style="padding:18px 24px;">
+      <div style="font-size:14px; font-weight:700; color:#0F172A; margin-bottom:10px;">Cơ cấu 50 biến Baseline theo 5 nhóm nguồn</div>
+      <svg viewBox="0 0 1000 58" width="100%" height="54">
+        <rect x="0" y="6" width="396" height="28" rx="6" fill="#0E192D"/>
+        <text x="198" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">TRX: 20 biến (40%)</text>
+
+        <rect x="402" y="6" width="256" height="28" rx="6" fill="#0D9488"/>
+        <text x="530" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">Prior: 13 biến (26%)</text>
+
+        <rect x="664" y="6" width="176" height="28" rx="6" fill="#EA580C"/>
+        <text x="752" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">DIALOG: 9 (18%)</text>
+
+        <rect x="846" y="6" width="132" height="28" rx="6" fill="#64748B"/>
+        <text x="912" y="25" text-anchor="middle" font-size="12.5" font-weight="700" fill="#FFFFFF">GEO: 7 (14%)</text>
+
+        <rect x="984" y="6" width="16" height="28" rx="4" fill="#CBD5E1"/>
+        <text x="992" y="50" text-anchor="end" font-size="11.5" font-weight="600" fill="#64748B">+1 cold_start (2%)</text>
+      </svg>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%;">Nhóm biến</th>
+          <th class="num" style="width:8%;">SL</th>
+          <th style="width:30%;">Xoay quanh tín hiệu gì?</th>
+          <th style="width:44%;">Cách tính cốt lõi (<code>&lt; YYYY-MM-01 00:00 MSK</code>)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. TRX (Giao dịch)</strong></td>
+          <td class="num"><strong>20</strong></td>
+          <td>Tần suất, độ tươi, giá trị, đa dạng &amp; ngoại tệ</td>
+          <td><code>count / log1p</code>, <code>active_days</code>, <code>days_since_last/first</code>, <code>median / max / signed_log_mean</code> (30d/90d/all), <code>nunique(type/subtype)</code>, <code>foreign_fraction</code></td>
+        </tr>
+        <tr class="row-mint">
+          <td class="txt-teal">2. Prior (Lịch sử mua)</td>
+          <td class="num txt-teal">13</td>
+          <td>Thói quen mua lặp &amp; từng sản phẩm p1..p4</td>
+          <td>Chỉ lấy nhãn 1-tháng đã đóng <code>t &le; s-1</code>: <code>bought_1m</code>, <code>3m/6m/all_buy_months</code>, <code>months_since_last_buy</code>, <code>p1..p4</code>, <code>months_observed</code> (tháng 02 giữ <code>NaN</code>)</td>
+        </tr>
+        <tr class="row-peach">
+          <td class="txt-orange">3. DIALOG (Hội thoại)</td>
+          <td class="num txt-orange">9</td>
+          <td>Mức độ &amp; độ gần tương tác tư vấn/CSKH</td>
+          <td><code>has_event</code>, <code>event_count</code>, <code>days_since_last_event</code> trên 3 cửa sổ <code>30d / 90d / all</code> &amp; <code>days_since_first_event</code></td>
+        </tr>
+        <tr>
+          <td><strong>4. GEO (Vị trí app)</strong></td>
+          <td class="num"><strong>7</strong></td>
+          <td>Độ phủ địa lý &amp; tần suất mở ứng dụng</td>
+          <td><code>event_count</code>, <code>days_since_last</code>, <code>geohash_4_nunique</code> (30d/all), <code>top_geohash_6_share</code>, <code>geo_90d_has_event</code></td>
+        </tr>
+        <tr>
+          <td><strong>5. Cold-start</strong></td>
+          <td class="num"><strong>1</strong></td>
+          <td>Tách biệt khách hoàn toàn chưa có log</td>
+          <td><code>cold_start = 1</code> khi đồng thời không có sự kiện ở cả 3 nguồn TRX, GEO, DIALOG trước cutoff</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 6: MUC 2B - 5 BASELINES ==================== -->
+<section class="slide">
+  <div class="kicker k-teal">MỤC 2 &bull; HỆ THỐNG 5 BASELINES (CÙNG 50 BIẾN CHUẨN)</div>
   <div class="title">Thang Đo 5 Baselines: Từ Luật Tay (5,61&times;) Đến CatBoost GPU (8,31&times;)</div>
-  <div class="subtitle">Cùng 50 biến chuẩn (13 Prior &bull; 9 DIALOG &bull; 20 TRX &bull; 7 GEO &bull; 1 Cold-start) &nbsp;|&nbsp; Đánh giá trên Locked OOT 2022-11</div>
+  <div class="subtitle">Cả 5 mô hình chạy trên đúng 50 biến vừa định nghĩa &nbsp;|&nbsp; Đánh giá trên Locked OOT 2022-11 (K = 1.003)</div>
   <div class="content">
     <div class="grid-2-bal">
       <!-- Horizontal Bar Chart for OOT Lift@1% -->
@@ -592,11 +664,71 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 6: 6 WARNINGS AUDIT ==================== -->
+<!-- ==================== SLIDE 7: DIALOG LEAKAGE AUDIT (STANDALONE) ==================== -->
 <section class="slide">
-  <div class="kicker k-orange">KIỂM CHỨNG RỦI RO &bull; AUDIT 6 CẢNH BÁO DỰ ÁN</div>
-  <div class="title">Kiểm Chứng 6/6 Cảnh Báo: 0% Rò Rỉ, Xác Nhận Tín Hiệu Thật</div>
-  <div class="subtitle">So sánh trực tiếp trên Validation 05..08 so với tham chiếu CatBoost Top-50 (PR = 0,0785 &bull; Lift@1% = 4,99&times;)</div>
+  <div class="kicker k-orange">KIỂM CHỨNG CHUYÊN SÂU &bull; CẢNH BÁO RÒ RỈ DIALOG</div>
+  <div class="title">Kiểm Chứng DIALOG Có Gây Leak Không? (Lag 0 / 7 / 14 / 30 Ngày)</div>
+  <div class="subtitle">Giả thuyết kiểm tra: Nếu DIALOG bị leak sát ngày chốt đơn, cắt lùi 7–14 ngày sẽ làm hiệu năng sập ngay về mức <code>no_dialog</code></div>
+  <div class="content">
+    <div class="grid-2-bal">
+      <!-- Dedicated SVG Chart comparing PR-AUC & Lift@1% across Dialog Lag -->
+      <div class="card" style="padding:22px 26px;">
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Hiệu năng Validation (05..08) theo Độ trễ cắt DIALOG</div>
+        <svg viewBox="0 0 540 250" width="100%" height="245">
+          <!-- Reference vertical line for no_dialog (0.07507 -> x=305) -->
+          <line x1="305" y1="8" x2="305" y2="235" stroke="#94A3B8" stroke-dasharray="4,4" stroke-width="1.5"/>
+          <text x="309" y="244" font-size="11" fill="#64748B">Mốc bỏ hẳn DIALOG (0,0751)</text>
+
+          <!-- Lag 0d -->
+          <text x="0" y="30" font-size="13.5" font-weight="700" fill="#0F172A">Full (Lag 0 ngày)</text>
+          <rect x="145" y="14" width="290" height="26" rx="6" fill="#0E192D"/>
+          <text x="444" y="32" font-size="13.5" font-weight="800" fill="#0F172A">0,0785 (4,99&times;)</text>
+
+          <!-- Lag 7d -->
+          <text x="0" y="76" font-size="13.5" font-weight="700" fill="#0D9488">Cắt lùi 7 ngày</text>
+          <rect x="145" y="60" width="215" height="26" rx="6" fill="#0D9488"/>
+          <text x="369" y="78" font-size="13.5" font-weight="800" fill="#0D9488">0,0761 (4,91&times;)</text>
+
+          <!-- Lag 14d -->
+          <text x="0" y="122" font-size="13.5" font-weight="700" fill="#0D9488">Cắt lùi 14 ngày</text>
+          <rect x="145" y="106" width="222" height="26" rx="6" fill="#14B8A6"/>
+          <text x="376" y="124" font-size="13.5" font-weight="800" fill="#0D9488">0,0763 (5,00&times;)</text>
+
+          <!-- Lag 30d -->
+          <text x="0" y="168" font-size="13.5" font-weight="600" fill="#475569">Cắt lùi 30 ngày</text>
+          <rect x="145" y="152" width="163" height="26" rx="6" fill="#64748B"/>
+          <text x="317" y="170" font-size="13.5" font-weight="700" fill="#475569">0,0751 (4,82&times;)</text>
+
+          <!-- No Dialog -->
+          <text x="0" y="214" font-size="13.5" font-weight="700" fill="#EA580C">Bỏ hẳn DIALOG</text>
+          <rect x="145" y="198" width="160" height="26" rx="6" fill="#EA580C"/>
+          <text x="314" y="216" font-size="13.5" font-weight="800" fill="#EA580C">0,0751 (-4,4%)</text>
+        </svg>
+      </div>
+
+      <!-- 2 Big Takeaway Cards -->
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <div class="card-mint">
+          <div class="kicker k-teal" style="margin-bottom:6px;">KẾT LUẬN: KHÔNG CÓ LEAK SÁT CUTOFF</div>
+          <div class="hero-num c-teal">4,91–5,00&times;</div>
+          <div class="hero-lbl">Lift@1% giữ nguyên khi cắt lùi 7–14 ngày</div>
+          <div class="hero-sub" style="color:#1E293B;">PR-AUC vẫn cao hơn hẳn mốc <code>no_dialog</code> (0,0761–0,0763 vs 0,0751; ROC 0,723 vs 0,717).</div>
+        </div>
+        <div class="card-white">
+          <div class="kicker k-orange" style="margin-bottom:6px;">QUY LUẬT SUY GIẢM TỰ NHIÊN</div>
+          <div class="hero-lbl">Tín hiệu phai dần mượt theo độ trễ 0d &rarr; 14d &rarr; 30d</div>
+          <div class="hero-sub" style="color:#334155;">Đúng bản chất hành vi tư vấn bán hàng (khách quan tâm gọi hỏi trước khi mua 1–3 tuần) &rarr; <strong>An toàn giữ toàn bộ DIALOG vào Stage 2</strong>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 8: OTHER 5 WARNINGS AUDIT ==================== -->
+<section class="slide">
+  <div class="kicker k-orange">KIỂM CHỨNG RỦI RO &bull; 5 CẢNH BÁO KỸ THUẬT CÒN LẠI</div>
+  <div class="title">Kiểm Chứng 5 Cảnh Báo Còn Lại: 0% Rò Rỉ &amp; Tối Ưu Tenure cap365</div>
+  <div class="subtitle">Đối chứng Prior delay, Label overlap, Múi giờ MSK/UTC, Tenure left-censor, Geohash drift &amp; Shuffled Sanity</div>
   <div class="content">
     <div class="grid-2-asym">
       <div class="img-clean" style="height:4.7in;">
@@ -604,16 +736,16 @@ def build_html() -> str:
       </div>
       <div style="display:flex; flex-direction:column; gap:14px;">
         <div class="card-mint" style="padding:16px 20px;">
-          <div class="hero-lbl c-teal">DIALOG &amp; Overlap: KHÔNG LEAK</div>
-          <div class="hero-sub" style="color:#1E293B;">Trễ Dialog 7–14d vẫn giữ <strong>4,91–5,00&times;</strong>. Rolling 02..05 (0,0843) &le; Non-overlap (0,0867).</div>
+          <div class="hero-lbl c-teal">Overlap &amp; Múi giờ: AN TOÀN</div>
+          <div class="hero-sub" style="color:#1E293B;">Rolling 02..05 (0,0843) &le; Non-overlap (0,0867). MSK vs UTC lệch &lt; 0,00001.</div>
         </div>
         <div class="card" style="padding:16px 20px;">
-          <div class="hero-lbl">Tenure cap365 &amp; MSK vs UTC</div>
-          <div class="hero-sub" style="color:#1E293B;">Chặn trần 365 ngày <strong>tăng Val PR &rarr; 0,0794</strong> (5,09&times;). MSK vs UTC lệch &lt; 0,00001.</div>
+          <div class="hero-lbl">Tenure cap365 &amp; Geohash Drift</div>
+          <div class="hero-sub" style="color:#1E293B;">Chặn trần 365 ngày <strong>tăng Val PR &rarr; 0,0794</strong> (5,09&times;). Geohash thô drift nhẹ &rarr; đổi sang Entropy.</div>
         </div>
         <div class="card-peach" style="padding:16px 20px;">
-          <div class="hero-lbl c-orange">Shuffled Sanity: 0% Rò rỉ</div>
-          <div class="hero-sub" style="color:#1E293B;">Shuffled Train ROC &approx; <strong>0,50</strong>; Shuffled Eval OOT Lift = <strong>0,97&times;</strong>. Lưu ý SLA trễ nhãn Prior (-3,9% PR).</div>
+          <div class="hero-lbl c-orange">Shuffled Sanity &amp; SLA Prior</div>
+          <div class="hero-sub" style="color:#1E293B;">Shuffled Train ROC &approx; <strong>0,50</strong>; Eval OOT Lift = <strong>0,97&times;</strong>. Trễ nhãn Prior 1m giảm -3,9% PR.</div>
         </div>
       </div>
     </div>
