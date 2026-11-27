@@ -1221,7 +1221,81 @@ def build_html(fig1_uri: str, fig2_uri: str) -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 16: IMPACT & DEPLOYMENT ==================== -->
+<!-- ==================== SLIDE 16: PREDICTED PROBABILITY VS ACTUAL (CALIBRATION) ==================== -->
+<section class="slide">
+  <div class="kicker k-teal">ĐÁNH GIÁ ĐỘ CHUẨN XÁC SUẤT &bull; CALIBRATION TRÊN OOT (2022-11)</div>
+  <div class="title">Xác Suất Dự Đoán So Với Tỷ Lệ Mua Thực Tế (Nền 2,17%)</div>
+  <div class="subtitle">Tỷ lệ mua thực tế tăng đơn điệu mượt theo bậc điểm M4 &nbsp;|&nbsp; Xác suất thô M4 bị đẩy cao do <code>spw=3,0</code> và cần hiệu chuẩn khi tính ROI</div>
+  <div class="content">
+    <div class="grid-2">
+      <!-- Chart Left: Actual Conversion Rate by Score Tier (M4) -->
+      <div class="card" style="padding:22px 26px;">
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Tỷ lệ mua thực tế theo bậc điểm M4_catboost_150</div>
+        <svg viewBox="0 0 460 220" width="100%" height="210">
+          <!-- Baseline 2.17% dashed line (bottom=185, scale 22% -> 155px => 2.17% = 15px => y=170) -->
+          <line x1="18" y1="170" x2="442" y2="170" stroke="#EA580C" stroke-dasharray="5,5" stroke-width="1.6"/>
+          <text x="440" y="24" text-anchor="end" font-size="11.5" font-weight="700" fill="#EA580C">--- Nền OOT 2,17%</text>
+
+          <!-- Top 0.5%: 20.85% -> h=147, y=38 -->
+          <rect x="30" y="38" width="80" height="147" rx="8" fill="#0D9488"/>
+          <text x="70" y="29" text-anchor="middle" font-size="14" font-weight="800" fill="#0D9488">20,85%</text>
+          <text x="70" y="114" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">9,62&times;</text>
+          <text x="70" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 0,5%</text>
+
+          <!-- Top 0.5-1%: 14.04% -> h=99, y=86 -->
+          <rect x="136" y="86" width="80" height="99" rx="8" fill="#14B8A6"/>
+          <text x="176" y="77" text-anchor="middle" font-size="14" font-weight="800" fill="#0D9488">14,04%</text>
+          <text x="176" y="140" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">6,47&times;</text>
+          <text x="176" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 0,5–1%</text>
+
+          <!-- Top 1-5%: 9.23% -> h=65, y=120 -->
+          <rect x="242" y="120" width="80" height="65" rx="8" fill="#0E192D"/>
+          <text x="282" y="111" text-anchor="middle" font-size="14" font-weight="800" fill="#0E192D">9,23%</text>
+          <text x="282" y="156" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">4,26&times;</text>
+          <text x="282" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">Top 1–5%</text>
+
+          <!-- Bottom 95%: 1.71% -> h=12, y=173 -->
+          <rect x="348" y="173" width="80" height="12" rx="4" fill="#94A3B8"/>
+          <text x="388" y="150" text-anchor="middle" font-size="13.5" font-weight="700" fill="#64748B">1,71%</text>
+          <text x="388" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#64748B">95% còn lại</text>
+        </svg>
+      </div>
+
+      <!-- Chart Right: Calibration Quality (OOT LogLoss & Brier) -->
+      <div class="card" style="padding:22px 26px;">
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Độ chuẩn xác suất OOT: LogLoss (thấp hơn = chuẩn hơn)</div>
+        <svg viewBox="0 0 460 220" width="100%" height="210">
+          <!-- Base LogLoss 0.1045 line: x_start=150, scale 0..0.14 -> 260px => 0.1045 -> 194px => x=344 -->
+          <line x1="344" y1="8" x2="344" y2="196" stroke="#64748B" stroke-dasharray="4,4" stroke-width="1.5"/>
+          <text x="344" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B">Nền Base Rate (0,1045)</text>
+
+          <text x="0" y="34" font-size="12.5" font-weight="700" fill="#0D9488">M2 LightGBM (spw=1)</text>
+          <rect x="150" y="18" width="174" height="24" rx="6" fill="#0D9488"/>
+          <text x="316" y="35" text-anchor="end" font-size="12" font-weight="800" fill="#FFFFFF">0,0939</text>
+
+          <text x="0" y="76" font-size="12.5" font-weight="700" fill="#0F172A">B5 CatBoost 50 (spw=1)</text>
+          <rect x="150" y="60" width="175" height="24" rx="6" fill="#0E192D"/>
+          <text x="317" y="77" text-anchor="end" font-size="12" font-weight="800" fill="#FFFFFF">0,0941</text>
+
+          <text x="0" y="118" font-size="12.5" font-weight="600" fill="#334155">M3 XGBoost (spw=1)</text>
+          <rect x="150" y="102" width="175" height="24" rx="6" fill="#475569"/>
+          <text x="317" y="119" text-anchor="end" font-size="12" font-weight="700" fill="#FFFFFF">0,0941</text>
+
+          <text x="0" y="160" font-size="12.5" font-weight="700" fill="#EA580C">M4 CatBoost (spw=3)</text>
+          <rect x="150" y="144" width="224" height="24" rx="6" fill="#EA580C"/>
+          <text x="382" y="161" font-size="12.5" font-weight="800" fill="#EA580C">0,1208</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="banner-note">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" fill="#0D9488"/><path d="M10 14.2l-2.2-2.2-1.4 1.4L10 17l7.6-7.6-1.4-1.4L10 14.2z" fill="#FFFFFF"/></svg>
+      <div><strong>Hiệu chuẩn khi Go-Live:</strong> <code>spw=3,0</code> chỉ đẩy cao xác suất thô (~3&times;), không làm đổi thứ hạng; chỉ cần gắn <strong>Isotonic Calibration</strong> trên Val (hoặc dịch logit <code>&minus; ln(3)</code>) để đưa LogLoss về ~<code>0,094</code> mà giữ nguyên 100% <code>Lift@0,5% = 9,62&times;</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 17: IMPACT & DEPLOYMENT ==================== -->
 <section class="slide">
   <div class="kicker k-teal">TÁC ĐỘNG KINH DOANH &amp; KHUYẾN NGHỊ TRIỂN KHAI</div>
   <div class="title">Hiệu Quả Theo Ngân Sách Tiếp Cận: <code>M4_catboost_gpu_150_tuned</code></div>
