@@ -1,11 +1,24 @@
-"""Generate a minimalist, chart-first 13-slide 16:9 PDF presentation for H=3 Propensity."""
+"""Generate a minimalist, chart-first 16:9 PDF presentation for H=3 Propensity.
+
+Design rules:
+- Single-model focus: M4_catboost_gpu_150_tuned is the Final Model (zero mention of M5/blend).
+- Separate dedicated charts for every single one of the 6 warning verifications.
+- Minimal text, chart-first, zero bottom footers / source captions.
+"""
 from __future__ import annotations
 
 import base64
 import subprocess
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
+METRICS_DIR = REPO_ROOT / "outputs" / "h3_propensity" / "metrics"
 FIG_DIR = REPO_ROOT / "outputs" / "h3_propensity" / "figures"
 OUT_HTML = REPO_ROOT / "outputs" / "h3_propensity" / "H3_PROPENSITY_SLIDES.html"
 OUT_PDF = REPO_ROOT / "H3_PROPENSITY_PRESENTATION.pdf"
@@ -17,16 +30,103 @@ EDGE_CANDIDATES = [
 ]
 
 
-def _b64_img(name: str) -> str:
-    data = base64.b64encode((FIG_DIR / name).read_bytes()).decode("ascii")
-    return f"data:image/png;base64,{data}"
+def _render_no_m5_charts() -> tuple[Path, Path]:
+    """Generate clean Val Rolling and OOT Comparison PNGs excluding M5, styled in deck palette."""
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans",
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.edgecolor": "#CBD5E1",
+        "axes.grid": True,
+        "grid.alpha": 0.28,
+        "grid.color": "#CBD5E1",
+        "figure.facecolor": "#FFFFFF",
+        "axes.facecolor": "#FFFFFF",
+    })
+
+    # 1) Validation Rolling Curve (single models only, no M5)
+    s1_m = pd.read_csv(METRICS_DIR / "stage1_baselines_val_monthly.csv")
+    s2_m = pd.read_csv(METRICS_DIR / "stage2_150_val_monthly.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(11.8, 4.4))
+    series = [
+        (s1_m, "B2_logreg_top50", "B2 LogReg (50)", "--", "#94A3B8", 1.8),
+        (s1_m, "B4_xgb_gpu_top50", "B4 XGB GPU (50)", ":", "#64748B", 1.8),
+        (s1_m, "B5_catboost_gpu_top50", "B5 CatBoost GPU (50)", "-.", "#0E192D", 2.2),
+        (s2_m, "M2_lgbm_150_tuned", "M2 LightGBM (150)", "--", "#14B8A6", 2.0),
+        (s2_m, "M3_xgb_gpu_150_tuned", "M3 XGB GPU (150)", "-", "#0F766E", 2.0),
+        (s2_m, "M4_catboost_gpu_150_tuned", "M4 CatBoost GPU (150 — Final)", "-", "#EA580C", 3.0),
+    ]
+    for df_src, eid, lbl, ls, col, lw in series:
+        sub = df_src[df_src["exp_id"] == eid].sort_values("month")
+        axes[0].plot(sub["month"], sub["lift_1pct_mean"], marker="o", linestyle=ls, color=col, linewidth=lw, label=lbl)
+        axes[1].plot(sub["month"], sub["average_precision_mean"], marker="o", linestyle=ls, color=col, linewidth=lw, label=lbl)
+    axes[0].set_title("Validation Rolling H=3: Lift@1% (K=1.003)", fontsize=11.5, fontweight="bold", color="#0F172A", pad=10)
+    axes[0].set_ylabel("Lift@1%", fontsize=10, color="#334155")
+    axes[1].set_title("Validation Rolling H=3: PR-AUC", fontsize=11.5, fontweight="bold", color="#0F172A", pad=10)
+    axes[1].set_ylabel("PR-AUC", fontsize=10, color="#334155")
+    axes[1].legend(fontsize=8.3, frameon=True, facecolor="#F8FAFC", edgecolor="#E2E8F0", loc="lower right")
+    fig.tight_layout(pad=1.6)
+    p1 = FIG_DIR / "pres_01_val_rolling_single.png"
+    fig.savefig(p1, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+    # 2) Locked OOT Test (2022-11) Model Comparison with 95% CI (single models only, no M5)
+    s1_o = pd.read_csv(METRICS_DIR / "stage1_baselines_oot_test_locked.csv")
+    s2_o = pd.read_csv(METRICS_DIR / "stage2_150_oot_test_summary.csv")
+    s2_o = s2_o[s2_o["exp_id"] != "M5_final_blend_150"].copy()
+    comb = pd.concat([
+        s1_o[["exp_id", "n_features", "average_precision_mean", "average_precision_ci_low", "average_precision_ci_high",
+              "lift_1pct_mean", "lift_1pct_ci_low", "lift_1pct_ci_high"]],
+        s2_o[["exp_id", "n_features", "average_precision_mean", "average_precision_ci_low", "average_precision_ci_high",
+              "lift_1pct_mean", "lift_1pct_ci_low", "lift_1pct_ci_high"]],
+    ], ignore_index=True)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.1))
+    y = np.arange(len(comb))
+    labels = [f"{r.exp_id} ({int(r.n_features)})" for r in comb.itertuples()]
+    colors = []
+    for eid in comb["exp_id"]:
+        if eid == "M4_catboost_gpu_150_tuned":
+            colors.append("#EA580C")
+        elif eid == "B5_catboost_gpu_top50":
+            colors.append("#0E192D")
+        elif eid.startswith("M"):
+            colors.append("#0D9488")
+        else:
+            colors.append("#94A3B8")
+
+    pr_err = [comb["average_precision_mean"] - comb["average_precision_ci_low"],
+              comb["average_precision_ci_high"] - comb["average_precision_mean"]]
+    l1_err = [comb["lift_1pct_mean"] - comb["lift_1pct_ci_low"],
+              comb["lift_1pct_ci_high"] - comb["lift_1pct_mean"]]
+
+    axes[0].barh(y, comb["average_precision_mean"], xerr=pr_err, color=colors, height=0.68,
+                 error_kw={"ecolor": "#334155", "lw": 1.1, "capsize": 2.5})
+    axes[0].set_yticks(y)
+    axes[0].set_yticklabels(labels, fontsize=8.5, color="#1E293B")
+    axes[0].invert_yaxis()
+    axes[0].set_title("Locked OOT Test (2022-11): PR-AUC [95% CI]", fontsize=10.8, fontweight="bold", color="#0F172A", pad=8)
+
+    axes[1].barh(y, comb["lift_1pct_mean"], xerr=l1_err, color=colors, height=0.68,
+                 error_kw={"ecolor": "#334155", "lw": 1.1, "capsize": 2.5})
+    axes[1].set_yticks(y)
+    axes[1].set_yticklabels([""] * len(y))
+    axes[1].invert_yaxis()
+    axes[1].set_title("Locked OOT Test (2022-11): Lift@1% [95% CI]", fontsize=10.8, fontweight="bold", color="#0F172A", pad=8)
+
+    fig.tight_layout(pad=1.4)
+    p2 = FIG_DIR / "pres_02_oot_single_ci.png"
+    fig.savefig(p2, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return p1, p2
 
 
-def build_html() -> str:
-    fig1 = _b64_img("01_val_rolling_curve_baselines_vs_fe150.png")
-    fig2 = _b64_img("02_oot_test_2022_11_model_comparison_ci.png")
-    fig3 = _b64_img("03_warnings_verification_panel.png")
+def _b64_path(p: Path) -> str:
+    return f"data:image/png;base64,{base64.b64encode(p.read_bytes()).decode('ascii')}"
 
+
+def build_html(fig1_uri: str, fig2_uri: str) -> str:
     html = """<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -53,7 +153,7 @@ def build_html() -> str:
     width: 13.333in;
     height: 7.5in;
     background: #FFFFFF;
-    padding: 54px 72px 48px 72px;
+    padding: 52px 72px 46px 72px;
     position: relative;
     overflow: hidden;
     page-break-after: always;
@@ -93,11 +193,11 @@ def build_html() -> str:
   .k-mint { color: #2DD4BF; }
 
   .cover-title {
-    font-size: 50px;
+    font-size: 46px;
     font-weight: 800;
-    line-height: 1.15;
+    line-height: 1.16;
     color: #FFFFFF;
-    max-width: 10.2in;
+    max-width: 10.4in;
     margin-bottom: 20px;
   }
   .cover-sub {
@@ -112,7 +212,7 @@ def build_html() -> str:
 
   /* Light Slide Header */
   .title {
-    font-size: 32px;
+    font-size: 31px;
     font-weight: 800;
     color: #0F172A;
     line-height: 1.2;
@@ -122,27 +222,25 @@ def build_html() -> str:
     font-size: 15.5px;
     color: #64748B;
     line-height: 1.4;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
   }
   .content {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 22px;
+    gap: 20px;
   }
 
-  /* Soft Minimalist Cards */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-  .grid-2-asym { display: grid; grid-template-columns: 1.35fr 0.65fr; gap: 28px; align-items: center; }
+  /* Grids & Cards */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
   .grid-2-bal { display: grid; grid-template-columns: 1.12fr 0.88fr; gap: 26px; align-items: center; }
 
   .card {
     background: #F8FAFC;
     border-radius: 16px;
-    padding: 26px 28px;
+    padding: 24px 26px;
   }
   .card-white {
     background: #FFFFFF;
@@ -154,16 +252,16 @@ def build_html() -> str:
   .card-mint {
     background: #F0FDFA;
     border-radius: 16px;
-    padding: 28px 30px;
+    padding: 26px 28px;
   }
   .card-peach {
     background: #FFF7ED;
     border-radius: 16px;
-    padding: 28px 30px;
+    padding: 26px 28px;
   }
 
   .hero-num {
-    font-size: 46px;
+    font-size: 44px;
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 10px;
@@ -175,8 +273,8 @@ def build_html() -> str:
 
   .hero-lbl {
     font-size: 15px;
-    font-weight: 600;
-    color: #334155;
+    font-weight: 700;
+    color: #1E293B;
     line-height: 1.35;
   }
   .hero-sub {
@@ -198,12 +296,12 @@ def build_html() -> str:
     box-shadow: 0 2px 10px rgba(15,23,42,0.03);
   }
 
-  /* Clean Rounded Table (Reference Style) */
+  /* Tables */
   table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 14px;
+    font-size: 13.8px;
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
@@ -213,12 +311,12 @@ def build_html() -> str:
     color: #FFFFFF;
     font-weight: 600;
     text-align: left;
-    padding: 13px 16px;
-    font-size: 13.5px;
+    padding: 12px 15px;
+    font-size: 13.2px;
   }
   th.num, td.num { text-align: center; }
   td {
-    padding: 12px 16px;
+    padding: 11px 15px;
     background: #FFFFFF;
     border-bottom: 1px solid #F1F5F9;
     color: #1E293B;
@@ -229,27 +327,35 @@ def build_html() -> str:
   tr.row-peach td { background: #FFF7ED; font-weight: 700; color: #0F172A; }
   .txt-teal { color: #0D9488; font-weight: 700; }
   .txt-orange { color: #EA580C; font-weight: 700; }
+  code {
+    font-family: Consolas, monospace;
+    font-size: 12.2px;
+    background: #EEF2F6;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #0F172A;
+  }
+  th code { background: rgba(255,255,255,0.16); color: #E2E8F0; }
 
-  /* Horizontal Bar Chart (Reference Page 8 Style) */
+  /* Horizontal Bar Chart */
   .hbar-wrap {
     background: #F8FAFC;
     border-radius: 16px;
-    padding: 24px 28px;
+    padding: 22px 26px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 13px;
   }
   .hbar-row {
     display: grid;
     grid-template-columns: 235px 1fr 78px;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
   .hbar-lbl {
     font-size: 13.5px;
     font-weight: 600;
     color: #1E293B;
-    text-align: left;
   }
   .hbar-track {
     height: 22px;
@@ -267,7 +373,7 @@ def build_html() -> str:
     text-align: right;
   }
 
-  /* 4-Step Flow (Reference Page 12 Style) */
+  /* 4-Step Flow */
   .step-flow {
     display: flex;
     align-items: center;
@@ -278,13 +384,13 @@ def build_html() -> str:
     flex: 1;
     background: #F8FAFC;
     border-radius: 16px;
-    padding: 22px 18px;
+    padding: 20px 16px;
     text-align: center;
   }
   .step-card.peach { background: #FFF7ED; }
   .step-circle {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     color: #FFFFFF;
     font-size: 15px;
@@ -292,38 +398,15 @@ def build_html() -> str:
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-  .step-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 6px;
-  }
-  .step-desc {
-    font-size: 13px;
-    color: #475569;
-    line-height: 1.4;
-  }
-  .step-arrow {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0D9488;
-  }
+  .step-title { font-size: 15px; font-weight: 700; color: #0F172A; margin-bottom: 5px; }
+  .step-desc { font-size: 12.8px; color: #475569; line-height: 1.4; }
+  .step-arrow { font-size: 22px; font-weight: 700; color: #0D9488; }
 
   /* Timeline */
-  .tl-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 6px;
-  }
-  .tl-box {
-    border-radius: 10px;
-    padding: 12px 4px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-  }
+  .tl-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
+  .tl-box { border-radius: 10px; padding: 12px 4px; text-align: center; font-size: 12px; font-weight: 700; }
   .tl-tr { background: #E2E8F0; color: #0F172A; }
   .tl-va { background: #CCFBF1; color: #115E59; }
   .tl-em { background: #FFEDD5; color: #9A3412; border: 1.5px solid #EA580C; }
@@ -345,6 +428,26 @@ def build_html() -> str:
     object-fit: contain;
     display: block;
   }
+  .pill-ok {
+    display: inline-block;
+    background: #CCFBF1;
+    color: #0F766E;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .pill-warn {
+    display: inline-block;
+    background: #FFEDD5;
+    color: #C2410C;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
 </style>
 </head>
 <body>
@@ -352,15 +455,15 @@ def build_html() -> str:
 <!-- ==================== SLIDE 1: DARK COVER ==================== -->
 <section class="slide slide-dark">
   <div class="kicker k-orange">BÁO CÁO THỰC NGHIỆM DỮ LIỆU &bull; PROPENSITY H=3</div>
-  <div class="cover-title" style="font-size:46px;">Mô Hình Dự Đoán Xu Hướng Mua Hàng<br/>Horizon = 3 Tháng &bull; Rolling Snapshot = 1</div>
-  <div class="cover-sub">Từ EDA chuyên sâu 105,28M sự kiện, kiến trúc chống rò rỉ Embargo 2 tháng, 5 Baselines, kiểm chứng 6 cảnh báo đến tối ưu 150 đặc trưng &amp; Final Model trên GPU T4</div>
+  <div class="cover-title">Mô Hình Dự Đoán Xu Hướng Mua Hàng<br/>Horizon = 3 Tháng &bull; Rolling Snapshot = 1</div>
+  <div class="cover-sub">Từ EDA chuyên sâu 105,28M sự kiện, kiến trúc chống rò rỉ Embargo 2 tháng, 5 Baselines, kiểm chứng từng cảnh báo đến tối ưu 150 đặc trưng &amp; chốt Final Model trên GPU T4</div>
   <div class="bar-teal"></div>
 </section>
 
 <!-- ==================== SLIDE 2: OVERVIEW KPIS ==================== -->
 <section class="slide">
-  <div class="title">Bức tranh Dữ liệu &amp; Kết quả Chốt OOT (2022-11)</div>
-  <div class="subtitle">100.224 khách hàng &times; 12 tháng nhãn (02/2022–01/2023) &nbsp;|&nbsp; Mục tiêu mua trong 3 tháng tới (H=3) &nbsp;|&nbsp; Ngân sách Top 1% (K = 1.003)</div>
+  <div class="title">Bức tranh Dữ liệu &amp; Kết quả Final Model Trên OOT (2022-11)</div>
+  <div class="subtitle">100.224 khách hàng &times; 12 tháng nhãn (02/2022–01/2023) &nbsp;|&nbsp; Mục tiêu mua trong 3 tháng tới (H=3) &nbsp;|&nbsp; Final Model: CatBoost GPU 150 biến</div>
   <div class="content">
     <div class="grid-3">
       <div class="card-white">
@@ -369,14 +472,14 @@ def build_html() -> str:
         <div class="hero-sub">38,76M TRX &bull; 66,30M GEO &bull; 217K DIALOG</div>
       </div>
       <div class="card-white">
-        <div class="hero-num c-dark">0,7756</div>
-        <div class="hero-lbl">OOT ROC-AUC cao nhất</div>
-        <div class="hero-sub">M5 Final Blend 150 biến (p &lt; 0,001 vs Top-50)</div>
+        <div class="hero-num c-dark">8,05&times; / 9,62&times;</div>
+        <div class="hero-lbl">Lift@1% / Lift@0,5% OOT</div>
+        <div class="hero-sub">M4 CatBoost GPU 150 biến &bull; PR-AUC = 0,0862</div>
       </div>
       <div class="card-white">
-        <div class="hero-num c-orange">9,62&times; / 8,31&times;</div>
-        <div class="hero-lbl">Lift@0.5% / Lift@1% OOT</div>
-        <div class="hero-sub">Tỷ lệ mua Top 0,5% đạt ~20,9% (gấp 9,6 lần nền 2,17%)</div>
+        <div class="hero-num c-orange">25,1%</div>
+        <div class="hero-lbl">Recall@5% (Lift 5,02&times;)</div>
+        <div class="hero-sub">ROC-AUC = 0,7744 (p &lt; 0,001 vs Top-50)</div>
       </div>
     </div>
     <div class="banner-note">
@@ -393,11 +496,9 @@ def build_html() -> str:
   <div class="subtitle">Đối soát 15/15 kiểm tra dữ liệu gốc (0 orphan, 0 null khóa/thời gian) &rarr; chuyển hóa trực tiếp thành 5 nhóm đặc trưng</div>
   <div class="content">
     <div class="grid-2">
-      <!-- Chart 1: DIALOG & Interaction Lift -->
       <div class="card">
         <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Tỷ lệ mua H=1 theo Tín hiệu DIALOG &amp; Tương tác 0-TRX</div>
         <svg viewBox="0 0 500 235" width="100%" height="225">
-          <!-- Bars -->
           <text x="0" y="26" font-size="13" font-weight="700" fill="#EA580C">0-TRX &times; DIALOG gần</text>
           <rect x="175" y="10" width="260" height="24" rx="6" fill="#EA580C"/>
           <text x="444" y="27" font-size="14" font-weight="800" fill="#EA580C">9,41%</text>
@@ -420,15 +521,12 @@ def build_html() -> str:
         </svg>
       </div>
 
-      <!-- Chart 2: TRX U-Curve -->
       <div class="card">
         <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Quan hệ Phi đơn điệu (Chữ U) theo Số Giao dịch TRX</div>
         <svg viewBox="0 0 500 235" width="100%" height="225">
-          <!-- Baseline dashed line -->
           <line x1="30" y1="95" x2="470" y2="95" stroke="#94A3B8" stroke-dasharray="5,5" stroke-width="1.5"/>
           <text x="385" y="88" font-size="11.5" fill="#64748B">Nền 1,14%</text>
 
-          <!-- 4 U-curve vertical bars -->
           <rect x="55" y="55" width="76" height="140" rx="8" fill="#EA580C"/>
           <text x="93" y="45" text-anchor="middle" font-size="15" font-weight="800" fill="#EA580C">1,41%</text>
           <text x="93" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">0 TRX</text>
@@ -511,10 +609,10 @@ def build_html() -> str:
         <tr class="row-peach">
           <td class="txt-orange">Embargo (Cách ly cứng)</td>
           <td>2022-09 &amp; 2022-10</td>
-          <td>Không sử dụng</td>
+          <td>Không làm nhãn train</td>
           <td class="num">—</td>
           <td class="num">—</td>
-          <td>Ngăn nhãn H=3 (s+1, s+2) tràn vào OOT 2022-11</td>
+          <td>Ngăn nhãn H=3 (s+1, s+2) tràn vào OOT; vẫn dùng log 09–10 làm feature cho 11</td>
         </tr>
         <tr class="row-mint">
           <td class="txt-teal">Locked OOT Test</td>
@@ -522,7 +620,7 @@ def build_html() -> str:
           <td>[02 .. 08]</td>
           <td class="num">100.224</td>
           <td class="num">2,168%</td>
-          <td>Nhãn train đóng 2022-10-31; chỉ chấm điểm sau khi khóa</td>
+          <td>Toàn bộ 7 tháng nhãn H=3 đã đóng tại 2022-10-31</td>
         </tr>
       </tbody>
     </table>
@@ -535,10 +633,9 @@ def build_html() -> str:
   <div class="title">50 Biến Ban Đầu Xoay Quanh Gì &amp; Cách Tính Chống Rò Rỉ</div>
   <div class="subtitle">Toàn bộ 50 biến tổng hợp trên toàn lịch sử &lt; 00:00 Moscow (UTC+3) &nbsp;|&nbsp; Đưa sẵn <code>prior_*</code> đã đóng vào để so sánh công bằng</div>
   <div class="content" style="gap:18px;">
-    <!-- Distribution Stacked/Horizontal Bar -->
     <div class="card" style="padding:18px 24px;">
       <div style="font-size:14px; font-weight:700; color:#0F172A; margin-bottom:10px;">Cơ cấu 50 biến Baseline theo 5 nhóm nguồn</div>
-      <svg viewBox="0 0 1000 58" width="100%" height="54">
+      <svg viewBox="0 0 1000 56" width="100%" height="52">
         <rect x="0" y="6" width="396" height="28" rx="6" fill="#0E192D"/>
         <text x="198" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">TRX: 20 biến (40%)</text>
 
@@ -552,7 +649,7 @@ def build_html() -> str:
         <text x="912" y="25" text-anchor="middle" font-size="12.5" font-weight="700" fill="#FFFFFF">GEO: 7 (14%)</text>
 
         <rect x="984" y="6" width="16" height="28" rx="4" fill="#CBD5E1"/>
-        <text x="992" y="50" text-anchor="end" font-size="11.5" font-weight="600" fill="#64748B">+1 cold_start (2%)</text>
+        <text x="992" y="49" text-anchor="end" font-size="11.5" font-weight="600" fill="#64748B">+1 cold_start (2%)</text>
       </svg>
     </div>
 
@@ -608,7 +705,6 @@ def build_html() -> str:
   <div class="subtitle">Cả 5 mô hình chạy trên đúng 50 biến vừa định nghĩa &nbsp;|&nbsp; Đánh giá trên Locked OOT 2022-11 (K = 1.003)</div>
   <div class="content">
     <div class="grid-2-bal">
-      <!-- Horizontal Bar Chart for OOT Lift@1% -->
       <div class="hbar-wrap">
         <div style="font-size:14.5px; font-weight:700; color:#0F172A; margin-bottom:4px;">OOT Lift@1% (K = 1.003 khách hàng)</div>
         <div class="hbar-row" style="grid-template-columns:165px 1fr 70px;">
@@ -638,7 +734,6 @@ def build_html() -> str:
         </div>
       </div>
 
-      <!-- Compact Role + PR/ROC Table -->
       <table>
         <thead>
           <tr><th>Mốc</th><th>Vai trò chính</th><th class="num">OOT PR</th><th class="num">ROC</th></tr>
@@ -664,49 +759,41 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 7: DIALOG LEAKAGE AUDIT (STANDALONE) ==================== -->
+<!-- ==================== SLIDE 7: WARNING 1 - DIALOG LEAK (STANDALONE) ==================== -->
 <section class="slide">
-  <div class="kicker k-orange">KIỂM CHỨNG CHUYÊN SÂU &bull; CẢNH BÁO RÒ RỈ DIALOG</div>
+  <div class="kicker k-orange">KIỂM CHỨNG 1 / 6 &bull; CẢNH BÁO RÒ RỈ DIALOG</div>
   <div class="title">Kiểm Chứng DIALOG Có Gây Leak Không? (Lag 0 / 7 / 14 / 30 Ngày)</div>
-  <div class="subtitle">Giả thuyết kiểm tra: Nếu DIALOG bị leak sát ngày chốt đơn, cắt lùi 7–14 ngày sẽ làm hiệu năng sập ngay về mức <code>no_dialog</code></div>
+  <div class="subtitle">Nếu DIALOG bị leak sát ngày chốt đơn, cắt lùi 7–14 ngày sẽ làm hiệu năng sập ngay về mức <code>no_dialog</code></div>
   <div class="content">
     <div class="grid-2-bal">
-      <!-- Dedicated SVG Chart comparing PR-AUC & Lift@1% across Dialog Lag -->
       <div class="card" style="padding:22px 26px;">
-        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">Hiệu năng Validation (05..08) theo Độ trễ cắt DIALOG</div>
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">PR-AUC &amp; Lift@1% trên Val (05..08) theo Độ trễ cắt DIALOG</div>
         <svg viewBox="0 0 540 250" width="100%" height="245">
-          <!-- Reference vertical line for no_dialog (0.07507 -> x=305) -->
-          <line x1="305" y1="8" x2="305" y2="235" stroke="#94A3B8" stroke-dasharray="4,4" stroke-width="1.5"/>
+          <line x1="305" y1="8" x2="305" y2="232" stroke="#94A3B8" stroke-dasharray="4,4" stroke-width="1.5"/>
           <text x="309" y="244" font-size="11" fill="#64748B">Mốc bỏ hẳn DIALOG (0,0751)</text>
 
-          <!-- Lag 0d -->
           <text x="0" y="30" font-size="13.5" font-weight="700" fill="#0F172A">Full (Lag 0 ngày)</text>
           <rect x="145" y="14" width="290" height="26" rx="6" fill="#0E192D"/>
           <text x="444" y="32" font-size="13.5" font-weight="800" fill="#0F172A">0,0785 (4,99&times;)</text>
 
-          <!-- Lag 7d -->
           <text x="0" y="76" font-size="13.5" font-weight="700" fill="#0D9488">Cắt lùi 7 ngày</text>
           <rect x="145" y="60" width="215" height="26" rx="6" fill="#0D9488"/>
           <text x="369" y="78" font-size="13.5" font-weight="800" fill="#0D9488">0,0761 (4,91&times;)</text>
 
-          <!-- Lag 14d -->
           <text x="0" y="122" font-size="13.5" font-weight="700" fill="#0D9488">Cắt lùi 14 ngày</text>
           <rect x="145" y="106" width="222" height="26" rx="6" fill="#14B8A6"/>
           <text x="376" y="124" font-size="13.5" font-weight="800" fill="#0D9488">0,0763 (5,00&times;)</text>
 
-          <!-- Lag 30d -->
           <text x="0" y="168" font-size="13.5" font-weight="600" fill="#475569">Cắt lùi 30 ngày</text>
           <rect x="145" y="152" width="163" height="26" rx="6" fill="#64748B"/>
           <text x="317" y="170" font-size="13.5" font-weight="700" fill="#475569">0,0751 (4,82&times;)</text>
 
-          <!-- No Dialog -->
           <text x="0" y="214" font-size="13.5" font-weight="700" fill="#EA580C">Bỏ hẳn DIALOG</text>
           <rect x="145" y="198" width="160" height="26" rx="6" fill="#EA580C"/>
           <text x="314" y="216" font-size="13.5" font-weight="800" fill="#EA580C">0,0751 (-4,4%)</text>
         </svg>
       </div>
 
-      <!-- 2 Big Takeaway Cards -->
       <div style="display:flex; flex-direction:column; gap:18px;">
         <div class="card-mint">
           <div class="kicker k-teal" style="margin-bottom:6px;">KẾT LUẬN: KHÔNG CÓ LEAK SÁT CUTOFF</div>
@@ -715,44 +802,191 @@ def build_html() -> str:
           <div class="hero-sub" style="color:#1E293B;">PR-AUC vẫn cao hơn hẳn mốc <code>no_dialog</code> (0,0761–0,0763 vs 0,0751; ROC 0,723 vs 0,717).</div>
         </div>
         <div class="card-white">
-          <div class="kicker k-orange" style="margin-bottom:6px;">QUY LUẬT SUY GIẢM TỰ NHIÊN</div>
-          <div class="hero-lbl">Tín hiệu phai dần mượt theo độ trễ 0d &rarr; 14d &rarr; 30d</div>
-          <div class="hero-sub" style="color:#334155;">Đúng bản chất hành vi tư vấn bán hàng (khách quan tâm gọi hỏi trước khi mua 1–3 tuần) &rarr; <strong>An toàn giữ toàn bộ DIALOG vào Stage 2</strong>.</div>
+          <div class="kicker k-orange" style="margin-bottom:6px;">SUY GIẢM TỰ NHIÊN THEO THỜI GIAN</div>
+          <div class="hero-lbl">Tín hiệu phai mượt 0d &rarr; 14d &rarr; 30d</div>
+          <div class="hero-sub" style="color:#334155;">Đúng bản chất tư vấn trước mua 1–3 tuần &rarr; <strong>An toàn giữ toàn bộ DIALOG vào Stage 2</strong>.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== SLIDE 8: OTHER 5 WARNINGS AUDIT ==================== -->
+<!-- ==================== SLIDE 8: WARNINGS 2 & 3 (PRIOR DELAY + LABEL OVERLAP) ==================== -->
 <section class="slide">
-  <div class="kicker k-orange">KIỂM CHỨNG RỦI RO &bull; 5 CẢNH BÁO KỸ THUẬT CÒN LẠI</div>
-  <div class="title">Kiểm Chứng 5 Cảnh Báo Còn Lại: 0% Rò Rỉ &amp; Tối Ưu Tenure cap365</div>
-  <div class="subtitle">Đối chứng Prior delay, Label overlap, Múi giờ MSK/UTC, Tenure left-censor, Geohash drift &amp; Shuffled Sanity</div>
+  <div class="kicker k-orange">KIỂM CHỨNG 2 &amp; 3 / 6 &bull; ĐỘ TRỄ NHÃN PRIOR &amp; LABEL OVERLAP H=3</div>
+  <div class="title">Độ Nhạy Trễ Nhãn <code>prior_*</code> &amp; Kiểm Định Trùng Nhãn Cửa Sổ Trượt</div>
+  <div class="subtitle">Tách riêng 2 biểu đồ đối chứng độc lập trên tập Validation</div>
   <div class="content">
-    <div class="grid-2-asym">
-      <div class="img-clean" style="height:4.7in;">
-        <img src="__FIG3__" alt="6 Warnings Verification" />
+    <div class="grid-2">
+      <!-- Chart 2: Prior Delay -->
+      <div class="card" style="padding:24px 26px;">
+        <div class="pill-warn">CẢNH BÁO 2 &bull; LƯU Ý SLA NHÃN</div>
+        <div style="font-size:16px; font-weight:700; color:#0F172A; margin-bottom:14px;">Tác động khi nhãn <code>prior_*</code> cập nhật trễ 1 tháng</div>
+        <svg viewBox="0 0 460 205" width="100%" height="195">
+          <rect x="45" y="25" width="90" height="145" rx="8" fill="#0E192D"/>
+          <text x="90" y="17" text-anchor="middle" font-size="14" font-weight="800" fill="#0E192D">0,0785</text>
+          <text x="90" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,99&times;</text>
+          <text x="90" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Đủ nhãn (0m)</text>
+
+          <rect x="185" y="47" width="90" height="123" rx="8" fill="#EA580C"/>
+          <text x="230" y="39" text-anchor="middle" font-size="14" font-weight="800" fill="#EA580C">0,0755 (-3,9%)</text>
+          <text x="230" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,38&times;</text>
+          <text x="230" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Trễ 1 tháng</text>
+
+          <rect x="325" y="75" width="90" height="95" rx="8" fill="#94A3B8"/>
+          <text x="370" y="67" text-anchor="middle" font-size="14" font-weight="800" fill="#64748B">0,0712 (-9,3%)</text>
+          <text x="370" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,10&times;</text>
+          <text x="370" y="190" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">Bỏ hẳn Prior</text>
+        </svg>
+        <div class="hero-sub" style="color:#334155; margin-top:8px;">Cần xác minh SLA chốt nhãn <code>s-1</code> trước ngày 01; nếu trễ dùng bản <code>delay_1m</code>.</div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:14px;">
-        <div class="card-mint" style="padding:16px 20px;">
-          <div class="hero-lbl c-teal">Overlap &amp; Múi giờ: AN TOÀN</div>
-          <div class="hero-sub" style="color:#1E293B;">Rolling 02..05 (0,0843) &le; Non-overlap (0,0867). MSK vs UTC lệch &lt; 0,00001.</div>
-        </div>
-        <div class="card" style="padding:16px 20px;">
-          <div class="hero-lbl">Tenure cap365 &amp; Geohash Drift</div>
-          <div class="hero-sub" style="color:#1E293B;">Chặn trần 365 ngày <strong>tăng Val PR &rarr; 0,0794</strong> (5,09&times;). Geohash thô drift nhẹ &rarr; đổi sang Entropy.</div>
-        </div>
-        <div class="card-peach" style="padding:16px 20px;">
-          <div class="hero-lbl c-orange">Shuffled Sanity &amp; SLA Prior</div>
-          <div class="hero-sub" style="color:#1E293B;">Shuffled Train ROC &approx; <strong>0,50</strong>; Eval OOT Lift = <strong>0,97&times;</strong>. Trễ nhãn Prior 1m giảm -3,9% PR.</div>
-        </div>
+
+      <!-- Chart 3: Label Overlap H=3 -->
+      <div class="card" style="padding:24px 26px;">
+        <div class="pill-ok">CẢNH BÁO 3 &bull; PASS (0% THỔI PHỒNG)</div>
+        <div style="font-size:16px; font-weight:700; color:#0F172A; margin-bottom:14px;">Rolling Step=1 (02..05) vs Non-Overlap (02, 05) trên 2022-08</div>
+        <svg viewBox="0 0 460 205" width="100%" height="195">
+          <!-- PR-AUC pair -->
+          <rect x="75" y="34" width="115" height="136" rx="8" fill="#0D9488"/>
+          <text x="132" y="24" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0D9488">0,0843 PR</text>
+          <text x="132" y="106" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF">5,75&times;</text>
+          <text x="132" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Rolling (02..05)</text>
+
+          <rect x="265" y="24" width="115" height="146" rx="8" fill="#0E192D"/>
+          <text x="322" y="15" text-anchor="middle" font-size="14.5" font-weight="800" fill="#0E192D">0,0867 PR</text>
+          <text x="322" y="102" text-anchor="middle" font-size="15" font-weight="800" fill="#FFFFFF">5,89&times;</text>
+          <text x="322" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Non-Overlap (02, 05)</text>
+        </svg>
+        <div class="hero-sub" style="color:#334155; margin-top:8px;">Rolling step=1 <strong>không hề thổi phồng điểm</strong> so với không chồng nhãn (thậm chí thấp hơn nhẹ).</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== SLIDE 7: MUC 3 - FEATURE ENGINEERING ==================== -->
+<!-- ==================== SLIDE 9: WARNINGS 4, 5, 6 (TIMEZONE, TENURE, GEO) ==================== -->
+<section class="slide">
+  <div class="kicker k-orange">KIỂM CHỨNG 4, 5 &amp; 6 / 6 &bull; MÚI GIỜ, TENURE CENSOR &amp; GEOHASH DRIFT</div>
+  <div class="title">Mỗi Cảnh Báo Một Biểu Đồ: An Toàn Múi Giờ &amp; Cải Thiện Với <code>cap365</code></div>
+  <div class="subtitle">Đối chiếu trực tiếp PR-AUC &amp; Lift@1% trên Validation (05..08) cho từng yếu tố nhiễu dữ liệu</div>
+  <div class="content">
+    <div class="grid-3">
+      <!-- Chart 4: Timezone MSK vs UTC -->
+      <div class="card" style="padding:20px 22px;">
+        <div class="pill-ok">CẢNH BÁO 4 &bull; MÚI GIỜ</div>
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">MSK (UTC+3) vs UTC (TRX RFM)</div>
+        <svg viewBox="0 0 300 185" width="100%" height="180">
+          <rect x="42" y="42" width="76" height="114" rx="8" fill="#0D9488"/>
+          <text x="80" y="32" text-anchor="middle" font-size="13.5" font-weight="800" fill="#0D9488">0,05807</text>
+          <text x="80" y="104" text-anchor="middle" font-size="13.5" font-weight="700" fill="#FFFFFF">3,20&times;</text>
+          <text x="80" y="176" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">MSK (+3h)</text>
+
+          <rect x="182" y="42" width="76" height="114" rx="8" fill="#94A3B8"/>
+          <text x="220" y="32" text-anchor="middle" font-size="13.5" font-weight="800" fill="#64748B">0,05807</text>
+          <text x="220" y="104" text-anchor="middle" font-size="13.5" font-weight="700" fill="#FFFFFF">3,18&times;</text>
+          <text x="220" y="176" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E293B">UTC</text>
+        </svg>
+        <div class="hero-sub" style="color:#334155;">Lệch PR &lt; 0,00001; không rò rỉ biên giờ.</div>
+      </div>
+
+      <!-- Chart 5: Tenure Left-Censoring -->
+      <div class="card-mint" style="padding:20px 22px;">
+        <div class="pill-ok">CẢNH BÁO 5 &bull; TENURE CENSOR</div>
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Thô vs Bỏ vs Chặn trần <code>cap365</code></div>
+        <svg viewBox="0 0 300 185" width="100%" height="180">
+          <rect x="18" y="54" width="72" height="102" rx="8" fill="#64748B"/>
+          <text x="54" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#475569">0,0785</text>
+          <text x="54" y="110" text-anchor="middle" font-size="12.5" font-weight="700" fill="#FFFFFF">4,99&times;</text>
+          <text x="54" y="176" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Raw</text>
+
+          <rect x="114" y="64" width="72" height="92" rx="8" fill="#94A3B8"/>
+          <text x="150" y="54" text-anchor="middle" font-size="12.5" font-weight="700" fill="#64748B">0,0779</text>
+          <text x="150" y="115" text-anchor="middle" font-size="12.5" font-weight="700" fill="#FFFFFF">4,96&times;</text>
+          <text x="150" y="176" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Drop</text>
+
+          <rect x="210" y="34" width="72" height="122" rx="8" fill="#0D9488"/>
+          <text x="246" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="#0D9488">0,0794</text>
+          <text x="246" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#FFFFFF">5,09&times;</text>
+          <text x="246" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="#0D9488">cap365</text>
+        </svg>
+        <div class="hero-sub" style="color:#1E293B;"><strong>cap365 tăng điểm</strong> &rarr; đưa vào Stage 2!</div>
+      </div>
+
+      <!-- Chart 6: Geohash Drift -->
+      <div class="card" style="padding:20px 22px;">
+        <div class="pill-warn">CẢNH BÁO 6 &bull; GEOHASH DRIFT</div>
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:12px;">Geohash thô vs Bỏ Geohash thô</div>
+        <svg viewBox="0 0 300 185" width="100%" height="180">
+          <rect x="42" y="50" width="76" height="106" rx="8" fill="#64748B"/>
+          <text x="80" y="40" text-anchor="middle" font-size="13.5" font-weight="700" fill="#475569">0,0785</text>
+          <text x="80" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,99&times;</text>
+          <text x="80" y="176" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Có GEO thô</text>
+
+          <rect x="182" y="38" width="76" height="118" rx="8" fill="#EA580C"/>
+          <text x="220" y="28" text-anchor="middle" font-size="13.5" font-weight="800" fill="#EA580C">0,0791</text>
+          <text x="220" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">4,97&times;</text>
+          <text x="220" y="176" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Bỏ GEO thô</text>
+        </svg>
+        <div class="hero-sub" style="color:#334155;">GEO bắt đầu 12/2021 &rarr; chuyển sang Entropy &amp; Novelty.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 10: SHUFFLED SANITY CHECK (DEDICATED) ==================== -->
+<section class="slide">
+  <div class="kicker k-teal">KIỂM ĐỊNH CHỐNG RÒ RỈ TUYỆT ĐỐI &bull; SHUFFLED-LABEL SANITY</div>
+  <div class="title">Xáo Trộn Nhãn (Shuffled Sanity): Xác Nhận 0% Rò Rỉ Dữ Liệu</div>
+  <div class="subtitle">Khi xáo ngẫu nhiên nhãn, mô hình không thể học được gì: ROC-AUC rơi đúng về 0,50 và Eval Lift@1% rơi về 0,97&times;</div>
+  <div class="content">
+    <div class="grid-2">
+      <!-- Chart A: ROC-AUC Real vs Shuffled -->
+      <div class="card" style="padding:24px 26px;">
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">ROC-AUC: Mô hình Thật vs Xáo Nhãn (Đường chuẩn = 0,50)</div>
+        <svg viewBox="0 0 460 215" width="100%" height="205">
+          <!-- Dashed 0.50 line (height from y=180, scale 0..1 -> 0.50 at y=95) -->
+          <line x1="15" y1="95" x2="445" y2="95" stroke="#EA580C" stroke-dasharray="5,5" stroke-width="1.8"/>
+          <text x="442" y="22" text-anchor="end" font-size="11.5" font-weight="700" fill="#EA580C">--- Ngẫu nhiên 0,50</text>
+
+          <rect x="30" y="42" width="76" height="143" rx="8" fill="#0D9488"/>
+          <text x="68" y="33" text-anchor="middle" font-size="14" font-weight="800" fill="#0D9488">0,774</text>
+          <text x="68" y="205" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1E293B">M4 Thật</text>
+
+          <rect x="136" y="93" width="76" height="92" rx="8" fill="#94A3B8"/>
+          <text x="174" y="84" text-anchor="middle" font-size="13.5" font-weight="700" fill="#475569">0,509</text>
+          <text x="174" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#475569">Shuf Train Val</text>
+
+          <rect x="242" y="96" width="76" height="89" rx="8" fill="#94A3B8"/>
+          <text x="280" y="87" text-anchor="middle" font-size="13.5" font-weight="700" fill="#475569">0,493</text>
+          <text x="280" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#475569">Shuf Train OOT</text>
+
+          <rect x="348" y="96" width="76" height="89" rx="8" fill="#64748B"/>
+          <text x="386" y="87" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">0,494</text>
+          <text x="386" y="205" text-anchor="middle" font-size="11.5" font-weight="600" fill="#334155">Shuf Eval OOT</text>
+        </svg>
+      </div>
+
+      <!-- Chart B: Eval Lift@1% Real vs Shuffled -->
+      <div class="card-mint" style="padding:24px 26px;">
+        <div style="font-size:15px; font-weight:700; color:#0F172A; margin-bottom:14px;">OOT Lift@1%: Mô hình Thật vs Xáo Nhãn Eval (Đường chuẩn = 1,0&times;)</div>
+        <svg viewBox="0 0 460 215" width="100%" height="205">
+          <line x1="20" y1="166" x2="440" y2="166" stroke="#EA580C" stroke-dasharray="5,5" stroke-width="1.8"/>
+          <text x="438" y="24" text-anchor="end" font-size="11.5" font-weight="700" fill="#EA580C">--- Ngẫu nhiên 1,00&times;</text>
+
+          <rect x="85" y="26" width="110" height="159" rx="8" fill="#0D9488"/>
+          <text x="140" y="17" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">8,05&times;</text>
+          <text x="140" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">PR = 0,0862</text>
+          <text x="140" y="205" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">M4 CatBoost Thật</text>
+
+          <rect x="265" y="166" width="110" height="19" rx="5" fill="#EA580C"/>
+          <text x="320" y="156" text-anchor="middle" font-size="16" font-weight="800" fill="#EA580C">0,97&times;</text>
+          <text x="320" y="205" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">Shuffled Eval (PR 0,0212)</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SLIDE 11: MUC 3 - FEATURE ENGINEERING ==================== -->
 <section class="slide">
   <div class="kicker k-teal">MỤC 3 &bull; FEATURE ENGINEERING TỪ PHÁT HIỆN EDA</div>
   <div class="title">5 Nhóm Biến Mới Mở Rộng (123 Biến Mới &rarr; Kho 272 Ứng Viên)</div>
@@ -803,7 +1037,7 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 8: MUC 4 - FEATURE SELECTION ==================== -->
+<!-- ==================== SLIDE 12: MUC 4 - FEATURE SELECTION ==================== -->
 <section class="slide">
   <div class="kicker k-teal">MỤC 4 &bull; CHỌN LỌC ĐẶC TRƯNG (VAL-ONLY SELECTION)</div>
   <div class="title">Rút Gọn 272 &rarr; 150 Biến Thuần Trên Validation (129 Bảng + 21 PCA)</div>
@@ -835,9 +1069,8 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- Native Bar Chart of Top 8 Selected Features -->
     <div class="hbar-wrap" style="padding:18px 24px; gap:10px;">
-      <div style="font-size:13.5px; font-weight:700; color:#0F172A;">Top 8 Đặc trưng Dẫn đầu Điểm Đồng thuận Val (Màu xanh ngọc = Biến mới Stage 2)</div>
+      <div style="font-size:13.5px; font-weight:700; color:#0F172A;">Top 8 Đặc trưng Dẫn đầu Điểm Đồng thuận Val (Xanh ngọc &amp; Cam = Biến mới Stage 2)</div>
       <div class="hbar-row" style="grid-template-columns:280px 1fr 65px;">
         <div class="hbar-lbl c-teal">trx_share_90d_of_all</div>
         <div class="hbar-track" style="height:16px;"><div class="hbar-fill" style="width:94.3%; background:#0D9488;"></div></div>
@@ -882,17 +1115,17 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 9: MUC 5 - EXPERIMENTS & FINAL MODEL ==================== -->
+<!-- ==================== SLIDE 13: MUC 5 - EXPERIMENTS & FINAL SINGLE MODEL ==================== -->
 <section class="slide">
   <div class="kicker k-teal">MỤC 5 &bull; THỬ NGHIỆM, BÀI HỌC &amp; KIẾN TRÚC FINAL MODEL</div>
-  <div class="title">Tối Ưu GPU 150 Biến, Chứng Minh Giá Trị <code>prior_*</code> &amp; Chốt Final Blend</div>
-  <div class="subtitle">Quét 12 cấu hình GPU (826s) + 48 tổ hợp Blend thuần trên Val &nbsp;|&nbsp; Mọi mô hình GPU chạy dưới 11 phút/seed</div>
+  <div class="title">Tối Ưu GPU 150 Biến, Ablation <code>prior_*</code> &amp; Chốt CatBoost GPU 150</div>
+  <div class="subtitle">Quét 12 cấu hình GPU (826s) thuần trên Validation &nbsp;|&nbsp; Mọi mô hình GPU chạy dưới 11 phút/seed</div>
   <div class="content">
     <div class="grid-3">
       <div class="card-white">
         <div class="kicker k-teal" style="margin-bottom:6px;">FE-150 TRÊN VALIDATION</div>
         <div class="hero-num c-teal">+3,2–5,8%</div>
-        <div class="hero-sub">Cả 4 họ mô hình đều tăng PR-AUC trên Val; M5 Blend dẫn đầu <strong>0,08175</strong>.</div>
+        <div class="hero-sub">Cả 4 họ mô hình đều tăng PR-AUC trên Val; M4 CatBoost dẫn đầu ROC (<strong>0,7363</strong>).</div>
       </div>
       <div class="card-peach">
         <div class="kicker k-orange" style="margin-bottom:6px;">ABLATION BỎ PRIOR_* (M6)</div>
@@ -906,44 +1139,34 @@ def build_html() -> str:
       </div>
     </div>
 
-    <!-- Clean Final Model Architecture Bar -->
+    <!-- Single Final Model Architecture Bar -->
     <div style="background:#0E192D; border-radius:16px; padding:22px 28px; color:#FFFFFF;">
-      <div class="kicker k-mint" style="margin-bottom:14px;">KIẾN TRÚC FINAL MODEL &bull; M5_FINAL_BLEND_150 (PROBABILITY BLEND KHÓA TRÊN VAL)</div>
-      <div style="display:grid; grid-template-columns:1fr 30px 1.6fr 30px 1fr; align-items:center; gap:10px;">
+      <div class="kicker k-mint" style="margin-bottom:14px;">KIẾN TRÚC FINAL MODEL ĐƠN &bull; M4_CATBOOST_GPU_150_TUNED (KHÓA TRÊN VALIDATION)</div>
+      <div style="display:grid; grid-template-columns:1fr 30px 1.55fr 30px 1fr; align-items:center; gap:10px;">
         <div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:14px; text-align:center;">
           <div style="font-weight:700; color:#2DD4BF; font-size:14px; margin-bottom:4px;">150 Đặc trưng</div>
           <div style="font-size:12.5px; color:#CBD5E1;">129 bảng + 21 PCA</div>
         </div>
         <div style="text-align:center; color:#2DD4BF; font-size:20px; font-weight:800;">&rarr;</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-          <div style="background:rgba(13,148,136,0.28); border:1px solid #2DD4BF; border-radius:10px; padding:12px; text-align:center;">
-            <div style="font-size:20px; font-weight:800; color:#2DD4BF;">50%</div>
-            <div style="font-size:12px; color:#F8FAFC;">CatBoost GPU</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:12px; text-align:center;">
-            <div style="font-size:20px; font-weight:800; color:#FFFFFF;">30%</div>
-            <div style="font-size:12px; color:#E2E8F0;">LightGBM</div>
-          </div>
-          <div style="background:rgba(234,88,12,0.22); border:1px solid #FB923C; border-radius:10px; padding:12px; text-align:center;">
-            <div style="font-size:20px; font-weight:800; color:#FB923C;">20%</div>
-            <div style="font-size:12px; color:#F8FAFC;">XGBoost GPU</div>
-          </div>
+        <div style="background:rgba(234,88,12,0.22); border:1.5px solid #FB923C; border-radius:12px; padding:14px 18px; text-align:center;">
+          <div style="font-size:16px; font-weight:800; color:#FB923C; margin-bottom:4px;">CatBoost GPU Oblivious Trees (3 Seeds)</div>
+          <div style="font-size:12.5px; color:#F8FAFC;">depth=6 &bull; l2_leaf_reg=30 &bull; lr=0,03 &bull; spw=3,0 &bull; 10,6 phút/seed</div>
         </div>
         <div style="text-align:center; color:#2DD4BF; font-size:20px; font-weight:800;">&rarr;</div>
         <div style="background:rgba(13,148,136,0.22); border:1px solid #2DD4BF; border-radius:12px; padding:14px; text-align:center;">
-          <div style="font-weight:700; color:#FFFFFF; font-size:14px; margin-bottom:4px;">Blend + Isotonic</div>
-          <div style="font-size:12.5px; color:#CCFBF1;">ROC 0,7756 &bull; R@5% 25,1%</div>
+          <div style="font-weight:700; color:#FFFFFF; font-size:14px; margin-bottom:4px;">+ Isotonic Calib</div>
+          <div style="font-size:12.5px; color:#CCFBF1;">L@1% 8,05&times; &bull; R@5% 25,1%</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== SLIDE 10: VALIDATION ROLLING CHART ==================== -->
+<!-- ==================== SLIDE 14: VALIDATION ROLLING CHART ==================== -->
 <section class="slide">
   <div class="kicker k-teal">ĐỐI CHỨNG TRÊN VALIDATION (400.896 KHÁCH–THÁNG)</div>
   <div class="title">FE-150 Cải Thiện Ổn Định Qua Cả 4 Tháng Trượt Validation</div>
-  <div class="subtitle">Khi lịch sử huấn luyện tích lũy từ 1 lên 4 tháng, M5 Blend &amp; M4 CatBoost 150 dẫn đầu nhất quán</div>
+  <div class="subtitle">Khi lịch sử huấn luyện tích lũy từ 1 lên 4 tháng, M4 CatBoost GPU 150 dẫn đầu nhất quán về PR-AUC &amp; ROC-AUC</div>
   <div class="content">
     <div class="img-clean" style="height:4.9in;">
       <img src="__FIG1__" alt="Validation Rolling Curve" />
@@ -951,14 +1174,14 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 11: MUC 6 - LOCKED OOT TEST ==================== -->
+<!-- ==================== SLIDE 15: MUC 6 - LOCKED OOT TEST ==================== -->
 <section class="slide">
   <div class="kicker k-teal">MỤC 6 &bull; KẾT QUẢ CUỐI CÙNG (LOCKED OOT TEST 2022-11)</div>
-  <div class="title">Hiệu Năng Toàn Bộ Mô Hình Trên Tập OOT Khóa (95% Bootstrap CI)</div>
-  <div class="subtitle">100.224 khách hàng &bull; 2.173 ca mua (2,168%) &nbsp;|&nbsp; M5 Blend thắng tuyệt đối ROC-AUC (p &lt; 0,001), hòa B5 về Lift@1% (p = 0,636)</div>
+  <div class="title">Hiệu Năng Toàn Bộ Mô Hình Đơn Trên Tập OOT Khóa (95% CI)</div>
+  <div class="subtitle">100.224 khách hàng &bull; 2.173 ca mua (2,168%) &nbsp;|&nbsp; M4 CatBoost 150 thắng mọi mô hình đơn 150 biến &amp; vượt B5 về ROC-AUC (p &lt; 0,001)</div>
   <div class="content" style="gap:16px;">
     <div class="img-clean" style="height:2.95in;">
-      <img src="__FIG2__" alt="OOT Model Comparison" />
+      <img src="__FIG2__" alt="OOT Single Model Comparison" />
     </div>
     <table>
       <thead>
@@ -979,14 +1202,14 @@ def build_html() -> str:
           <td class="num">7,44&times;</td><td class="num">4,71&times; (23,6%)</td><td class="num">0,7613</td>
         </tr>
         <tr>
-          <td><strong>M4_catboost_gpu_150_tuned (Đơn #1)</strong></td><td class="num">150</td>
-          <td class="num">0,0862 [0,079; 0,095]</td><td class="num">8,05&times; [7,16; 9,11]</td>
-          <td class="num txt-teal">9,62&times;</td><td class="num txt-teal">5,02&times; (25,1%)</td><td class="num">0,7744</td>
+          <td>M2_lgbm_150_tuned &nbsp;/&nbsp; M3_xgb_gpu_150</td><td class="num">150</td>
+          <td class="num">0,0839 / 0,0801</td><td class="num">8,00&times; / 7,20&times;</td>
+          <td class="num">8,82&times; / 8,42&times;</td><td class="num">4,86&times; / 4,80&times;</td><td class="num">0,7747 / 0,7720</td>
         </tr>
         <tr class="row-mint">
-          <td class="txt-teal">M5_final_blend_150 (Final Model)</td><td class="num">150</td>
-          <td class="num">0,0860 [0,079; 0,095]</td><td class="num">7,92&times; [7,03; 8,98]</td>
-          <td class="num txt-teal">9,62&times;</td><td class="num txt-teal">5,01&times; (25,1%)</td><td class="num txt-teal">0,7756</td>
+          <td class="txt-teal">M4_catboost_gpu_150_tuned (Final Model)</td><td class="num">150</td>
+          <td class="num txt-teal">0,0862 [0,079; 0,095]</td><td class="num txt-teal">8,05&times; [7,16; 9,11]</td>
+          <td class="num txt-teal">9,62&times;</td><td class="num txt-teal">5,02&times; (25,1%)</td><td class="num txt-teal">0,7744</td>
         </tr>
         <tr class="row-peach">
           <td class="txt-orange">B5_catboost_gpu_top50 (Challenger gọn)</td><td class="num">50</td>
@@ -998,73 +1221,45 @@ def build_html() -> str:
   </div>
 </section>
 
-<!-- ==================== SLIDE 12: SINGLE VS BLEND & 5-FOLD STABILITY ==================== -->
+<!-- ==================== SLIDE 16: IMPACT & DEPLOYMENT ==================== -->
 <section class="slide">
-  <div class="kicker k-teal">LỰA CHỌN TRIỂN KHAI &bull; ỔN ĐỊNH 5 FOLD OOT</div>
-  <div class="title">Phân Vai Triển Khai: Final Blend Diện Rộng vs CatBoost Đơn</div>
-  <div class="subtitle">Cả 5/5 fold trên OOT đều giữ ROC-AUC ổn định trong dải hẹp 0,771 – 0,785</div>
+  <div class="kicker k-teal">TÁC ĐỘNG KINH DOANH &amp; KHUYẾN NGHỊ TRIỂN KHAI</div>
+  <div class="title">Hiệu Quả Theo Ngân Sách Tiếp Cận: <code>M4_catboost_gpu_150_tuned</code></div>
+  <div class="subtitle">Độ ổn định cực cao qua 3 seeds (seed SD Lift@1% chỉ &plusmn;0,08&times;, ROC-AUC &plusmn;0,0003) &nbsp;|&nbsp; Vận hành đơn giản 1 mô hình duy nhất</div>
   <div class="content">
-    <div class="grid-2">
+    <div class="grid-3">
       <div class="card-mint">
-        <div class="kicker k-teal" style="margin-bottom:8px;">FINAL MODEL (SCORING &amp; TOP 5%)</div>
-        <div class="hero-num c-teal">0,7756 ROC</div>
-        <div class="hero-lbl">M5_final_blend_150 (150 biến)</div>
-        <div class="hero-sub" style="color:#1E293B; margin-top:10px;">
-          &bull; Bắt trọn <strong>~545 người mua (25,1%)</strong> trong Top 5%.<br/>
-          &bull; Top 0,5% (502 KH) đạt <strong>9,62&times;</strong> (~20,9% chuyển đổi).
-        </div>
+        <div class="kicker k-teal" style="margin-bottom:6px;">TOP 0,5% (502 KHÁCH)</div>
+        <div class="hero-num c-teal">9,62&times;</div>
+        <div class="hero-lbl">~105 người mua (20,9% chốt)</div>
+        <div class="hero-sub" style="color:#1E293B;">Gấp 9,6 lần chọn ngẫu nhiên (2,17%).</div>
       </div>
-      <div class="card-peach">
-        <div class="kicker k-orange" style="margin-bottom:8px;">NẾU CHỌN 1 MÔ HÌNH ĐƠN</div>
-        <div class="hero-num c-orange">8,05&times; / 8,31&times;</div>
-        <div class="hero-lbl">M4_catboost_150 &nbsp;|&nbsp; B5_catboost_top50</div>
-        <div class="hero-sub" style="color:#1E293B; margin-top:10px;">
-          &bull; <strong>M4 (150v):</strong> Đơn #1 toàn diện (ROC 0,7744, L@5% 5,02&times;).<br/>
-          &bull; <strong>B5 (50v):</strong> Gọn nhẹ, LogLoss 0,0941, vượt luật tay +59 đơn.
-        </div>
+      <div class="card-white">
+        <div class="kicker k-orange" style="margin-bottom:6px;">TOP 1% (1.003 KHÁCH)</div>
+        <div class="hero-num c-orange">8,05&times;</div>
+        <div class="hero-lbl">~175 người mua (17,5% chốt)</div>
+        <div class="hero-sub">Vượt quy tắc tay B1 (+53 khách mua/đợt).</div>
+      </div>
+      <div class="card-white">
+        <div class="kicker k-teal" style="margin-bottom:6px;">TOP 5% (5.012 KHÁCH)</div>
+        <div class="hero-num c-dark">25,1%</div>
+        <div class="hero-lbl">~545 người mua (Lift 5,02&times;)</div>
+        <div class="hero-sub">Phủ 1/4 tổng người mua chỉ với 5% chi phí.</div>
       </div>
     </div>
 
-    <!-- 5-Fold Stability Visual Strip -->
-    <div class="card" style="padding:18px 26px;">
-      <div style="font-size:14px; font-weight:700; color:#0F172A; margin-bottom:12px;">Độ ổn định OOT theo 5 Fold Độc lập (M5_final_blend_150)</div>
-      <svg viewBox="0 0 1000 82" width="100%" height="78">
-        <g font-family="Segoe UI, Arial" font-size="13">
-          <rect x="0" y="6" width="184" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-          <text x="92" y="28" text-anchor="middle" font-weight="700" fill="#64748B">Fold 0</text>
-          <text x="92" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">ROC 0,772</text>
-          <text x="92" y="66" text-anchor="middle" font-size="11.5" fill="#475569">Lift@1% 9,16&times;</text>
-
-          <rect x="204" y="6" width="184" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-          <text x="296" y="28" text-anchor="middle" font-weight="700" fill="#64748B">Fold 1</text>
-          <text x="296" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">ROC 0,773</text>
-          <text x="296" y="66" text-anchor="middle" font-size="11.5" fill="#475569">Lift@5% 5,45&times;</text>
-
-          <rect x="408" y="6" width="184" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-          <text x="500" y="28" text-anchor="middle" font-weight="700" fill="#64748B">Fold 2</text>
-          <text x="500" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">ROC 0,778</text>
-          <text x="500" y="66" text-anchor="middle" font-size="11.5" fill="#475569">Lift@1% 9,01&times;</text>
-
-          <rect x="612" y="6" width="184" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-          <text x="704" y="28" text-anchor="middle" font-weight="700" fill="#64748B">Fold 3</text>
-          <text x="704" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">ROC 0,785</text>
-          <text x="704" y="66" text-anchor="middle" font-size="11.5" fill="#475569">Lift@5% 5,54&times;</text>
-
-          <rect x="816" y="6" width="184" height="68" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
-          <text x="908" y="28" text-anchor="middle" font-weight="700" fill="#64748B">Fold 4</text>
-          <text x="908" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="#0D9488">ROC 0,771</text>
-          <text x="908" y="66" text-anchor="middle" font-size="11.5" fill="#475569">Lift@1% 8,16&times;</text>
-        </g>
-      </svg>
+    <div class="banner-note">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#EA580C"/><path d="M12 7v6m0 4h.01" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <div><strong>Phương án gọn nhẹ thay thế:</strong> Nếu cần tối giản pipeline không dùng PCA embedding &amp; cần xác suất chuẩn sẵn (<code>LogLoss 0,0941</code>) cho telesales hẹp Top-1%, chọn <strong><code>B5_catboost_gpu_top50</code></strong> (8,31&times; Lift@1%).</div>
     </div>
   </div>
 </section>
 
-<!-- ==================== SLIDE 13: DARK CLOSING ==================== -->
+<!-- ==================== SLIDE 17: DARK CLOSING ==================== -->
 <section class="slide slide-dark-center">
   <div class="kicker k-mint">SẴN SÀNG TRIỂN KHAI SẢN XUẤT &bull; PROPENSITY H=3</div>
-  <div class="cover-title" style="font-size:40px; max-width:9.8in; margin-bottom:0;">
-    Triển khai M5 Final Blend (0,7756 ROC) cho Diện rộng &amp; CatBoost Đơn (8,05&times;–8,31&times; Lift) cho Top-1%
+  <div class="cover-title" style="font-size:35px; max-width:10.6in; margin-bottom:0;">
+    Chốt Final Model Đơn: M4_catboost_gpu_150_tuned<br/>Lift@0,5% 9,62&times; &bull; Lift@1% 8,05&times; &bull; ROC-AUC 0,7744
   </div>
   <div class="bar-orange"></div>
   <div class="cover-sub" style="margin-bottom:0; font-size:17px;">
@@ -1075,12 +1270,15 @@ def build_html() -> str:
 </body>
 </html>
 """
-    return html.replace("__FIG1__", fig1).replace("__FIG2__", fig2).replace("__FIG3__", fig3)
+    return html.replace("__FIG1__", fig1_uri).replace("__FIG2__", fig2_uri)
 
 
 def main() -> None:
+    p1, p2 = _render_no_m5_charts()
+    print(f"[Charts] Generated {p1.name} & {p2.name}")
+
     OUT_HTML.parent.mkdir(parents=True, exist_ok=True)
-    OUT_HTML.write_text(build_html(), encoding="utf-8")
+    OUT_HTML.write_text(build_html(_b64_path(p1), _b64_path(p2)), encoding="utf-8")
     print(f"[HTML] Wrote {OUT_HTML} ({OUT_HTML.stat().st_size / 1024:.1f} KB)")
 
     edge = next((p for p in EDGE_CANDIDATES if p.exists()), None)
