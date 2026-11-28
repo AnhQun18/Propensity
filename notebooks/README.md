@@ -1,6 +1,6 @@
 # Notebook của dự án
 
-Thư mục gồm **10 notebook** bám sát 2 file báo cáo (`MBD MINI UNDERSTANDING DATA.pdf` và `MBD_MINI_DEEP_INSIGHTS_DECK.pdf`), quy trình chuẩn bị dữ liệu và bộ baseline mô hình song song $H=1$ & $H=3$. Mở notebook bằng kernel Python của `.venv` tại thư mục gốc dự án.
+Thư mục gồm **14 notebook** bám sát 2 file báo cáo (`MBD MINI UNDERSTANDING DATA.pdf` và `MBD_MINI_DEEP_INSIGHTS_DECK.pdf`), quy trình chuẩn bị dữ liệu và bộ baseline mô hình song song $H=1$ & $H=3$. Mở notebook bằng kernel Python của `.venv` tại thư mục gốc dự án.
 
 | Notebook | Phạm vi & Đối chiếu Báo cáo |
 | --- | --- |
@@ -14,6 +14,10 @@ Thư mục gồm **10 notebook** bám sát 2 file báo cáo (`MBD MINI UNDERSTAN
 | [`08_baseline_top50.ipynb`](08_baseline_top50.ipynb) | **Baseline Ưu tiên 1 (`50` biến tinh gọn, `H=1` & `H=3`):** Toàn lịch sử từ 2021, burn-in 3 tháng (`prior_purchase`), embargo 2 tháng cho `H=3`, Calibration tháng 12, Holdout `2023-01` & `2022-11` |
 | [`09_baseline_full252.ipynb`](09_baseline_full252.ipynb) | **Baseline Ưu tiên 2 (`252` biến đầy đủ, `H=1` & `H=3`):** Bậc thang ablation 10 cấu hình (`49 → 252`), kiểm định paired bootstrap **Top-50 vs Full-252** và phân tích đóng góp biến ngoài Top-50 |
 | [`10_baseline_benchmark_suite.ipynb`](10_baseline_benchmark_suite.ipynb) | **Bộ Đánh Giá Baseline Đa Tầng & Kiểm Chứng Out-of-Client (`H=1` & `H=3`):** Đầy đủ các tầng `Random → Rule RF / Rule EDA → LogReg Simple-10 / Top-50 → LightGBM/XGBoost Default (Raw 203 & Top-50) → CatBoost Final (+ Calibration)`, Brier Score + 1.000 Client-Clustered Bootstrap CI, Reliability Curve, chẩn đoán `B0` pooled artifact và kiểm chứng **5-fold `OOT + OOC` (0% trùng `client_id`)** |
+| [`11_baseline_v2_colab.ipynb`](11_baseline_v2_colab.ipynb) | **Baseline v2 (`Protocol B` trên Colab):** Rolling theo tháng × 5-fold OOC cho `H=1` (`2022-09..2023-01`) |
+| [`12_fe_v2_and_verification_colab.ipynb`](12_fe_v2_and_verification_colab.ipynb) | **Verification & FE-v2 (`<= 120` biến) trên Colab GPU:** Group 2.4, Group 3 và FE-v2 |
+| [`13_h3_propensity_full_colab.ipynb`](13_h3_propensity_full_colab.ipynb) | **H=3 Stage 1 & Stage 2 Full Colab GPU:** 5 Top-50 Baselines, 6 Warning Audits, EDA FE-150 & Locked OOT `2022-11` |
+| [`14_h3_wide_rolling_colab.ipynb`](14_h3_wide_rolling_colab.ipynb) | **H=3 kho biến rộng:** 5 baseline, log theo fold, Val rolling, khóa cấu hình và chấm hai test 10–11 từ cùng lượt fit. |
 
 ## Tái tạo & kiểm tra đồng bộ
 
